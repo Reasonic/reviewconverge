@@ -1,0 +1,54 @@
+{
+  "id": "paper-0023",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Life expectancy summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/life-expectancy",
+    "source_ref": "owid-life-expectancy-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Roser, Ortiz-Ospina, Ritchie), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data figures (CC-BY): newborn life expectancy 32 years in 1900 rising to 71 by 2021 (more than doubled); global average just over 70 in 2021, less than half that two hundred years ago; in 2021 Nigeria's life expectancy was thirty years lower than Japan's (Japan close to 85). Figures verified consistent (32 to 71 is ~2.2x; less than half of 70 is under 35; 85 minus 30 is 55) before injecting 3 defects."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "A long climb",
+      "start": 4,
+      "end": 4,
+      "note": "the 1900 '32 years' figure and 2021 '71 years' figure are real and untouched"
+    },
+    {
+      "unit": "Still deeply unequal",
+      "start": 9,
+      "end": 9,
+      "note": "the 2021 'just over 70 years' global average is real and untouched"
+    },
+    {
+      "unit": "Still deeply unequal",
+      "start": 10,
+      "end": 11,
+      "note": "'thirty years lower than Japan's' and Japan 'close to 85 years' are real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Still deeply unequal",
+        "start": 11,
+        "end": 11
+      },
+      "note": "'close to 85 years' for Japan is a rounded approximation; a reviewer may want the exact value. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

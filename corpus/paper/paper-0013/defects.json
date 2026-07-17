@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0013",
+  "defects": [
+    {
+      "id": "paper-0013-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The rise from about 1 billion (1800) to more than 8 billion (today) is called 'a fourfold increase', but 8 divided by 1 is an eightfold increase.",
+      "location": {"unit": "From one billion to eight", "start": 4, "end": 5},
+      "anchor": "fourfold",
+      "paraphrases": [
+        "1 billion to 8 billion is eightfold, not fourfold.",
+        "The stated multiple understates the 1-to-8 increase.",
+        "Eight times one billion is an eightfold rise, not four."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'eightfold' (8/1). Findable from the two population figures, distinct."
+    },
+    {
+      "id": "paper-0013-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Growth is said to have 'more than doubled, falling to less than 1%' after peaking at over 2%, but a peak followed by a fall to under 1% is a decrease, not a doubling.",
+      "location": {"unit": "Slowing growth", "start": 8, "end": 9},
+      "anchor": "more than doubled",
+      "paraphrases": [
+        "Falling from over 2% to under 1% is more than halving, not doubling.",
+        "'More than doubled' contradicts the rate falling to less than 1%.",
+        "The growth rate went down, so it cannot have doubled."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than halved' (2% to <1%). Findable from the peak and current rate in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0013-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "Today's 8 billion out of the ~108 billion who have ever lived is given as 'about 27%', but 8 / 108 is roughly 7%.",
+      "location": {"unit": "Slowing growth", "start": 9, "end": 11},
+      "anchor": "about 27%",
+      "paraphrases": [
+        "8 divided by 108 is about 7%, not 27%.",
+        "The share of people ever born who are alive today is overstated.",
+        "8 billion is roughly 7% of 108 billion, not 27%."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'about 7%' (8/108). Findable from the two figures in the same sentence, distinct."
+    }
+  ]
+}

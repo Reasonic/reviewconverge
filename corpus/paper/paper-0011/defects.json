@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0011",
+  "defects": [
+    {
+      "id": "paper-0011-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The share using safe sanitation is given as 'just over half — around 74%', but just over half is about 50%, not 74%.",
+      "location": {"unit": "The global picture", "start": 4, "end": 4},
+      "anchor": "around 74%",
+      "paraphrases": [
+        "'Just over half' is roughly 50%, so 'around 74%' does not match.",
+        "74% is far more than just over half.",
+        "The phrase (just over half) and the figure (74%) disagree."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'around 54%' (just over half). Findable from the phrase and the figure in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0011-d2",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "The share without safe sanitation is given as 'nearly one in two, about 26%', but one in two is 50%, not 26%.",
+      "location": {"unit": "The global picture", "start": 5, "end": 5},
+      "anchor": "about 26%",
+      "paraphrases": [
+        "One in two is 50%, so 'about 26%' is wrong.",
+        "The fraction (one in two) and the percentage (26%) disagree.",
+        "26% is about a quarter, not one in two."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'about 46%' (complement of ~54%). Findable from the fraction, distinct."
+    },
+    {
+      "id": "paper-0011-d3",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The poorest-country coverage is given as 'one in five — roughly 40%', but one in five is 20%, not 40%.",
+      "location": {"unit": "The poorest countries", "start": 9, "end": 9},
+      "anchor": "roughly 40%",
+      "paraphrases": [
+        "One in five is 20%, so 'roughly 40%' does not match.",
+        "The fraction (one in five) and the percentage (40%) disagree.",
+        "40% is two in five, not one in five."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 20%' (one in five). Findable from the fraction, distinct."
+    }
+  ]
+}

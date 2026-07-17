@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0014",
+  "defects": [
+    {
+      "id": "paper-0014-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The renewable share of primary energy is given as 'one-seventh — roughly 34%', but one-seventh is about 14%, not 34%.",
+      "location": {"unit": "A small but growing share", "start": 4, "end": 4},
+      "anchor": "roughly 34%",
+      "paraphrases": [
+        "One-seventh is roughly 14%, so 'roughly 34%' does not match.",
+        "The fraction (one-seventh) and the percentage (34%) disagree.",
+        "34% is closer to a third than a seventh."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 14%' (one-seventh). Findable from the fraction and the figure in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0014-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The share without renewables is given as 'the remaining two-sevenths', but if one-seventh is renewable the remainder must be six-sevenths, not two-sevenths.",
+      "location": {"unit": "A small but growing share", "start": 4, "end": 5},
+      "anchor": "two-sevenths",
+      "paraphrases": [
+        "One-seventh plus two-sevenths is three-sevenths, not the whole.",
+        "If one-seventh is renewable, six-sevenths is not, not two-sevenths.",
+        "The renewable and non-renewable fractions do not add up to one."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'six-sevenths' (complement of one-seventh). Findable from the stated renewable fraction, distinct."
+    },
+    {
+      "id": "paper-0014-d3",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "The renewable share of electricity is given as 'almost one-third, about 60%', but one-third is about 33%, not 60%.",
+      "location": {"unit": "A small but growing share", "start": 6, "end": 7},
+      "anchor": "about 60%",
+      "paraphrases": [
+        "One-third is about 33%, so 'about 60%' is wrong.",
+        "The fraction (one-third) and the percentage (60%) disagree.",
+        "60% is closer to two-thirds than one-third."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'about 30%' (~one-third). Findable from the fraction and the figure in the same sentence, distinct."
+    }
+  ]
+}

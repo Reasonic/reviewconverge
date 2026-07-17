@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0007",
+  "defects": [
+    {
+      "id": "paper-0007-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "450 per 100,000 versus 11 per 100,000 is called 'roughly 400 times higher', but 450 / 11 is about 41 — roughly 40 times, not 400.",
+      "location": {"unit": "A vast gap", "start": 6, "end": 6},
+      "anchor": "400 times higher",
+      "paraphrases": [
+        "450 divided by 11 is about 41, so it is ~40 times higher, not 400.",
+        "The stated ratio between low- and high-income rates is off by a factor of ten.",
+        "'400 times higher' overstates the 450-to-11 ratio (which is ~40)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 40 times higher' (450/11). Findable from the two rates in the same passage, distinct."
+    },
+    {
+      "id": "paper-0007-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "900 deaths per 100,000 is described as 'nearly one in a thousand', but 900 per 100,000 is about 1 in 111 — nearly one in a hundred, not one in a thousand.",
+      "location": {"unit": "Before modern medicine", "start": 9, "end": 10},
+      "anchor": "one in a thousand",
+      "paraphrases": [
+        "900 per 100,000 is roughly 1 in 111, i.e. nearly one in a hundred, not one in a thousand.",
+        "The fraction contradicts the rate: 900/100,000 is about 0.9%, close to 1 in 100.",
+        "'One in a thousand' understates 900 per 100,000 by roughly tenfold."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'one in a hundred' (900/100,000 ~= 1/111). Findable from the 900-per-100,000 rate in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0007-d3",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "The second clinic is described with 'only one in 5' died versus 'every tenth' in the first, but one in 5 (20%) is higher than one in 10 (10%), so 'only' is contradictory.",
+      "location": {"unit": "Before modern medicine", "start": 11, "end": 12},
+      "anchor": "one in 5",
+      "paraphrases": [
+        "One in 5 is 20%, which is more than the first clinic's one in 10, so 'only' is wrong.",
+        "The 'only' framing implies fewer deaths, but one in 5 exceeds one in 10.",
+        "One in 5 cannot be the lower rate when compared with every tenth mother."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'one in 25' (< one in 10). Findable by comparing the two clinic fractions in the same sentence, distinct."
+    }
+  ]
+}

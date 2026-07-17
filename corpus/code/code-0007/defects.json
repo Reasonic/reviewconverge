@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0007",
+  "defects": [
+    {
+      "id": "code-0007-d1",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "For even numbers the sequence halves by dividing by 3 (`n //= 3`) instead of by 2, breaking the Collatz rule for even n.",
+      "location": {"unit": "src/collatz.py", "start": 17, "end": 17},
+      "anchor": "n //= 3",
+      "paraphrases": [
+        "The even-case step should be `n //= 2`, not `n //= 3`.",
+        "Even numbers are divided by 3 rather than halved, contradicting the sequence in the docstring.",
+        "`collatz_sequence(4)` cannot yield (4, 2, 1) because 4 is divided by 3."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `n //= 2`. Real (wrong even step), findable against the docstring example, distinct from the odd-branch defect."
+    },
+    {
+      "id": "code-0007-d2",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "For odd numbers the step is `3 * n - 1` instead of `3 * n + 1`, using the wrong Collatz update for odd n.",
+      "location": {"unit": "src/collatz.py", "start": 19, "end": 19},
+      "anchor": "3 * n - 1",
+      "paraphrases": [
+        "The odd-case step should be `3 * n + 1`, not `3 * n - 1`.",
+        "Odd numbers use a minus-one update, contradicting the sequence for 5 in the docstring.",
+        "`collatz_sequence(5)` cannot yield 16 after 5 because it computes 3*5-1 = 14."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `n = 3 * n + 1`. Real (wrong odd step), findable against the docstring example, distinct from the even-branch defect."
+    },
+    {
+      "id": "code-0007-d3",
+      "category": "missing-guard",
+      "severity": "minor",
+      "description": "The input guard uses `n < 0`, so `n == 0` is accepted even though the sequence is only defined for positive integers (0 then loops forever).",
+      "location": {"unit": "src/collatz.py", "start": 12, "end": 12},
+      "anchor": "n < 0",
+      "paraphrases": [
+        "`n < 0` should be `n < 1`; zero is not positive but slips past the guard.",
+        "The guard fails to reject 0, contradicting the 'positive integers' precondition.",
+        "Passing 0 is accepted and never terminates, because the guard only rejects negatives."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `n < 1`. Real (0 accepted / non-terminating), findable via the stated precondition, distinct."
+    }
+  ]
+}

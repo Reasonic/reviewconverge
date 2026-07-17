@@ -1,0 +1,54 @@
+{
+  "id": "spec-0008",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Kubernetes Deployment + Service (real-derived from kubernetes/website)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://github.com/kubernetes/website/blob/0640ccf95db0469f884f37fb856951a1a182c9f1/content/en/examples/service/networking/run-my-nginx.yaml",
+    "source_ref": "0640ccf95db0469f884f37fb856951a1a182c9f1",
+    "retrieved": "2026-07-05",
+    "attribution": "The Kubernetes Authors (CC-BY-4.0)",
+    "notes": "Base = the upstream (valid) run-my-nginx Deployment and nginx-svc Service, combined into one multi-document manifest. Three defects injected, each findable by cross-referencing labels/ports within the manifest: a Deployment selector/template mismatch, a container/Service port mismatch, and a Service selector that matches no pods."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "cross-field-inconsistency",
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Deployment.spec.template.metadata.labels",
+      "start": 13,
+      "end": 13,
+      "note": "the pod label run: my-nginx is the reference value, untouched"
+    },
+    {
+      "unit": "Service.metadata.labels",
+      "start": 26,
+      "end": 26,
+      "note": "the Service's own label is untouched"
+    },
+    {
+      "unit": "Service.spec.ports",
+      "start": 29,
+      "end": 29,
+      "note": "the Service port 80 is the reference value, untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Deployment.spec.template.spec.containers",
+        "start": 16,
+        "end": 19
+      },
+      "note": "The container declares no resource requests/limits. A reviewer may flag the missing limits as a best-practice issue; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

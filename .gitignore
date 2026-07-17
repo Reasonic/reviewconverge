@@ -1,0 +1,46 @@
+# --- Secrets: never commit API keys or credentials ---
+.env
+.env.*
+!.env.example
+*.key
+*_key
+*_key.*
+.anthropic_key
+.openai_key
+secrets.*
+credentials.*
+*.pem
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- OS / editor ---
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# --- Held-out answer keys: withheld from the public release so the blind validations
+#     stay blind (the on-distribution M2 labeling and a second independent kappa rater).
+#     Released once those validations are complete; the labels are derivable from the
+#     public oracle in any case. ---
+matcher_gold/ondist/key.jsonl
+matcher_gold/kappa_key.csv
+
+# --- Local run scratch (released logs live in runs/ and are committed deliberately) ---
+runs/_scratch/
+runs/*.local.*
+*.tmp

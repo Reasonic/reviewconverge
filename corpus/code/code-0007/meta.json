@@ -1,0 +1,32 @@
+{
+  "id": "code-0007",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "collatz_sequence(): Collatz sequence generator (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/maths/collatz_sequence.py",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `collatz_sequence`, into src/collatz.py (type hints dropped, docstring trimmed). Three independently-findable defects injected (guard, even branch, odd branch), each affecting different inputs; upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "missing-guard",
+      "wrong-operator"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/collatz.py",
+      "start": 14,
+      "end": 16,
+      "note": "the initial yield, loop condition, and parity test are correct and untouched"
+    }
+  ],
+  "defect_count": 3
+}

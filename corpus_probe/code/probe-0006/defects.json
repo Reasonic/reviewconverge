@@ -1,0 +1,99 @@
+{
+ "defects": [
+  {
+   "id": "probe-0006-d1",
+   "category": "off-by-one-exponent",
+   "severity": "minor",
+   "description": "The backoff exponent uses `retry_index` instead of `retry_index - 1`, so the first retry waits base_delay*multiplier rather than base_delay, shifting the whole geometric sequence one step too high.",
+   "location": {
+    "unit": "src/retry.py",
+    "start": 129,
+    "end": 129
+   },
+   "anchor": "self.multiplier ** retry_index)",
+   "paraphrases": [
+    "The exponent is not decremented before raising the multiplier, so the initial wait already includes one growth step instead of starting at the configured base.",
+    "Every scheduled backoff is computed one geometric term ahead, making the very first delay base_delay*multiplier and inflating each subsequent one.",
+    "Because the index is used raw as the power, the series skips its base term and all attempts sleep longer than the policy specifies."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        delay = self.base_delay * (self.multiplier ** (retry_index - 1))'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0006-d2",
+   "category": "wrong-arithmetic-operator",
+   "severity": "major",
+   "description": "Equal jitter subtracts the random component from the half-delay instead of adding it, producing values in [0, delay/2] rather than the intended [delay/2, delay], so backoffs systematically under-wait.",
+   "location": {
+    "unit": "src/retry.py",
+    "start": 139,
+    "end": 139
+   },
+   "anchor": "return half - rng.uniform(0.0, half)",
+   "paraphrases": [
+    "The 'equal' strategy should sit at half the delay and vary upward, but the minus sign pulls its results into the lower half of the range.",
+    "Jittered equal backoffs collapse toward zero because the random slice is deducted from the fixed half rather than stacked on top of it.",
+    "Instead of a guaranteed half plus some extra, the value becomes a half minus some amount, so an equal-jittered wait never exceeds 50% of the computed delay."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        return half + rng.uniform(0.0, half)'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0006-d3",
+   "category": "inverted-condition",
+   "severity": "critical",
+   "description": "The deadline check direction is reversed (`<=` instead of `>=`), so a policy with a deadline aborts with a 'deadline' RetryError while budget still remains, and conversely fails to stop once the budget is genuinely exhausted.",
+   "location": {
+    "unit": "src/retry.py",
+    "start": 214,
+    "end": 214
+   },
+   "anchor": "if elapsed <= policy.deadline:",
+   "paraphrases": [
+    "The comparison against the time budget runs backwards, tripping the timeout on the first retry whenever elapsed time is still comfortably within the allotment.",
+    "A deadline-bounded call bails out as soon as it has spent less than its budget, because the guard fires while elapsed remains below the deadline rather than beyond it.",
+    "The short-circuit treats 'time still left' as 'time is up', so the retry loop raises the deadline error prematurely and only skips the check once truly over budget."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '            if elapsed >= policy.deadline:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0006-d4",
+   "category": "wrong-default-return",
+   "severity": "major",
+   "description": "When no retryable exception types are configured, should_retry_exception returns True instead of False, so a policy built with retry_on=None retries every exception rather than letting it propagate immediately.",
+   "location": {
+    "unit": "src/retry.py",
+    "start": 147,
+    "end": 147
+   },
+   "anchor": "            return True",
+   "paraphrases": [
+    "An empty set of retryable exception classes is meant to mean 'retry nothing', yet the early-out reports retryable, causing all raised errors to be retried.",
+    "With no exception types registered the method wrongly classifies every exception as eligible for retry, contradicting the 'anything else propagates immediately' contract.",
+    "The no-configured-types branch yields the wrong boolean, effectively turning retry_on=None into retry-on-any-exception."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '            return False'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0006-d5",
+   "category": "missing-input-validation",
+   "severity": "minor",
+   "description": "`_normalize_exc_types` does `tuple(exc)` on any iterable without checking its elements are exception classes, so a malformed `retry_on` (e.g. a list containing non-exception values) is accepted silently at construction and only fails much later as a `TypeError` inside `isinstance()` during matching.",
+   "location": {
+    "unit": "src/retry.py",
+    "start": 70,
+    "end": 70
+   },
+   "anchor": "return tuple(exc)",
+   "paraphrases": [
+    "No validation that `retry_on` elements are exception types: `tuple(exc)` accepts arbitrary objects, deferring the failure to a confusing `TypeError` inside `isinstance` at retry time.",
+    "A `retry_on` iterable containing non-exception objects is silently accepted here and only errors later during exception matching, rather than being rejected at construction.",
+    "`_normalize_exc_types` should reject non-exception-class elements up front, but blindly builds the tuple, so malformed input surfaces as a late, opaque `isinstance()` error."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: validate each element is a BaseException subclass and raise at construction, e.g. `types = tuple(exc); if not all(isinstance(t, type) and issubclass(t, BaseException) for t in types): raise TypeError(...); return types`. Human R/F/U-audited & confirmed 2026-07-12 (promoted from a flagged gray zone)."
+  }
+ ]
+}

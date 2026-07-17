@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0017",
+  "defects": [
+    {
+      "id": "code-0017-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The bit test `number % 2 == 0` counts the zero bits rather than the set (1) bits; it should be `== 1`.",
+      "location": {"unit": "src/popcount.py", "start": 18, "end": 18},
+      "anchor": "number % 2 == 0",
+      "paraphrases": [
+        "`== 0` should be `== 1`; the function must count 1-bits, not 0-bits.",
+        "Testing for an even low bit counts the wrong bits.",
+        "count_set_bits(25) would not be 3 because it tallies zero bits."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `number % 2 == 1`. Real (counts the wrong bits), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0017-d2",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "Each counted bit adds 2 (`result += 2`) instead of 1, so the count is inflated.",
+      "location": {"unit": "src/popcount.py", "start": 19, "end": 19},
+      "anchor": "result += 2",
+      "paraphrases": [
+        "`result += 2` should be `result += 1`; each bit counts once.",
+        "Incrementing by two doubles the contribution of each bit.",
+        "The tally is off because it adds 2 per matching bit."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `result += 1`. Real (inflated count), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0017-d3",
+      "category": "off-by-one",
+      "severity": "minor",
+      "description": "The shift `number >>= 2` consumes two bits per iteration instead of one, so half of the bits are never examined.",
+      "location": {"unit": "src/popcount.py", "start": 20, "end": 20},
+      "anchor": "number >>= 2",
+      "paraphrases": [
+        "`number >>= 2` should be `number >>= 1`; only one bit is processed per step.",
+        "Shifting by two skips every other bit.",
+        "Half the bits are dropped because the shift is by two."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `number >>= 1`. Real (skips bits), findable via the docstring, distinct from the increment."
+    }
+  ]
+}

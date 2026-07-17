@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0011",
+  "defects": [
+    {
+      "id": "code-0011-d1",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The loop `for _ in range(n)` runs one iteration too many (the list already starts with two elements), producing more Fibonacci numbers than requested.",
+      "location": {"unit": "src/fib.py", "start": 19, "end": 19},
+      "anchor": "range(n)",
+      "paraphrases": [
+        "`range(n)` should be `range(n - 1)`; the seed already provides two values.",
+        "The loop appends one element too many, so the result is longer than n.",
+        "Off-by-one in the loop bound over-generates the sequence."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `range(n - 1)`. Real (list too long), findable via the docstring lengths, distinct."
+    },
+    {
+      "id": "code-0011-d2",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The recurrence subtracts (`fib[-1] - fib[-2]`) instead of adding, so it does not produce Fibonacci numbers.",
+      "location": {"unit": "src/fib.py", "start": 20, "end": 20},
+      "anchor": "fib[-1] - fib[-2]",
+      "paraphrases": [
+        "`fib[-1] - fib[-2]` should be `fib[-1] + fib[-2]`; Fibonacci adds the two previous terms.",
+        "Using subtraction breaks the sequence (e.g. it would yield 0 and negatives after 1, 1).",
+        "The next term must be the sum, not the difference, of the last two."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `fib[-1] + fib[-2]`. Real (not Fibonacci), findable via the docstring example, distinct from the range defect."
+    },
+    {
+      "id": "code-0011-d3",
+      "category": "off-by-one",
+      "severity": "minor",
+      "description": "For n == 0 the function returns `[]`, but the first 0-indexed Fibonacci number is 0, so it should return `[0]`.",
+      "location": {"unit": "src/fib.py", "start": 17, "end": 17},
+      "anchor": "return []",
+      "paraphrases": [
+        "`return []` should be `return [0]`; fib_iterative(0) is documented as [0].",
+        "The n == 0 case drops the initial 0.",
+        "An empty list is returned where a single-element [0] is expected."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `return [0]`. Real (wrong base case), findable via the docstring (fib_iterative(0) == [0]), distinct."
+    }
+  ]
+}

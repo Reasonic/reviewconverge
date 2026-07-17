@@ -1,0 +1,54 @@
+{
+  "id": "paper-0003",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Extreme-poverty summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/extreme-poverty",
+    "source_ref": "owid-extreme-poverty-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Roser, Hasell, et al.), CC-BY-4.0",
+    "notes": "Prose is composed from real, verbatim Our World in Data sentences (CC-BY) arranged into a short excerpt: 1990 = 2.3 billion / 44%; 2025 = ~800 million / one in ten / $3 line; >1.5 billion fewer than 1990; 24% under $5/day, 52% under $10/day. Clean version verified internally consistent (2.3B - 0.8B = 1.5B decline; <$5 share <= <$10 share) before injecting 3 self-contained defects. OWID is a living article; source_ref pins the retrieval date."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "The long-run decline",
+      "start": 4,
+      "end": 4,
+      "note": "the 2.3 billion (1990) figure is the real, untouched value"
+    },
+    {
+      "unit": "The long-run decline",
+      "start": 6,
+      "end": 6,
+      "note": "the ~800 million (2025) figure is the real, untouched value"
+    },
+    {
+      "unit": "Higher poverty lines",
+      "start": 13,
+      "end": 14,
+      "note": "the 52% under $10/day figure is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "The long-run decline",
+        "start": 9,
+        "end": 9
+      },
+      "note": "The extreme-poverty line is stated as $3/day (OWID's updated line). A reviewer relying on outside knowledge of a different line (e.g. $2.15) might flag it; that is not a seeded defect, so exclude from false-finding scoring."
+    }
+  ],
+  "defect_count": 3
+}

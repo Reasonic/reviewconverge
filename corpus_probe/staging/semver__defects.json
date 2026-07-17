@@ -1,0 +1,59 @@
+{
+ "module": "semver.py",
+ "defects": [
+  {
+   "category": "wrong comparison",
+   "severity": "major",
+   "anchor": "return len(left) > len(right)",
+   "correct_form": "return len(left) < len(right)",
+   "description": "The prefix tie-break in `_prerelease_lt` compares lengths with `>` instead of `<`, so when one prerelease tuple is a prefix of the other the longer identifier list is ranked as lower precedence, inverting the order of e.g. `1.0.0-alpha` and `1.0.0-alpha.1`.",
+   "paraphrases": [
+    "After all shared prerelease identifiers compare equal, SemVer says the version with more fields wins, but the length comparison is reversed so the shorter one is treated as greater.",
+    "`1.0.0-alpha` should sort before `1.0.0-alpha.1`; the flipped length test makes the one with extra identifiers sort first instead.",
+    "The final same-prefix ordering decision returns the wrong boolean because it asks whether the left tuple is longer rather than shorter."
+   ]
+  },
+  {
+   "category": "wrong variable",
+   "severity": "major",
+   "anchor": "high = Version(major + 1, minor, 0)",
+   "correct_form": "high = Version(major + 1, 0, 0)",
+   "description": "The non-zero-major caret upper bound in `_caret_bounds` keeps the original `minor` instead of zeroing it, so `^1.2.0` compiles to `< 2.<minor>.0` and wrongly admits next-major releases such as `2.0.0`.",
+   "paraphrases": [
+    "When bumping the major for a caret bound, the minor component is carried over rather than reset to 0, pushing the exclusive ceiling past the intended `2.0.0` line.",
+    "`^1.2.x` is supposed to stop below the next major (`<2.0.0`), but the ceiling is built with the old minor, letting `2.0.0` satisfy the range.",
+    "The upper comparator for a caret range fails to zero out the minor field after incrementing major, so versions in the next major series leak in."
+   ]
+  },
+  {
+   "category": "wrong operator",
+   "severity": "critical",
+   "anchor": "return candidate != target",
+   "correct_form": "return candidate == target",
+   "description": "The `=` case in `_Comparator.allows` returns `candidate != target`, inverting exact-match so an exact-version range matches every version except the one it names.",
+   "paraphrases": [
+    "Equality was replaced with inequality in the exact-match comparator, so `satisfies('1.2.3', '1.2.3')` returns False while unrelated versions pass.",
+    "The `=` operator now accepts anything that differs from its target and rejects the target itself, exactly backwards.",
+    "An exact pin is treated as an exclusion filter because the comparison for the `=` operator is negated."
+   ]
+  },
+  {
+   "category": "wrong comparison",
+   "severity": "major",
+   "anchor": "best is None or candidate < best",
+   "correct_form": "best is None or candidate > best",
+   "description": "`max_satisfying` keeps a candidate when it is `<` the current best instead of `>`, so it returns the lowest satisfying version rather than the highest.",
+   "paraphrases": [
+    "The running-best update in `max_satisfying` prefers smaller versions, making the function behave like a min instead of the documented max.",
+    "Because the retained candidate must be less than the incumbent, the selection walks down to the minimum satisfying version.",
+    "The comparison that should track the largest matching version is reversed, yielding the smallest match."
+   ]
+  }
+ ],
+ "gray_zones": [
+  {
+   "note": "`_group_allows` enforces a 'no surprise prereleases' containment rule (a prerelease candidate is rejected unless some comparator's bound shares its exact core version), an opinionated and non-obvious departure from plain comparator-AND semantics that a reviewer might reasonably question.",
+   "approx_line": 265
+  }
+ ]
+}

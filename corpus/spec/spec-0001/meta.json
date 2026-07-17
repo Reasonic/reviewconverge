@@ -1,0 +1,53 @@
+{
+  "id": "spec-0001",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "payments-api deployment config with stated constraints",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "synthetic",
+    "license": "CC-BY-4.0",
+    "url": null,
+    "notes": "The platform constraints are stated in the header comment so every defect is findable from the artifact alone."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "cross-field-inconsistency",
+      "range-violation",
+      "dangling-reference",
+      "security-misconfig"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "environment",
+      "start": 8,
+      "end": 8,
+      "note": "environment: production is a valid value"
+    },
+    {
+      "unit": "services",
+      "start": 18,
+      "end": 20,
+      "note": "services block is well-formed"
+    },
+    {
+      "unit": "routes[0]",
+      "start": 23,
+      "end": 24,
+      "note": "/charge -> payments-core is a defined backend (clean)"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "services",
+        "start": 20,
+        "end": 20
+      },
+      "note": "Service `ledger` is declared but no route references it (unused). Not a seeded defect; a reviewer may flag it, so exclude from false-finding scoring."
+    }
+  ],
+  "defect_count": 4
+}

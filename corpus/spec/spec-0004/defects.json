@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0004",
+  "defects": [
+    {
+      "id": "spec-0004-d1",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "proxy.networks references `frontend`, which is not declared under the top-level `networks` key (only `backnet` and `frontnet` exist).",
+      "location": {"unit": "services.proxy.networks", "start": 49, "end": 49},
+      "anchor": "frontend",
+      "paraphrases": [
+        "The proxy joins network `frontend`, but only `backnet` and `frontnet` are defined; `frontend` is undefined.",
+        "Undefined network: `frontend` should be `frontnet`.",
+        "Dangling network reference in the proxy service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking proxy.networks against the top-level networks (backnet, frontnet); `frontend` is never declared."
+    },
+    {
+      "id": "spec-0004-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "backend.secrets references `app-secret`, which is not defined under the top-level `secrets` key (only `db-password` exists there).",
+      "location": {"unit": "services.backend.secrets", "start": 32, "end": 32},
+      "anchor": "app-secret",
+      "paraphrases": [
+        "The backend mounts a secret `app-secret` that is never declared in the top-level secrets section.",
+        "Undefined secret: `app-secret` should be `db-password`, the only secret defined.",
+        "Dangling secret reference in the backend service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking backend.secrets against the top-level secrets (only db-password is defined)."
+    },
+    {
+      "id": "spec-0004-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "critical",
+      "description": "backend publishes host port 80 (`80:8000`), colliding with proxy's host port 80 (`80:80`); two services cannot bind the same host port.",
+      "location": {"unit": "services.backend.ports", "start": 34, "end": 34},
+      "anchor": "80:8000",
+      "paraphrases": [
+        "Host port 80 is mapped by both backend (80:8000) and proxy (80:80), which conflicts.",
+        "Port collision: the backend's `80:8000` reuses host port 80 already taken by the proxy.",
+        "Two services bind the same host port (80), so the stack cannot start."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the published host ports of backend (line 34) and proxy (line 45) within the file."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0010",
+  "defects": [
+    {
+      "id": "code-0010-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The comparison `collection[j] < collection[j + 1]` swaps when the left element is smaller, which sorts in descending order; ascending order needs `>`.",
+      "location": {"unit": "src/bubble.py", "start": 16, "end": 16},
+      "anchor": "collection[j] < collection[j + 1]",
+      "paraphrases": [
+        "`<` should be `>`; as written the list ends up in descending order.",
+        "The swap condition is reversed, so bubble_sort([0,5,2,3,2]) would not be ascending.",
+        "Comparing with `<` sorts largest-first instead of smallest-first."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `collection[j] > collection[j + 1]`. Real (wrong sort order), findable via the ascending docstring examples, distinct."
+    },
+    {
+      "id": "code-0010-d2",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The inner loop `for j in range(i - 1)` stops one position too early, so the last unsorted pair on each pass is never compared and the list is left partially unsorted.",
+      "location": {"unit": "src/bubble.py", "start": 15, "end": 15},
+      "anchor": "range(i - 1)",
+      "paraphrases": [
+        "`range(i - 1)` should be `range(i)`; the final adjacent pair each pass is skipped.",
+        "The inner bound is short by one, leaving the collection incompletely sorted.",
+        "Off-by-one in the inner loop range drops the last comparison of each pass."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `range(i)`. Real (incomplete sort), findable via the docstring examples, distinct from the comparison defect."
+    },
+    {
+      "id": "code-0010-d3",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The swap assigns each element to itself (`collection[j], collection[j + 1] = collection[j], collection[j + 1]`), so it is a no-op and never actually exchanges the two elements.",
+      "location": {"unit": "src/bubble.py", "start": 18, "end": 18},
+      "anchor": "= collection[j], collection[j + 1]",
+      "paraphrases": [
+        "The right-hand side should be `collection[j + 1], collection[j]`; as written nothing is swapped.",
+        "The swap is a no-op because both sides of the assignment are identical.",
+        "Elements are assigned to themselves, so no reordering happens."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `collection[j], collection[j + 1] = collection[j + 1], collection[j]`. Real (no elements ever move), findable by reading the assignment, distinct."
+    }
+  ]
+}

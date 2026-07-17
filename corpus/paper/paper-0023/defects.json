@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0023",
+  "defects": [
+    {
+      "id": "paper-0023-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The rise from 32 years in 1900 to 71 in 2021 is called 'more than tripled', but 71 is about 2.2 times 32 — a bit more than a doubling, not a tripling.",
+      "location": {"unit": "A long climb", "start": 4, "end": 5},
+      "anchor": "more than tripled",
+      "paraphrases": [
+        "32 to 71 is roughly a doubling, not a tripling.",
+        "Tripling 32 would give about 96 years, not 71.",
+        "The stated multiple is too large for a rise from 32 to 71."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than doubled' (71 / 32 ~ 2.2). Findable from the 1900 and 2021 figures, distinct."
+    },
+    {
+      "id": "paper-0023-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The global figure two hundred years ago is said to be 'less than half of today's' (today's is just over 70), yet it is then given as 'around 45 years', which is well over half of 70.",
+      "location": {"unit": "A long climb", "start": 5, "end": 6},
+      "anchor": "around 45 years",
+      "paraphrases": [
+        "45 is more than half of 70, so it cannot be 'less than half of today's'.",
+        "Less than half of just-over-70 would be under 35, not 45.",
+        "The stated past figure contradicts the 'less than half' description."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'around 30 years' (less than half of ~70). Findable from 'less than half' and today's ~70/71 figure, distinct."
+    },
+    {
+      "id": "paper-0023-d3",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "With Japan close to 85 and Nigeria thirty years lower, Nigeria should be around 55, but the text puts Nigeria at 'around 65 years'.",
+      "location": {"unit": "Still deeply unequal", "start": 10, "end": 11},
+      "anchor": "around 65 years",
+      "paraphrases": [
+        "85 minus 30 is 55, not 65.",
+        "Thirty years below 85 is about 55, so 65 is too high.",
+        "Nigeria's implied value does not match 'thirty years lower than Japan's'."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'around 55 years' (85 - 30). Findable from Japan 'close to 85' and 'thirty years lower', distinct."
+    }
+  ]
+}

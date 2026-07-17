@@ -1,0 +1,81 @@
+{
+  "artifact_id": "code-0002",
+  "defects": [
+    {
+      "id": "code-0002-d1",
+      "category": "missing-guard",
+      "severity": "minor",
+      "description": "The input guard is `n < 0`, so `n == 0` is accepted despite the raised message ('n must be at least 1') and docstring requiring n >= 1; the correct guard is `n < 1`.",
+      "location": {
+        "unit": "src/partition.py",
+        "start": 16,
+        "end": 16
+      },
+      "anchor": "n < 0",
+      "paraphrases": [
+        "`if n < 0` fails to reject `n == 0`, which the ValueError text ('n must be at least 1') says is invalid.",
+        "The guard should be `n < 1`; as written, `divide(0, seq)` slips through instead of raising.",
+        "Zero is not rejected by the precondition check, contradicting the function's stated minimum of 1."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `if n < 1:`. Real (n=0 is silently accepted instead of raising as the contract requires), findable (the guard contradicts its own error message 'n must be at least 1'), uniquely describable. Consequence claim deliberately scoped to the contract mismatch, not a divide-by-zero, because the co-present d2 swaps the divmod operands."
+    },
+    {
+      "id": "code-0002-d2",
+      "category": "api-misuse",
+      "severity": "critical",
+      "description": "The arguments to `divmod` are swapped: `divmod(n, len(seq))` should be `divmod(len(seq), n)`, so q and r are computed from the wrong operands.",
+      "location": {
+        "unit": "src/partition.py",
+        "start": 26,
+        "end": 26
+      },
+      "anchor": "divmod(n, len(seq))",
+      "paraphrases": [
+        "`divmod(n, len(seq))` has its operands reversed relative to the intended `divmod(len(seq), n)`.",
+        "The quotient/remainder are taken over (n, length) instead of (length, n), so part sizes are wrong.",
+        "Argument-order bug in the divmod call inverts the division used to size the parts."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `divmod(len(seq), n)`. Real (part sizes wrong), findable by checking against the docstring examples, distinct from the other defects."
+    },
+    {
+      "id": "code-0002-d3",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The loop `for i in range(1, n)` iterates one time too few, producing n-1 parts instead of n (the docstring shows `divide(2, ...)` must yield two parts).",
+      "location": {
+        "unit": "src/partition.py",
+        "start": 30,
+        "end": 30
+      },
+      "anchor": "range(1, n)",
+      "paraphrases": [
+        "`range(1, n)` should be `range(1, n + 1)`; the last part is never emitted.",
+        "Off-by-one in the part loop drops one partition, so `divide(2, ...)` returns only one group.",
+        "The function yields n-1 parts because the range upper bound is short by one."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `range(1, n + 1)`. Real (wrong number of parts), findable against the doctest, distinct from the inverted-condition defect."
+    },
+    {
+      "id": "code-0002-d4",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The remainder is distributed with `i >= r` instead of `i <= r`, so the extra elements are added to the later parts rather than the earlier ones.",
+      "location": {
+        "unit": "src/partition.py",
+        "start": 32,
+        "end": 32
+      },
+      "anchor": "i >= r",
+      "paraphrases": [
+        "`q + 1 if i >= r else q` inverts the distribution; it should be `i <= r`.",
+        "The leftover elements go to the wrong parts because the comparison to `r` is flipped.",
+        "For uneven splits the earlier parts should be longer, but `i >= r` makes the later parts longer instead."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `q + 1 if i <= r else q`. Real (contradicts the divide(3,[1..7]) doctest), findable, uniquely describable."
+    }
+  ]
+}

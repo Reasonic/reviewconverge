@@ -1,0 +1,48 @@
+{
+  "id": "spec-0017",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "nginx/Flask/MongoDB Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/nginx-flask-mongo/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) nginx-flask-mongo compose.yaml. Three defects injected, each findable within the file: a proxy-target port that does not match the backend, and two dangling service dependencies. The backend FLASK_SERVER_PORT and the mongo service are the untouched references."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "cross-field-inconsistency",
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.backend.environment",
+      "start": 19,
+      "end": 19,
+      "note": "the backend serves on FLASK_SERVER_PORT=9091 (reference value, untouched)"
+    },
+    {
+      "unit": "services.mongo",
+      "start": 24,
+      "end": 25,
+      "note": "the mongo service is upstream and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "services.mongo",
+        "start": 25,
+        "end": 25
+      },
+      "note": "The mongo image is unpinned (no version tag). A reviewer may flag it; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

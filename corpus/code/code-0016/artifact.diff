@@ -1,0 +1,26 @@
+diff --git a/src/selsort.py b/src/selsort.py
+new file mode 100644
+index 0000000..e5a9c30
+--- /dev/null
++++ b/src/selsort.py
+@@ -0,0 +1,20 @@
++"""Selection sort (ascending, in place)."""
++
++
++def selection_sort(collection):
++    """Sort a list ascending, in place, and return it.
++
++        >>> selection_sort([0, 5, 3, 2, 2])
++        [0, 2, 2, 3, 5]
++        >>> selection_sort([-2, -5, -45])
++        [-45, -5, -2]
++    """
++    length = len(collection)
++    for i in range(length - 1):
++        min_index = 0
++        for k in range(i + 1, length - 1):
++            if collection[k] > collection[min_index]:
++                min_index = k
++        if min_index != i:
++            collection[i], collection[min_index] = collection[min_index], collection[i]
++    return collection

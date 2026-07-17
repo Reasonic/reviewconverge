@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0012",
+  "defects": [
+    {
+      "id": "paper-0012-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The text says the number of people in cities 'overtook' the number in the countryside around 2007, yet describes the urban share as 'less than half' — overtaking means the urban share became the majority (more than half).",
+      "location": {"unit": "Crossing the halfway point", "start": 4, "end": 5},
+      "anchor": "less than half",
+      "paraphrases": [
+        "If urban overtook rural, the urban share must exceed half, not be less than half.",
+        "'Less than half' contradicts the claim that cities overtook the countryside.",
+        "Overtaking rural implies a majority, so 'less than half' is wrong."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than half' (overtaking = majority). Findable within the same sentence, distinct."
+    },
+    {
+      "id": "paper-0012-d2",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "In 1960 the rural population is said to be 'more than 60%', which leaves under 40% urban, but the text says 'over 40% in towns and cities'.",
+      "location": {"unit": "Crossing the halfway point", "start": 6, "end": 7},
+      "anchor": "over 40%",
+      "paraphrases": [
+        "If rural was over 60%, urban must be under 40%, not over 40%.",
+        "The urban and rural shares would exceed 100% (over 60% plus over 40%).",
+        "'Over 40%' urban contradicts 'more than 60%' rural."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'under 40%' (complement of >60%). Findable from the rural figure in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0012-d3",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The breakdown gives 45% cities, 35% towns, and 40% villages, which sums to 120% rather than 100%.",
+      "location": {"unit": "A finer breakdown", "start": 10, "end": 11},
+      "anchor": "40% live in villages",
+      "paraphrases": [
+        "45 + 35 + 40 is 120, not 100.",
+        "The three shares do not add up to the whole population.",
+        "The village share should make the parts total 100%."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value '20% live in villages' (45 + 35 + 20 = 100). Findable from the three shares, distinct from the other defects."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "code-0015",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "insertion_sort(): insertion sort (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/sorts/insertion_sort.py#L27",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `insertion_sort`, into src/insort.py (type hints dropped, docstring trimmed). Three independently-findable defects injected (outer range, comparison, shift); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "off-by-one",
+      "inverted-condition",
+      "wrong-operator"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/insort.py",
+      "start": 13,
+      "end": 13,
+      "note": "capturing the insert value is correct"
+    },
+    {
+      "unit": "src/insort.py",
+      "start": 16,
+      "end": 18,
+      "note": "the index decrement, final placement, and return are correct"
+    }
+  ],
+  "defect_count": 3
+}

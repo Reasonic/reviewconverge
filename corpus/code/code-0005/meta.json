@@ -1,0 +1,55 @@
+{
+  "id": "code-0005",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "roman_to_int(): Roman numeral to integer (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/conversions/roman_numerals.py#L18",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `roman_to_int`, into src/roman.py with a trimmed docstring (concrete doctest examples retained). Three independently-findable defects injected across both branches; the upstream form of each mutated line is recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "wrong-operator",
+      "inverted-condition",
+      "off-by-one"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/roman.py",
+      "start": 16,
+      "end": 16,
+      "note": "the numeral value map is correct and untouched"
+    },
+    {
+      "unit": "src/roman.py",
+      "start": 17,
+      "end": 18,
+      "note": "total/place initialization is correct"
+    },
+    {
+      "unit": "src/roman.py",
+      "start": 21,
+      "end": 21,
+      "note": "the subtractive value computation (next - current) is correct and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "src/roman.py",
+        "start": 5,
+        "end": 5
+      },
+      "note": "The function does not validate its input (a documented assumption); a reviewer may flag the missing error handling / KeyError on bad characters. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

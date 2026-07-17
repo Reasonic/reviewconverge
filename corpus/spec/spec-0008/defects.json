@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0008",
+  "defects": [
+    {
+      "id": "spec-0008-d1",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The Deployment's selector matchLabels is `run: web`, but the pod template labels are `run: my-nginx`; a Deployment's selector must match its template labels.",
+      "location": {"unit": "Deployment.spec.selector.matchLabels", "start": 8, "end": 8},
+      "anchor": "run: web",
+      "paraphrases": [
+        "matchLabels (run: web) does not match the template labels (run: my-nginx), so the Deployment is invalid.",
+        "The Deployment selects `run: web` but labels its pods `run: my-nginx`.",
+        "Selector/template label mismatch inside the Deployment."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the Deployment selector (line 8) to the pod template labels (line 13); should be run: my-nginx."
+    },
+    {
+      "id": "spec-0008-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The container listens on `containerPort: 8080`, but the Service exposes port 80 with no targetPort (so it routes to pod port 80); the container port and the Service's target port do not match.",
+      "location": {"unit": "Deployment.spec.template.spec.containers.ports", "start": 19, "end": 19},
+      "anchor": "containerPort: 8080",
+      "paraphrases": [
+        "The container port (8080) does not match the Service port 80 it is meant to back.",
+        "Service traffic to port 80 will not reach the container listening on 8080.",
+        "Port mismatch between the container (8080) and the Service (80)."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the containerPort (line 19) with the Service port (line 29); should be 80."
+    },
+    {
+      "id": "spec-0008-d3",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The Service selector is `run: nginx`, which matches no pods: the Deployment labels its pods `run: my-nginx`, so the Service selects nothing.",
+      "location": {"unit": "Service.spec.selector", "start": 32, "end": 32},
+      "anchor": "run: nginx",
+      "paraphrases": [
+        "The Service selector `run: nginx` does not match the pod label `run: my-nginx`.",
+        "No pods carry the label `run: nginx`, so the Service has no endpoints.",
+        "Service selector points at a label that no pod has."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the Service selector (line 32) to the pod template labels (line 13); should be run: my-nginx."
+    }
+  ]
+}

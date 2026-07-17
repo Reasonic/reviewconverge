@@ -1,0 +1,41 @@
+{
+ "id": "probe-0001",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "cron (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "off-by-one",
+   "wrong boolean operator",
+   "wrong comparison",
+   "wrong operator"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/cron.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/cron.py",
+    "start": 213,
+    "end": 213
+   },
+   "note": "`_is_restricted` returns False for any `*/n` step wildcard, so a stepped-wildcard day field is treated as unrestricted; under the Vixie both-days rule this is a debatable interpretation (a field like `*/2` arguably restricts the days) that a reviewer might flag."
+  }
+ ],
+ "defect_count": 4
+}

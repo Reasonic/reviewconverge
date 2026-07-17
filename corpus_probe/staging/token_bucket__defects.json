@@ -1,0 +1,59 @@
+{
+  "module": "token_bucket.py",
+  "defects": [
+    {
+      "category": "wrong-comparison-operator",
+      "severity": "major",
+      "anchor": "if bucket.level > cost:",
+      "correct_form": "            if bucket.level >= cost:",
+      "description": "The spend guard uses strict `>` instead of `>=`, so a request whose cost exactly equals the tokens on hand is rejected even though the bucket holds enough to cover it.",
+      "paraphrases": [
+        "A bucket holding precisely `cost` tokens should permit the spend, yet the strict-greater-than test turns that exact-balance case into a denial.",
+        "The last available token can never be spent in one call: when the level equals the requested amount the affordability check fails and the decision comes back not-allowed.",
+        "Callers asking for exactly the number of tokens currently present are wrongly told to wait, because equality is excluded from the sufficiency comparison."
+      ]
+    },
+    {
+      "category": "wrong-arithmetic-operator",
+      "severity": "critical",
+      "anchor": "bucket.level = min(bucket.burst, bucket.level - gained)",
+      "correct_form": "            bucket.level = min(bucket.burst, bucket.level + gained)",
+      "description": "The lazy refill subtracts the accrued tokens instead of adding them, so an idle bucket drains over time and eventually goes negative rather than replenishing toward its ceiling.",
+      "paraphrases": [
+        "Elapsed time is meant to credit the bucket, but the replenishment line deducts the amount earned, so keys grow more throttled the longer they sit quiet.",
+        "The sign on the time-based top-up is inverted, turning the refill routine into a slow leak that drives levels below zero.",
+        "Rather than raising the balance by the tokens accumulated since the last touch, the code removes them, so an untouched bucket loses capacity instead of recovering it."
+      ]
+    },
+    {
+      "category": "wrong-min-max-clamp",
+      "severity": "major",
+      "anchor": "else min(cap, self._burst)",
+      "correct_form": "        top = float(burst) if burst is not None else max(cap, self._burst)",
+      "description": "When no explicit burst is supplied the per-key ceiling defaults to the minimum of the new capacity and the limiter's burst instead of the maximum, so raising a key's capacity above the limiter-wide burst yields a ceiling below capacity and trips the 'burst must be >= capacity' validation.",
+      "paraphrases": [
+        "The omitted-burst fallback collapses to whichever of the requested capacity and the global burst is smaller, so a per-key override that increases capacity beyond that burst is rejected with a ValueError.",
+        "Because the default headroom picks the lesser of the two ceilings, a key can be assigned a cap that exceeds its own top, breaking the invariant checked on the very next line.",
+        "Configuring a key to a larger capacity than the limiter's burst should widen its bucket, but the min() makes the ceiling fall beneath capacity and the call fails validation instead."
+      ]
+    },
+    {
+      "category": "over-restrictive-validation-boundary",
+      "severity": "minor",
+      "anchor": "if refill_per_sec <= 0:",
+      "correct_form": "        if refill_per_sec < 0:",
+      "description": "The constructor rejects `refill_per_sec == 0` via `<= 0`, even though a zero refill rate is documented as valid (a static bucket that never replenishes), so a legitimate non-negative configuration raises ValueError.",
+      "paraphrases": [
+        "A refill rate of exactly zero denotes a bucket that only ever drains and should be accepted, but the boundary treats it as an illegal value.",
+        "The guard bars the zero case together with the negatives, making it impossible to build a never-replenishing limiter despite the documented non-negative contract.",
+        "By flagging a zero rate the check over-tightens the input to strictly positive values, contradicting the stated allowance for any non-negative rate."
+      ]
+    }
+  ],
+  "gray_zones": [
+    {
+      "note": "The 'impossible cost' short-circuit in allow() compares the requested cost against the limiter-wide self._burst, ignoring any per-key burst set through configure_key, so the retry_after=inf fast path can disagree with a key's actual ceiling. Arguably a pre-existing inconsistency a reviewer might flag, but it is not one of the injected defects.",
+      "approx_line": 136
+    }
+  ]
+}

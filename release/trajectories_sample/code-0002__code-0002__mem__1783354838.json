@@ -1,0 +1,400 @@
+{
+  "trajectory": {
+    "run_id": "code-0002__mem__1783354838",
+    "artifact_id": "code-0002",
+    "config_id": "mem",
+    "model_id": "deepseek-v4-flash",
+    "seed": null,
+    "rounds": [
+      {
+        "round_index": 0,
+        "findings": [
+          {
+            "id": "r0-f0",
+            "claim": "The arguments to `divmod` are swapped, dividing the number of parts by the sequence length instead of the sequence length by the number of parts, resulting in meaningless slice sizes.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "critical",
+            "evidence": "The docstring examples expect parts of equal size (or one extra for early parts), but with n=2 and len=6, divmod(2,6) yields (0,2), making every slice empty.",
+            "raw": null
+          },
+          {
+            "id": "r0-f1",
+            "claim": "The loop `for i in range(1, n):` runs only n-1 times, producing exactly n-1 parts and missing the last segment.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 30,
+              "end": 30
+            },
+            "severity": "major",
+            "evidence": "The function claims to divide into n parts, but returns a list of n-1 iterators (e.g., divide(2, [1,2,3,4]) would return only one iterator).",
+            "raw": null
+          },
+          {
+            "id": "r0-f2",
+            "claim": "The validation `if n < 0` does not reject n == 0, but the docstring explicitly states 'n must be at least 1'; n=0 would cause an empty loop and a misleading result (empty list) instead of an error.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 16,
+              "end": 17
+            },
+            "severity": "minor",
+            "evidence": "Docstring says 'Divide the elements of iterable into n parts' and example shows n >= 2; a value of 0 is nonsensical and should be rejected.",
+            "raw": null
+          },
+          {
+            "id": "r0-f3",
+            "claim": "When iterable is empty (length 0), line 26 (`divmod(n, 0)`) raises a ZeroDivisionError; the function does not guard against this case.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "major",
+            "evidence": "An empty sequence is a valid input (e.g., divide(3, []) should return three empty iterators, not crash). The code fails to check for len(seq) == 0.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 1,
+        "findings": [
+          {
+            "id": "r1-f0",
+            "claim": "Swapped arguments in divmod: arguments are reversed, should be len(seq) // n and len(seq) % n.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "major",
+            "evidence": "The docstring shows that splitting [1,2,3,4,5,6] into 2 parts yields [1,2,3] and [4,5,6] (each part of length 3). Achieving that requires len(seq) // n = 6 // 2 = 3, not n // len(seq) = 2 // 6 = 0.",
+            "raw": null
+          },
+          {
+            "id": "r1-f1",
+            "claim": "Loop runs only n-1 times, missing the last part.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 30,
+              "end": 30
+            },
+            "severity": "critical",
+            "evidence": "With n=2 and a 6\u2011element list, the loop runs once (i=1) and appends one part. The returned list contains only one iterator, while the docstring expects two parts.",
+            "raw": null
+          },
+          {
+            "id": "r1-f2",
+            "claim": "n=0 is not rejected despite \"at least 1\" documentation.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 16,
+              "end": 17
+            },
+            "severity": "major",
+            "evidence": "Invoking divide(0, [1,2,3]) returns [] (no parts) instead of raising an error.",
+            "raw": null
+          },
+          {
+            "id": "r1-f3",
+            "claim": "No guard against an empty sequence causing ZeroDivisionError.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "major",
+            "evidence": "divmod(3, 0) raises ZeroDivisionError; the function has no check for len(seq) == 0 before this line.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 2,
+        "findings": [
+          {
+            "id": "r2-f0",
+            "claim": "The guard `if n < 0` only rejects negative n but allows n == 0, which is meaningless and violates the documented contract that n must be at least 1.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 16,
+              "end": 17
+            },
+            "severity": "major",
+            "evidence": "Docstring states \u201cdivide (*n*, \u2026)\u201d; the error message says `'n must be at least 1'`, yet `n=0` passes without error.",
+            "raw": null
+          },
+          {
+            "id": "r2-f1",
+            "claim": "The arguments to `divmod` on line 26 are reversed: it calls `divmod(n, len(seq))` instead of `divmod(len(seq), n)`, producing incorrect part sizes.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "critical",
+            "evidence": "The docstring examples show that parts are sized based on `len(seq) // n` and `len(seq) % n`, not the inverse.",
+            "raw": null
+          },
+          {
+            "id": "r2-f2",
+            "claim": "The loop `for i in range(1, n)` runs only n\u22121 times, so only n\u22121 parts are appended to `ret`; the last part is never created or returned, violating the contract to produce n parts.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 30,
+              "end": 30
+            },
+            "severity": "critical",
+            "evidence": "With `n=3` and a 7\u2011element list, the loop iterates over `i = 1, 2` and appends only two parts; the third part (shown in the docstring) is missing.",
+            "raw": null
+          },
+          {
+            "id": "r2-f3",
+            "claim": "No guard against an empty sequence; when `seq` is empty, `divmod(n, 0)` raises a `ZeroDivisionError`.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "major",
+            "evidence": "The code does not check `len(seq) == 0` before performing division.",
+            "raw": null
+          },
+          {
+            "id": "r2-f4",
+            "claim": "The condition `i >= r` on line 32 for distributing extra elements is reversed; after fixing `divmod`, the remainder should be given to the first r parts, but this condition gives it to the last r parts.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 32,
+              "end": 32
+            },
+            "severity": "major",
+            "evidence": "Docstring example `divide(3, [1,2,3,4,5,6,7])` expects `[[1,2,3], [4,5], [6,7]]` (first part gets the extra element); with the reversed condition the first part would get only q elements and later parts would get q+1.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 3,
+        "findings": [
+          {
+            "id": "r3-f0",
+            "claim": "The guard `if n < 0` rejects only negative n but allows n == 0, which is meaningless and contradicts the documented constraint 'n must be at least 1'.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 16,
+              "end": 17
+            },
+            "severity": "major",
+            "evidence": "The guard `if n < 0` does not check for zero; zero parts cannot be produced and would cause a logical failure (loops over `range(1, 0)` are empty, `divmod` would still execute, etc.).",
+            "raw": null
+          },
+          {
+            "id": "r3-f1",
+            "claim": "The arguments to `divmod` on line 26 are reversed: `divmod(n, len(seq))` should be `divmod(len(seq), n)`, causing incorrect part sizes.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "critical",
+            "evidence": "According to the function\u2019s goal, the total number of elements (`len(seq)`) must be divided by the number of parts (`n`). The current call swaps the divisor and dividend, producing incorrect sizes for every call where `len(seq) != n`.",
+            "raw": null
+          },
+          {
+            "id": "r3-f2",
+            "claim": "The loop on line 30 runs `for i in range(1, n)`, executing only n-1 iterations, so only n-1 parts are appended, omitting the nth part.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 30,
+              "end": 30
+            },
+            "severity": "major",
+            "evidence": "The function\u2019s docstring expects an `n`-part result, and the loop range clearly gives one fewer iteration than needed. After the loop, no additional part is added.",
+            "raw": null
+          },
+          {
+            "id": "r3-f3",
+            "claim": "No guard against an empty sequence on line 26; when `seq` is empty, `divmod(n, 0)` raises a `ZeroDivisionError`.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "critical",
+            "evidence": "The code unconditionally calls `divmod(n, len(seq))` without checking for zero length; the docstring does not exclude empty iterables.",
+            "raw": null
+          },
+          {
+            "id": "r3-f4",
+            "claim": "The condition `i >= r` on line 32 for distributing extra elements is reversed relative to the documented 'earlier parts are longer' policy; it gives extra elements to later parts instead of earlier ones.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 32,
+              "end": 32
+            },
+            "severity": "major",
+            "evidence": "The docstring example `divide(3, [1,2,3,4,5,6,7])` produces `[[1,2,3],[4,5],[6,7]]` (first part longer). The condition `i >= r` would instead make later parts longer (e.g., for `n=3, len=7`, after fixing `divmod`, `r=1`; then `i=1` and `i=2` would each get an extra element, leading to sizes 3,3,1 \u2013 contradicting the specification).",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 4,
+        "findings": [
+          {
+            "id": "r4-f0",
+            "claim": "Guard permits n == 0, which is invalid.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 16,
+              "end": 17
+            },
+            "severity": "major",
+            "evidence": "The guard `if n < 0` only rejects negative values, but `n == 0` is nonsensical for splitting into zero parts and contradicts the error message 'n must be at least 1'. If `n == 0` the loop on line 30 would be empty and the function would return an empty list, which is not a valid division.",
+            "raw": null
+          },
+          {
+            "id": "r4-f1",
+            "claim": "Arguments to divmod are reversed, leading to incorrect part sizes.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "major",
+            "evidence": "`divmod(n, len(seq))` should be `divmod(len(seq), n)`. With the current order, the quotient and remainder are computed as if dividing the number of parts by the sequence length, which is the inverse of the intended calculation. This causes every subsequent size computation to be wrong.",
+            "raw": null
+          },
+          {
+            "id": "r4-f2",
+            "claim": "Loop runs only n-1 iterations, so only n-1 parts are created.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 30,
+              "end": 30
+            },
+            "severity": "major",
+            "evidence": "`for i in range(1, n)` iterates over `i = 1, 2, ..., n-1`, producing exactly `n-1` slices. The first part (index 0) is never appended, so the returned list has one fewer element than required. The documentation expects `n` parts.",
+            "raw": null
+          },
+          {
+            "id": "r4-f3",
+            "claim": "No guard for an empty sequence, causing a ZeroDivisionError.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "critical",
+            "evidence": "When `seq` is empty, `len(seq) == 0`, so `divmod(n, 0)` raises division by zero. The function should handle the empty case (e.g., return `n` empty iterators) or raise a clear error.",
+            "raw": null
+          },
+          {
+            "id": "r4-f4",
+            "claim": "Condition for distributing extra elements is reversed relative to the documented earlier parts are longer policy.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 32,
+              "end": 32
+            },
+            "severity": "major",
+            "evidence": "The condition `i >= r` gives an extra element when the part index is greater than or equal to the remainder, which makes later parts longer. The documented behavior (see example `divide(3, [1,2,3,4,5,6,7])`) requires earlier parts to be longer, i.e., extra elements should go to parts with index `< r`.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 5,
+        "findings": [
+          {
+            "id": "r5-f0",
+            "claim": "Guard permits n == 0, which is invalid.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 16,
+              "end": 17
+            },
+            "severity": "major",
+            "evidence": "The condition `if n < 0` only rejects negative values; `n = 0` passes, but dividing into zero parts is undefined. The error message says \u201cn must be at least 1\u201d, contradicting the actual guard.",
+            "raw": null
+          },
+          {
+            "id": "r5-f1",
+            "claim": "Arguments to divmod are reversed.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "critical",
+            "evidence": "`q, r = divmod(n, len(seq))` computes `n // len(seq)` and `n % len(seq)`. To split a sequence of length `L` into `n` parts, the correct call is `divmod(L, n)`. The reversed order yields `q` and `r` that do not represent the base part size and the number of extra parts.",
+            "raw": null
+          },
+          {
+            "id": "r5-f2",
+            "claim": "Loop runs only n-1 iterations, so only n-1 parts are created.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 30,
+              "end": 30
+            },
+            "severity": "major",
+            "evidence": "`for i in range(1, n):` iterates from `1` to `n-1` inclusive. The function never appends a part for the last slice (from the final `stop` to the end of the sequence).",
+            "raw": null
+          },
+          {
+            "id": "r5-f3",
+            "claim": "No guard for an empty sequence, causing a ZeroDivisionError.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 26,
+              "end": 26
+            },
+            "severity": "major",
+            "evidence": "`len(seq)` is used as the divisor in `divmod`. If the input is empty (e.g., `divide(2, [])`), then `len(seq) == 0` and `divmod(n, 0)` raises `ZeroDivisionError`.",
+            "raw": null
+          },
+          {
+            "id": "r5-f4",
+            "claim": "Condition for distributing extra elements is reversed relative to the documented \u201cearlier parts are longer\u201d policy.",
+            "location": {
+              "unit": "src/partition.py",
+              "start": 32,
+              "end": 32
+            },
+            "severity": "major",
+            "evidence": "The ternary uses `i >= r` to decide whether a part gets an extra element. The docstring explicitly states that *earlier parts are longer* \u2013 i.e., the first `r` parts (where `r = len(seq) % n`) should receive the extra element. With `i` starting at `1`, the correct condition would be `i <= r`. The reversed condition gives the extra element to the *later* parts (indices `r` through `n-1`), contradicting the specification.",
+            "raw": null
+          }
+        ]
+      }
+    ]
+  },
+  "transcripts": [
+    [
+      "**Issue 1 (Line 26):** The arguments to `divmod` are swapped \u2014 `divmod(n, len(seq))` divides the number of parts by the sequence length instead of dividing the sequence length by the number of parts, so the resulting quotient and remainder are meaningless for the intended slice sizes.  \n**Evidence:** The docstring examples expect parts of equal size (or one extra for early parts), but with `n=2` and `len=6`, `divmod(2,6)` yields `(0,2)`, making every slice empty.  \n\n**Issue 2 (Line 30):** The loop `for i in range(1, n):` runs only `n-1` times, producing exactly `n-1` parts and missing the last segment.  \n**Evidence:** The function claims to divide into `n` parts, but returns a list of `n-1` iterators (e.g., `divide(2, [1,2,3,4])` would return only one iterator).  \n\n**Issue 3 (Lines 16\u201317):** The validation `if n < 0` does not reject `n == 0`, but the docstring explicitly states *\u201cn must be at least 1\u201d*; `n=0` would cause an empty loop and a misleading result (empty list) instead of an error.  \n**Evidence:** Docstring says *\u201cDivide the elements of iterable into n parts\u201d* and example shows `n >= 2`; a value of `0` is nonsensical and should be rejected.  \n\n**Issue 4 (No explicit handling for empty iterable):** When `iterable` is empty (length 0), line 26 (`divmod(n, 0)`) raises a `ZeroDivisionError` because `len(seq)` is zero; the function does not guard against this case.  \n**Evidence:** An empty sequence is a valid input (e.g., `divide(3, [])` should return three empty iterators, not crash). The code fails to check for `len(seq) == 0`."
+    ],
+    [
+      "### Issue 1 \u2013 Swapped arguments in `divmod`\n- **Location:** Line 26: `q, r = divmod(n, len(seq))`  \n- **Problem:** The arguments are reversed: `divmod(n, len(seq))` computes `n // len(seq)` and `n % len(seq)`. The correct division should be `len(seq) // n` and `len(seq) % n` so that `q` is the floor size of each part and `r` is the number of parts that receive an extra element.  \n- **Evidence:** The docstring shows that splitting `[1,2,3,4,5,6]` into 2 parts yields `[1,2,3]` and `[4,5,6]` (each part of length 3). Achieving that requires `len(seq) // n = 6 // 2 = 3`, not `n // len(seq) = 2 // 6 = 0`.\n\n### Issue 2 \u2013 Loop runs only `n-1` times, missing the last part\n- **Location:** Line 30: `for i in range(1, n):`  \n- **Problem:** The loop iterates from `1` to `n-1`, building exactly `n-1` parts. The final part (from the last `stop` to the end of the sequence) is never appended to `ret`.  \n- **Evidence:** With `n=2` and a 6\u2011element list, the loop runs once (i=1) and appends one part. The returned list contains only one iterator, while the docstring expects two parts.\n\n### Issue 3 \u2013 `n=0` is not rejected despite \u201cat least 1\u201d documentation\n- **Location:** Lines 16\u201317: `if n < 0: raise ValueError(...)`  \n- **Problem:** The validation only rejects negative `n`. Passing `n=0` bypasses the check, leading to an empty loop and an empty list returned\u2014a result that contradicts the documented requirement \u201cn must be at least 1\u201d.  \n- **Evidence:** Invoking `divide(0, [1,2,3])` returns `[]` (no parts) instead of raising an error.\n\n### Issue 4 \u2013 No guard against an empty sequence\n- **Location:** Line 26: `q, r = divmod(n, len(seq))`  \n- **Problem:** When the iterable is empty (e.g., `divide(3, [])`), `len(seq)` is `0`, causing a `ZeroDivisionError` inside `divmod`.  \n- **Evidence:** `divmod(3, 0)` raises `ZeroDivisionError`; the function has no check for `len(seq) == 0` before this line."
+    ],
+    [
+      "## Issues Found\n\n1. **Line 16\u201317** \u2013 The guard `if n < 0` only rejects negative `n`, but the documentation says \u201c*n* must be at least 1\u201d. A value of `n == 0` is accepted, which is meaningless (zero parts) and causes the function to return an empty list despite the contract. The condition should be `if n < 1` (or `n <= 0`).  \n   *Evidence*: Docstring states \u201cdivide (*n*, \u2026)\u201d; the error message says `'n must be at least 1'`, yet `n=0` passes without error.\n\n2. **Line 26** \u2013 The arguments to `divmod` are reversed. The intended computation is `divmod(len(seq), n)` (quotient and remainder of the sequence length divided by the number of parts). The current code `divmod(n, len(seq))` divides the part count by the sequence length, which is logically incorrect.  \n   *Evidence*: The docstring examples show that parts are sized based on `len(seq) // n` and `len(seq) % n`, not the inverse.\n\n3. **Line 30** \u2013 The loop `for i in range(1, n)` runs only `n-1` times, so only `n-1` parts are appended to `ret`. The last part is never created or returned, violating the contract to produce *n* parts.  \n   *Evidence*: With `n=3` and a 7\u2011element list, the loop iterates over `i = 1, 2` and appends only two parts; the third part (shown in the docstring) is missing.\n\n4. **Line 26** \u2013 No guard against an empty sequence. When `seq` is empty (`len(seq) == 0`), the call `divmod(n, 0)` raises a `ZeroDivisionError`.  \n   *Evidence*: The code does not check `len(seq) == 0` before performing division.\n\n5. **Line 32** \u2013 The condition `i >= r` for deciding which parts get an extra element is reversed. After fixing the `divmod` arguments, the remainder `r` should be distributed to the *first* `r` parts to satisfy \u201cearlier parts are longer\u201d (as stated in the docstring). The current condition adds the extra element to parts with index `i >= r`, i.e., the *last* `r` parts.  \n   *Evidence*: Docstring example `divide(3, [1,2,3,4,5,6,7])` expects `[[1,2,3], [4,5], [6,7]]` (first part gets the extra element); with the reversed condition the first part would get only `q` elements and later parts would get `q+1`."
+    ],
+    [
+      "**Issue 1** \u2013 `if n < 0` on line 16 rejects only negative `n` but allows `n == 0`, which is meaningless and contradicts the documented constraint \u201cn must be at least 1\u201d (line 14 docstring).  \n**Location**: Lines 16\u201317.  \n**Evidence**: The guard `if n < 0` does not check for zero; zero parts cannot be produced and would cause a logical failure (loops over `range(1, 0)` are empty, `divmod` would still execute, etc.).\n\n**Issue 2** \u2013 The arguments to `divmod` on line 26 are reversed: `divmod(n, len(seq))` should be `divmod(len(seq), n)`. As written, the quotient and remainder are computed from `n // len(seq)` and `n % len(seq)`, which give values unrelated to the intended part sizes.  \n**Location**: Line 26.  \n**Evidence**: According to the function\u2019s goal, the total number of elements (`len(seq)`) must be divided by the number of parts (`n`). The current call swaps the divisor and dividend, producing incorrect sizes for every call where `len(seq) != n`.\n\n**Issue 3** \u2013 The loop on line 30 runs `for i in range(1, n)`, executing only `n-1` iterations, so only `n-1` parts are appended to `ret`. The nth (last) part is never created or returned, violating the contract to produce exactly `n` parts.  \n**Location**: Line 30.  \n**Evidence**: The function\u2019s docstring expects an `n`-part result, and the loop range clearly gives one fewer iteration than needed. After the loop, no additional part is added.\n\n**Issue 4** \u2013 No guard against an empty sequence on line 26. When `seq` is empty (`len(seq) == 0`), `divmod(n, 0)` raises a `ZeroDivisionError`.  \n**Location**: Line 26.  \n**Evidence**: The code unconditionally calls `divmod(n, len(seq))` without checking for zero length; the docstring does not exclude empty iterables.\n\n**Issue 5** \u2013 The condition `i >= r` on line 32 for distributing extra elements is reversed relative to the documented \u201cearlier parts are longer\u201d policy. After fixing the `divmod` argument order, remainder `r` should be given to the first `r` parts (i.e., parts with index < r). The current condition gives the extra element to parts with index >= r, i.e., the last `r` parts.  \n**Location**: Line 32.  \n**Evidence**: The docstring example `divide(3, [1,2,3,4,5,6,7])` produces `[[1,2,3],[4,5],[6,7]]` (first part longer). The condition `i >= r` would instead make later parts longer (e.g., for `n=3, len=7`, after fixing `divmod`, `r=1`; then `i=1` and `i=2` would each get an extra element, leading to sizes 3,3,1 \u2013 contradicting the specification)."
+    ],
+    [
+      "## Full List of Issues\n\n1. **Guard permits `n == 0`, which is invalid.**  \n   **Location:** Lines 16\u201317  \n   **Evidence:** The guard `if n < 0` only rejects negative values, but `n == 0` is nonsensical for splitting into zero parts and contradicts the error message \"n must be at least 1\". If `n == 0` the loop on line 30 would be empty and the function would return an empty list, which is not a valid division.\n\n2. **Arguments to `divmod` are reversed, leading to incorrect part sizes.**  \n   **Location:** Line 26  \n   **Evidence:** `divmod(n, len(seq))` should be `divmod(len(seq), n)`. With the current order, the quotient and remainder are computed as if dividing the number of parts by the sequence length, which is the inverse of the intended calculation. This causes every subsequent size computation to be wrong.\n\n3. **Loop runs only `n-1` iterations, so only `n-1` parts are created.**  \n   **Location:** Line 30  \n   **Evidence:** `for i in range(1, n)` iterates over `i = 1, 2, ..., n-1`, producing exactly `n-1` slices. The first part (index 0) is never appended, so the returned list has one fewer element than required. The documentation expects `n` parts.\n\n4. **No guard for an empty sequence, causing a `ZeroDivisionError`.**  \n   **Location:** Line 26  \n   **Evidence:** When `seq` is empty, `len(seq) == 0`, so `divmod(n, 0)` raises division by zero. The function should handle the empty case (e.g., return `n` empty iterators) or raise a clear error.\n\n5. **Condition for distributing extra elements is reversed relative to the documented \"earlier parts are longer\" policy.**  \n   **Location:** Line 32  \n   **Evidence:** The condition `i >= r` gives an extra element when the part index is greater than or equal to the remainder, which makes later parts longer. The documented behavior (see example `divide(3, [1,2,3,4,5,6,7])`) requires earlier parts to be longer, i.e., extra elements should go to parts with index `< r`."
+    ],
+    [
+      "## Issues\n\n1. **Guard permits `n == 0`, which is invalid.**  \n   - **Location:** Lines 16\u201317  \n   - **Evidence:** The condition `if n < 0` only rejects negative values; `n = 0` passes, but dividing into zero parts is undefined. The error message says *\u201cn must be at least 1\u201d*, contradicting the actual guard.  \n   - **Why it\u2019s a problem:** With `n = 0` the function returns an empty list (no parts) or, after fixing other bugs, would attempt a loop over `range(1, 0)` and then miss the final part, producing nonsensical output instead of raising an error.\n\n2. **Arguments to `divmod` are reversed.**  \n   - **Location:** Line 26  \n   - **Evidence:** `q, r = divmod(n, len(seq))` computes `n // len(seq)` and `n % len(seq)`. To split a sequence of length `L` into `n` parts, the correct call is `divmod(L, n)`. The reversed order yields `q` and `r` that do not represent the base part size and the number of extra parts.  \n   - **Why it\u2019s a problem:** All subsequent part\u2011size calculations are fundamentally wrong (e.g., for `divide(3, [1,2,3,4,5,6,7])` it computes `q=0, r=3` instead of `q=2, r=1`).\n\n3. **Loop runs only `n-1` iterations, so only `n-1` parts are created.**  \n   - **Location:** Line 30  \n   - **Evidence:** `for i in range(1, n):` iterates from `1` to `n-1` inclusive. The function never appends a part for the last slice (from the final `stop` to the end of the sequence).  \n   - **Why it\u2019s a problem:** The function is documented to return `n` parts. With `n = 3`, it returns a list of two iterators (the third part is missing entirely).\n\n4. **No guard for an empty sequence, causing a `ZeroDivisionError`.**  \n   - **Location:** Line 26  \n   - **Evidence:** `len(seq)` is used as the divisor in `divmod`. If the input is empty (e.g., `divide(2, [])`), then `len(seq) == 0` and `divmod(n, 0)` raises `ZeroDivisionError`.  \n   - **Why it\u2019s a problem:** The function crashes instead of handling an empty iterable gracefully (e.g., returning `n` empty lists or raising a clear exception).\n\n5. **Condition for distributing extra elements is reversed relative to the documented \u201cearlier parts are longer\u201d policy.**  \n   - **Location:** Line 32  \n   - **Evidence:** The ternary uses `i >= r` to decide whether a part gets an extra element. The docstring explicitly states that *earlier parts are longer* \u2013 i.e., the first `r` parts (where `r = len(seq) % n`) should receive the extra element. With `i` starting at `1`, the correct condition would be `i <= r`. The reversed condition gives the extra element to the *later* parts (indices `r` through `n-1`), contradicting the specification.  \n   - **Why it\u2019s a problem:** Using the example `divide(3, [1,2,3,4,5,6,7])`, the documented result is `[[1,2,3],[4,5],[6,7]]` (first part longer). With the reversed condition, the implementation would place the extra element on later parts instead."
+    ]
+  ],
+  "reviewer_calls": 6,
+  "extractor_calls": 6,
+  "prompt_version": "1.0.0"
+}

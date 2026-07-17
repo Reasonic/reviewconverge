@@ -1,0 +1,43 @@
+{
+  "id": "spec-0003",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "nginx/Go/Postgres Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/nginx-golang-postgres/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) nginx-golang-postgres compose.yaml. Three dangling references injected (a secret and two service dependencies), all findable by cross-referencing within the file. The db service body, healthcheck, and secrets section are untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.db.healthcheck",
+      "start": 24,
+      "end": 28,
+      "note": "healthcheck block is upstream and valid"
+    },
+    {
+      "unit": "services.db.environment",
+      "start": 19,
+      "end": 21,
+      "note": "db environment is upstream and valid"
+    },
+    {
+      "unit": "secrets",
+      "start": 42,
+      "end": 44,
+      "note": "top-level secrets definition is untouched and valid"
+    }
+  ],
+  "defect_count": 3
+}

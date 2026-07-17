@@ -1,0 +1,99 @@
+{
+ "defects": [
+  {
+   "id": "probe-0005-d1",
+   "category": "off-by-one-loop-bound",
+   "severity": "major",
+   "description": "Capacity enforcement evicts while the size is `>=` capacity instead of strictly greater, so the cache tops out at capacity-1 live entries and discards a valid entry one insertion too early.",
+   "location": {
+    "unit": "src/lru_ttl_cache.py",
+    "start": 210,
+    "end": 210
+   },
+   "anchor": "while len(self._store) >= self._capacity:",
+   "paraphrases": [
+    "The eviction loop fires the moment the store reaches its limit rather than after surpassing it, permanently costing the cache one slot of its advertised size.",
+    "Filling the cache to exactly N entries immediately triggers a removal, so a cache configured for N never actually retains N items.",
+    "Because the condition includes equality, the least-recently-used entry is thrown out prematurely whenever the count merely equals the bound."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        while len(self._store) > self._capacity:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0005-d2",
+   "category": "wrong-comparison-boundary",
+   "severity": "minor",
+   "description": "Expiry uses strict `>` against the deadline instead of `>=`, so an entry read at exactly its expiration instant is still reported as live rather than expired.",
+   "location": {
+    "unit": "src/lru_ttl_cache.py",
+    "start": 33,
+    "end": 33
+   },
+   "anchor": "and now > self.expires_at",
+   "paraphrases": [
+    "At the precise clock value where an entry's deadline lands it should count as stale, but the strict comparison keeps it valid for that tick.",
+    "A lookup arriving exactly on `expires_at` returns the cached value instead of a miss, so entries survive one instant past their intended lifetime.",
+    "The deadline is treated as still-fresh because expiry requires the clock to advance strictly beyond it rather than reach it."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        return self.expires_at is not None and now >= self.expires_at'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0005-d3",
+   "category": "wrong-variable",
+   "severity": "major",
+   "description": "The hit_rate property divides misses by total lookups instead of hits, so it reports the miss fraction under the name hit_rate and propagates the wrong value into as_dict() and __repr__.",
+   "location": {
+    "unit": "src/lru_ttl_cache.py",
+    "start": 62,
+    "end": 62
+   },
+   "anchor": "return (self.misses / total) if total else 0.0",
+   "paraphrases": [
+    "The success ratio is derived from the miss counter, so a cache serving mostly hits advertises a deceptively low figure.",
+    "What the property returns is really the fraction of lookups that failed, making every stats snapshot show the complement of the true value.",
+    "The numerator names the wrong tally \u2014 misses where hits belong \u2014 inverting the meaning of the reported effectiveness metric."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        return (self.hits / total) if total else 0.0'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0005-d4",
+   "category": "inverted-return-predicate",
+   "severity": "major",
+   "description": "delete() returns the negation of what it should: checking `is None` makes it report True when the key was absent (nothing removed) and False when an entry was actually deleted.",
+   "location": {
+    "unit": "src/lru_ttl_cache.py",
+    "start": 206,
+    "end": 206
+   },
+   "anchor": "return self._store.pop(key, None) is None",
+   "paraphrases": [
+    "The boolean result of the removal is flipped, so callers are told a deletion succeeded exactly when nothing was there to delete.",
+    "Deleting a present key yields False while deleting a missing key yields True, because the presence test is written against None instead of not-None.",
+    "The return value contradicts the documented 'whether anything was deleted' \u2014 a real removal signals false and a no-op signals true."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '            return self._store.pop(key, None) is not None'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0005-d5",
+   "category": "impure-membership-side-effect",
+   "severity": "major",
+   "description": "`__contains__` delegates to `peek()`, which lazily evicts an expired entry and increments the `_expirations` counter, so a plain membership test (`key in cache`) mutates cache contents and observability statistics as a side effect instead of being read-only.",
+   "location": {
+    "unit": "src/lru_ttl_cache.py",
+    "start": 262,
+    "end": 263
+   },
+   "anchor": "self.peek(key, _MISSING)",
+   "paraphrases": [
+    "Membership testing is not side-effect-free: `key in cache` can delete an expired entry and bump the expiration counter because `__contains__` calls the mutating `peek()`.",
+    "Because `__contains__` routes through `peek`, repeatedly checking `key in cache` changes `_expirations` and can evict entries, so containment checks are observably impure.",
+    "A read-only `in` check unexpectedly mutates state here \u2014 `__contains__` should test presence/liveness without removing keys or updating statistics."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: `__contains__` tests key presence and liveness without evicting or touching `_expirations` (no call into the mutating peek()). Human R/F/U-audited & confirmed 2026-07-12 (promoted from a flagged gray zone)."
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0003",
+  "defects": [
+    {
+      "id": "spec-0003-d1",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "backend.secrets references `db-secret`, which is not defined under the top-level `secrets` key (only `db-password` exists there).",
+      "location": {"unit": "services.backend.secrets", "start": 7, "end": 7},
+      "anchor": "db-secret",
+      "paraphrases": [
+        "The backend mounts a secret `db-secret` that is never declared in the top-level secrets section.",
+        "Undefined secret: `db-secret` should be `db-password`, the only secret defined.",
+        "Dangling secret reference in the backend service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking backend.secrets against the top-level secrets (only db-password is defined)."
+    },
+    {
+      "id": "spec-0003-d2",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "backend.depends_on names service `database`, but no such service is defined (the Postgres service is named `db`).",
+      "location": {"unit": "services.backend.depends_on", "start": 9, "end": 9},
+      "anchor": "database:",
+      "paraphrases": [
+        "The backend depends on `database`, which is not a defined service (services are backend, db, proxy).",
+        "depends_on points at `database`; the actual database service is `db`.",
+        "Dangling service dependency: `database` is undefined, so the stack will not start."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking backend.depends_on against the service list; the service is named `db`, not `database`."
+    },
+    {
+      "id": "spec-0003-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "proxy.depends_on names service `api`, which is not defined (the application service is named `backend`).",
+      "location": {"unit": "services.proxy.depends_on", "start": 39, "end": 39},
+      "anchor": "- api",
+      "paraphrases": [
+        "The proxy depends on `api`, but no service `api` exists (it should be `backend`).",
+        "Undefined service in proxy.depends_on: `api` is never declared.",
+        "Dangling dependency: proxy waits on a service `api` that the file never defines."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking proxy.depends_on against the service list; the app service is named `backend`, not `api`."
+    }
+  ]
+}

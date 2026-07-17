@@ -1,0 +1,80 @@
+{
+ "defects": [
+  {
+   "id": "probe-0008-d1",
+   "category": "wrong comparison",
+   "severity": "major",
+   "description": "The prefix tie-break in `_prerelease_lt` compares lengths with `>` instead of `<`, so when one prerelease tuple is a prefix of the other the longer identifier list is ranked as lower precedence, inverting the order of e.g. `1.0.0-alpha` and `1.0.0-alpha.1`.",
+   "location": {
+    "unit": "src/semver.py",
+    "start": 135,
+    "end": 135
+   },
+   "anchor": "return len(left) > len(right)",
+   "paraphrases": [
+    "After all shared prerelease identifiers compare equal, SemVer says the version with more fields wins, but the length comparison is reversed so the shorter one is treated as greater.",
+    "`1.0.0-alpha` should sort before `1.0.0-alpha.1`; the flipped length test makes the one with extra identifiers sort first instead.",
+    "The final same-prefix ordering decision returns the wrong boolean because it asks whether the left tuple is longer rather than shorter."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'return len(left) < len(right)'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0008-d2",
+   "category": "wrong variable",
+   "severity": "major",
+   "description": "The non-zero-major caret upper bound in `_caret_bounds` keeps the original `minor` instead of zeroing it, so `^1.2.0` compiles to `< 2.<minor>.0` and wrongly admits next-major releases such as `2.0.0`.",
+   "location": {
+    "unit": "src/semver.py",
+    "start": 221,
+    "end": 221
+   },
+   "anchor": "high = Version(major + 1, minor, 0)",
+   "paraphrases": [
+    "When bumping the major for a caret bound, the minor component is carried over rather than reset to 0, pushing the exclusive ceiling past the intended `2.0.0` line.",
+    "`^1.2.x` is supposed to stop below the next major (`<2.0.0`), but the ceiling is built with the old minor, letting `2.0.0` satisfy the range.",
+    "The upper comparator for a caret range fails to zero out the minor field after incrementing major, so versions in the next major series leak in."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'high = Version(major + 1, 0, 0)'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0008-d3",
+   "category": "wrong operator",
+   "severity": "critical",
+   "description": "The `=` case in `_Comparator.allows` returns `candidate != target`, inverting exact-match so an exact-version range matches every version except the one it names.",
+   "location": {
+    "unit": "src/semver.py",
+    "start": 166,
+    "end": 166
+   },
+   "anchor": "return candidate != target",
+   "paraphrases": [
+    "Equality was replaced with inequality in the exact-match comparator, so `satisfies('1.2.3', '1.2.3')` returns False while unrelated versions pass.",
+    "The `=` operator now accepts anything that differs from its target and rejects the target itself, exactly backwards.",
+    "An exact pin is treated as an exclusion filter because the comparison for the `=` operator is negated."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'return candidate == target'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0008-d4",
+   "category": "wrong comparison",
+   "severity": "major",
+   "description": "`max_satisfying` keeps a candidate when it is `<` the current best instead of `>`, so it returns the lowest satisfying version rather than the highest.",
+   "location": {
+    "unit": "src/semver.py",
+    "start": 303,
+    "end": 303
+   },
+   "anchor": "best is None or candidate < best",
+   "paraphrases": [
+    "The running-best update in `max_satisfying` prefers smaller versions, making the function behave like a min instead of the documented max.",
+    "Because the retained candidate must be less than the incumbent, the selection walks down to the minimum satisfying version.",
+    "The comparison that should track the largest matching version is reversed, yielding the smallest match."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'best is None or candidate > best'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  }
+ ]
+}

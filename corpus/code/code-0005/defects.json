@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0005",
+  "defects": [
+    {
+      "id": "code-0005-d1",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "In the non-subtractive branch the running total is decremented (`total -= ...`) instead of incremented, so ordinary numerals accumulate negatively.",
+      "location": {"unit": "src/roman.py", "start": 24, "end": 24},
+      "anchor": "total -= vals[roman[place]]",
+      "paraphrases": [
+        "`total -= vals[roman[place]]` should add, not subtract; the else branch must accumulate with `+=`.",
+        "A single numeral like 'III' would evaluate to -3 because the value is subtracted rather than added.",
+        "The additive step uses `-=` where it should use `+=`."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `total += vals[roman[place]]`. Real (all non-subtractive values counted negatively), findable against the docstring (III == 3), distinct from the other defects."
+    },
+    {
+      "id": "code-0005-d2",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The subtractive-pair test is inverted: it triggers when the current symbol is greater than the next (`>`), but subtraction applies when the current symbol is smaller (`<`), as in IV or IX.",
+      "location": {"unit": "src/roman.py", "start": 20, "end": 20},
+      "anchor": "> vals[roman[place + 1]]",
+      "paraphrases": [
+        "The condition should be `vals[roman[place]] < vals[roman[place + 1]]`; using `>` detects the wrong pairs.",
+        "Subtractive notation (e.g. IX = 10 - 1) is recognized when current > next, but it should be current < next.",
+        "The `<`/`>` comparison for subtractive pairs is backwards."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `vals[roman[place]] < vals[roman[place + 1]]`. Real (subtractive pairs mishandled), findable from Roman-numeral subtractive rules and the docstring (MIX == 1009), distinct."
+    },
+    {
+      "id": "code-0005-d3",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "After consuming a two-character subtractive pair the index advances by 3 (`place += 3`) instead of 2, skipping the character that follows the pair.",
+      "location": {"unit": "src/roman.py", "start": 22, "end": 22},
+      "anchor": "place += 3",
+      "paraphrases": [
+        "`place += 3` should be `place += 2`; a subtractive pair is two characters, so the next character gets skipped.",
+        "The index over-advances past a subtractive pair, dropping the following symbol.",
+        "Consuming a 2-character pair should move the cursor by 2, not 3."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `place += 2`. Real (a symbol after each subtractive pair is skipped), findable by counting the pair length, distinct from the else-branch advance."
+    }
+  ]
+}

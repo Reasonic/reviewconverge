@@ -1,0 +1,53 @@
+{
+  "id": "paper-0001",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Clinical-summarization results excerpt (synthetic)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "synthetic",
+    "license": "CC-BY-4.0",
+    "url": null,
+    "notes": "Fictional benchmark (CLINSUM) and results; no real paper. Numbers chosen so the arithmetic in clean regions is internally correct."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "citation-inversion",
+      "overgeneralization",
+      "methodology-flaw"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Abstract",
+      "start": 4,
+      "end": 7,
+      "note": "41.2 - 34.4 = 6.8; the abstract's arithmetic is correct"
+    },
+    {
+      "unit": "Dataset and Training",
+      "start": 10,
+      "end": 10,
+      "note": "800 + 200 + 200 = 1,200; the split is consistent"
+    },
+    {
+      "unit": "Results",
+      "start": 17,
+      "end": 17,
+      "note": "baseline 132 of 200 = 66% is correctly labeled"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Results",
+        "start": 16,
+        "end": 19
+      },
+      "note": "No significance tests or confidence intervals are reported. A common reviewer finding but not a seeded defect; exclude from false-finding scoring."
+    }
+  ],
+  "defect_count": 4
+}

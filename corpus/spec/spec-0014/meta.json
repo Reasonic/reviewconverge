@@ -1,0 +1,47 @@
+{
+  "id": "spec-0014",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "React + Express + MongoDB Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/react-express-mongodb/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) react-express-mongodb compose.yaml. Three dangling references injected (two service dependencies and one network), all findable by cross-referencing within the file. The mongo service block and network/volume declarations are otherwise untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.frontend.networks",
+      "start": 14,
+      "end": 14,
+      "note": "frontend's network (react-express) is correct and declared"
+    },
+    {
+      "unit": "services.mongo",
+      "start": 32,
+      "end": 40,
+      "note": "the mongo service block is upstream and valid"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "services.mongo",
+        "start": 34,
+        "end": 34
+      },
+      "note": "The mongo image is pinned to an old version (4.2.0). A reviewer may flag the outdated image; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

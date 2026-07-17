@@ -1,0 +1,39 @@
+{
+  "id": "code-0012",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "bin_to_decimal(): binary string to integer (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/conversions/binary_to_decimal.py",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `bin_to_decimal`, into src/bin2dec.py (docstring trimmed). Three independently-findable defects injected (sign-strip slice, Horner base, return sign); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "off-by-one",
+      "wrong-operator",
+      "inverted-condition"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/bin2dec.py",
+      "start": 17,
+      "end": 17,
+      "note": "negative-sign detection is correct"
+    },
+    {
+      "unit": "src/bin2dec.py",
+      "start": 20,
+      "end": 22,
+      "note": "binary validation and accumulator init are correct"
+    }
+  ],
+  "defect_count": 3
+}

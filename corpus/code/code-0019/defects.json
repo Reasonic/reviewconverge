@@ -1,0 +1,62 @@
+{
+  "artifact_id": "code-0019",
+  "defects": [
+    {
+      "id": "code-0019-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The order test `lst[i - 1] >= lst[i]` advances when the earlier element is larger, which sorts in descending order; ascending gnome sort needs `<=`.",
+      "location": {
+        "unit": "src/gnome.py",
+        "start": 16,
+        "end": 16
+      },
+      "anchor": "lst[i - 1] >= lst[i]",
+      "paraphrases": [
+        "`>=` should be `<=`; the pair is in order when the earlier element is not larger.",
+        "The comparison is reversed, producing a descending sort.",
+        "The order test treats an already-ascending adjacent pair as out of order and advances the wrong way."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `lst[i - 1] <= lst[i]`. Real (wrong order), findable via the ascending docstring, distinct."
+    },
+    {
+      "id": "code-0019-d2",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The swap `lst[i - 1], lst[i] = lst[i - 1], lst[i]` assigns each element to itself, so it never actually exchanges the out-of-order pair.",
+      "location": {
+        "unit": "src/gnome.py",
+        "start": 19,
+        "end": 19
+      },
+      "anchor": "= lst[i - 1], lst[i]",
+      "paraphrases": [
+        "The right-hand side should be `lst[i], lst[i - 1]`; the swap is a no-op.",
+        "Assigning the pair to itself exchanges nothing, so the list is never reordered.",
+        "The two elements are not actually swapped."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `lst[i - 1], lst[i] = lst[i], lst[i - 1]`. Real (no elements move), findable by reading the assignment, distinct."
+    },
+    {
+      "id": "code-0019-d3",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "The scan index starts at `0` instead of `1`, so the first comparison reads `lst[i - 1]` as `lst[-1]`, comparing the last element with the first.",
+      "location": {
+        "unit": "src/gnome.py",
+        "start": 14,
+        "end": 14
+      },
+      "anchor": "i = 0",
+      "paraphrases": [
+        "`i = 0` should be `i = 1`; gnome sort begins comparing from the second element.",
+        "Starting at 0 makes lst[i - 1] wrap around to the last element.",
+        "The initial index is off, so the first comparison is against the wrong element."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `i = 1`. Real (wrong starting comparison), findable by reading the index setup, distinct."
+    }
+  ]
+}

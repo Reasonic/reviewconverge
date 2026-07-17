@@ -1,0 +1,59 @@
+{
+  "module": "topo.py",
+  "defects": [
+    {
+      "category": "wrong-comparison-operator",
+      "severity": "major",
+      "anchor": "if len(order) > len(deps):",
+      "correct_form": "    if len(order) != len(deps):",
+      "description": "The completeness check that detects an unresolved cycle uses `>`, but the emitted order can never exceed the node count, so the branch is never taken and `topo_sort` silently returns a partial ordering for cyclic graphs instead of raising CycleError.",
+      "paraphrases": [
+        "Comparing the produced-order length with strictly-greater-than can only ever be false, so a graph containing a cycle yields a truncated result and no exception is thrown.",
+        "Because the number of ordered nodes is at most the number of nodes, the guard's `>` condition is unreachable, and unschedulable graphs are accepted rather than reported as cyclic.",
+        "The cycle-detection gate should fire whenever fewer nodes were ordered than exist; using greater-than means it never fires, letting cyclic input pass through as an incomplete list."
+      ]
+    },
+    {
+      "category": "wrong-sentinel-constant",
+      "severity": "major",
+      "anchor": "if color[dep] == BLACK:",
+      "correct_form": "                if color[dep] == GRAY:",
+      "description": "Cycle detection tests for a BLACK (finished) neighbor instead of a GRAY (on-stack) one, so genuine back-edges into the active DFS path are missed and `find_cycle` returns None for cyclic graphs while spuriously flagging some acyclic ones.",
+      "paraphrases": [
+        "The DFS looks for an edge into an already-completed node rather than one into a node still on the recursion stack, which fails to recognize the back-edge that constitutes a real cycle.",
+        "Detecting the loop requires spotting a neighbor currently colored in-progress; checking for the finished color instead lets true cycles slip by undetected and can misread cross-edges in a DAG as loops.",
+        "By keying on the terminal color, the traversal no longer identifies revisits to the active path, so it reports no cycle where one exists."
+      ]
+    },
+    {
+      "category": "missing-increment",
+      "severity": "major",
+      "anchor": "depth[node] = max(depth[dep] for dep in node_deps)",
+      "correct_form": "            depth[node] = 1 + max(depth[dep] for dep in node_deps)",
+      "description": "A dependent node's level is set to the maximum of its dependencies' levels without adding one, so the longest-chain depth never grows and every node collapses to level 0 instead of being one deeper than its prerequisites.",
+      "paraphrases": [
+        "The recurrence omits the `+1` step, so a node inherits its deepest dependency's level verbatim and the whole graph flattens to a single depth.",
+        "Level assignment fails to advance past its dependencies: taking the max without incrementing means chains of prerequisites all resolve to the same value.",
+        "Because the depth is not raised above its inputs, nodes that should sit progressively deeper than their dependencies all land at level zero."
+      ]
+    },
+    {
+      "category": "range-bound-off-by-one",
+      "severity": "major",
+      "anchor": "for _ in range(span)]",
+      "correct_form": "    buckets: List[List[Node]] = [[] for _ in range(span + 1)]",
+      "description": "The level buckets are allocated with `range(span)` rather than `range(span + 1)`, leaving no slot for the deepest level, so `group_by_level` raises IndexError when a node occupies the maximum level.",
+      "paraphrases": [
+        "Levels run from 0 through the maximum inclusive, but only that many buckets minus one are created, so indexing the top level overruns the list.",
+        "The bucket list is one entry short of the needed count; a node whose level equals the span has nowhere to go and the append blows past the end of the array.",
+        "Sizing the staging containers to the span instead of span-plus-one omits the final level's slot, triggering an out-of-range write for the deepest nodes."
+      ]
+    }
+  ],
+  "gray_zones": [
+    {
+      "note": "`_sort_key` orders nodes by the repr of `(type(node).__name__, str(node))`, so heterogeneous or numeric nodes are compared as strings and sort lexicographically (e.g. '10' before '9'); a reviewer might flag this as a surprising, non-numeric tie-break. It is not one of the injected defects.",
+      "approx_line": 49
+    }
+  ]
+}

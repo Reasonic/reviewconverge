@@ -1,0 +1,915 @@
+{
+  "n_runs": 10,
+  "n_files": 10,
+  "n_skipped": 0,
+  "skipped_files": [],
+  "regime_distribution_overall": {
+    "contractive-to-correct": 0.3,
+    "false-convergence": 0.0,
+    "oscillatory-churn": 0.3,
+    "divergent": 0.4
+  },
+  "regime_distribution_by_config": {
+    "single-mem": {
+      "contractive-to-correct": 0.3,
+      "false-convergence": 0.0,
+      "oscillatory-churn": 0.3,
+      "divergent": 0.4
+    }
+  },
+  "regime_distribution_by_type": {
+    "code": {
+      "contractive-to-correct": 0.3,
+      "false-convergence": 0.0,
+      "oscillatory-churn": 0.3,
+      "divergent": 0.4
+    }
+  },
+  "runs": [
+    {
+      "run_id": "probe-0002__single-mem__1783877850",
+      "artifact_id": "probe-0002",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        4,
+        4,
+        5,
+        6,
+        6,
+        7
+      ],
+      "churn": [
+        0.0,
+        0.2,
+        0.1667,
+        0.0,
+        0.1429
+      ],
+      "mean_churn": 0.1019,
+      "late_churn": 0.1429,
+      "false_fraction": [
+        0.25,
+        0.25,
+        0.4,
+        0.5,
+        0.5,
+        0.5714
+      ],
+      "terminal_false_fraction": 0.5714,
+      "true_attrition_events": 0,
+      "oscillation_degree": 0,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.4286,
+      "terminal_recall": 1.0,
+      "n_defects": 3,
+      "regime": "divergent",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0002-d1",
+          "def:probe-0002-d2",
+          "def:probe-0002-d3",
+          "false:0"
+        ],
+        [
+          "def:probe-0002-d1",
+          "def:probe-0002-d2",
+          "def:probe-0002-d3",
+          "false:0"
+        ],
+        [
+          "def:probe-0002-d1",
+          "def:probe-0002-d2",
+          "def:probe-0002-d3",
+          "false:0",
+          "false:1"
+        ],
+        [
+          "def:probe-0002-d1",
+          "def:probe-0002-d2",
+          "def:probe-0002-d3",
+          "false:0",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0002-d1",
+          "def:probe-0002-d2",
+          "def:probe-0002-d3",
+          "false:0",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0002-d1",
+          "def:probe-0002-d2",
+          "def:probe-0002-d3",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0003__single-mem__1783878490",
+      "artifact_id": "probe-0003",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        4,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "churn": [
+        0.5,
+        0.0,
+        0.1667,
+        0.0,
+        0.0
+      ],
+      "mean_churn": 0.1333,
+      "late_churn": 0.0,
+      "false_fraction": [
+        0.25,
+        0.2,
+        0.2,
+        0.3333,
+        0.3333,
+        0.3333
+      ],
+      "terminal_false_fraction": 0.3333,
+      "true_attrition_events": 0,
+      "oscillation_degree": 0,
+      "stabilized_round": 3,
+      "converged": true,
+      "terminal_precision": 0.6667,
+      "terminal_recall": 1.0,
+      "n_defects": 4,
+      "regime": "contractive-to-correct",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0003-d1",
+          "def:probe-0003-d3",
+          "def:probe-0003-d4",
+          "false:0"
+        ],
+        [
+          "def:probe-0003-d1",
+          "def:probe-0003-d2",
+          "def:probe-0003-d3",
+          "def:probe-0003-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0003-d1",
+          "def:probe-0003-d2",
+          "def:probe-0003-d3",
+          "def:probe-0003-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0003-d1",
+          "def:probe-0003-d2",
+          "def:probe-0003-d3",
+          "def:probe-0003-d4",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0003-d1",
+          "def:probe-0003-d2",
+          "def:probe-0003-d3",
+          "def:probe-0003-d4",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0003-d1",
+          "def:probe-0003-d2",
+          "def:probe-0003-d3",
+          "def:probe-0003-d4",
+          "false:1",
+          "false:2"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0006__single-mem__1783903408",
+      "artifact_id": "probe-0006",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        5,
+        4,
+        5,
+        6,
+        7,
+        7
+      ],
+      "churn": [
+        0.2,
+        0.2,
+        0.1667,
+        0.1429,
+        0.4444
+      ],
+      "mean_churn": 0.2308,
+      "late_churn": 0.4444,
+      "false_fraction": [
+        0.4,
+        0.25,
+        0.4,
+        0.5,
+        0.5714,
+        0.4286
+      ],
+      "terminal_false_fraction": 0.4286,
+      "true_attrition_events": 0,
+      "oscillation_degree": 0,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.5714,
+      "terminal_recall": 0.8,
+      "n_defects": 5,
+      "regime": "divergent",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0006-d1",
+          "def:probe-0006-d2",
+          "def:probe-0006-d3",
+          "false:0",
+          "false:1"
+        ],
+        [
+          "def:probe-0006-d1",
+          "def:probe-0006-d2",
+          "def:probe-0006-d3",
+          "false:1"
+        ],
+        [
+          "def:probe-0006-d1",
+          "def:probe-0006-d2",
+          "def:probe-0006-d3",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0006-d1",
+          "def:probe-0006-d2",
+          "def:probe-0006-d3",
+          "false:1",
+          "false:2",
+          "false:3"
+        ],
+        [
+          "def:probe-0006-d1",
+          "def:probe-0006-d2",
+          "def:probe-0006-d3",
+          "false:1",
+          "false:2",
+          "false:3",
+          "false:4"
+        ],
+        [
+          "def:probe-0006-d1",
+          "def:probe-0006-d2",
+          "def:probe-0006-d3",
+          "def:probe-0006-d4",
+          "false:2",
+          "false:3",
+          "false:5"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0005__single-mem__1783903043",
+      "artifact_id": "probe-0005",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        5,
+        5,
+        5,
+        5,
+        6,
+        6
+      ],
+      "churn": [
+        0.3333,
+        0.0,
+        0.0,
+        0.1667,
+        0.0
+      ],
+      "mean_churn": 0.1,
+      "late_churn": 0.0,
+      "false_fraction": [
+        0.0,
+        0.2,
+        0.2,
+        0.2,
+        0.3333,
+        0.3333
+      ],
+      "terminal_false_fraction": 0.3333,
+      "true_attrition_events": 1,
+      "oscillation_degree": 0,
+      "stabilized_round": 4,
+      "converged": true,
+      "terminal_precision": 0.6667,
+      "terminal_recall": 0.8,
+      "n_defects": 5,
+      "regime": "contractive-to-correct",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0005-d1",
+          "def:probe-0005-d2",
+          "def:probe-0005-d3",
+          "def:probe-0005-d4",
+          "def:probe-0005-d5"
+        ],
+        [
+          "def:probe-0005-d1",
+          "def:probe-0005-d3",
+          "def:probe-0005-d4",
+          "def:probe-0005-d5",
+          "false:0"
+        ],
+        [
+          "def:probe-0005-d1",
+          "def:probe-0005-d3",
+          "def:probe-0005-d4",
+          "def:probe-0005-d5",
+          "false:0"
+        ],
+        [
+          "def:probe-0005-d1",
+          "def:probe-0005-d3",
+          "def:probe-0005-d4",
+          "def:probe-0005-d5",
+          "false:0"
+        ],
+        [
+          "def:probe-0005-d1",
+          "def:probe-0005-d3",
+          "def:probe-0005-d4",
+          "def:probe-0005-d5",
+          "false:0",
+          "false:1"
+        ],
+        [
+          "def:probe-0005-d1",
+          "def:probe-0005-d3",
+          "def:probe-0005-d4",
+          "def:probe-0005-d5",
+          "false:0",
+          "false:1"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0004__single-mem__1783902537",
+      "artifact_id": "probe-0004",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        6,
+        5,
+        5,
+        5,
+        6,
+        5
+      ],
+      "churn": [
+        0.1667,
+        0.0,
+        0.0,
+        0.1667,
+        0.1667
+      ],
+      "mean_churn": 0.1,
+      "late_churn": 0.1667,
+      "false_fraction": [
+        0.3333,
+        0.2,
+        0.2,
+        0.2,
+        0.3333,
+        0.2
+      ],
+      "terminal_false_fraction": 0.2,
+      "true_attrition_events": 0,
+      "oscillation_degree": 1,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.8,
+      "terminal_recall": 1.0,
+      "n_defects": 4,
+      "regime": "oscillatory-churn",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0004-d1",
+          "def:probe-0004-d2",
+          "def:probe-0004-d3",
+          "def:probe-0004-d4",
+          "false:0",
+          "false:1"
+        ],
+        [
+          "def:probe-0004-d1",
+          "def:probe-0004-d2",
+          "def:probe-0004-d3",
+          "def:probe-0004-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0004-d1",
+          "def:probe-0004-d2",
+          "def:probe-0004-d3",
+          "def:probe-0004-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0004-d1",
+          "def:probe-0004-d2",
+          "def:probe-0004-d3",
+          "def:probe-0004-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0004-d1",
+          "def:probe-0004-d2",
+          "def:probe-0004-d3",
+          "def:probe-0004-d4",
+          "false:0",
+          "false:1"
+        ],
+        [
+          "def:probe-0004-d1",
+          "def:probe-0004-d2",
+          "def:probe-0004-d3",
+          "def:probe-0004-d4",
+          "false:1"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0007__single-mem__1783903883",
+      "artifact_id": "probe-0007",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        3,
+        6,
+        8,
+        8,
+        5,
+        6
+      ],
+      "churn": [
+        0.5,
+        0.25,
+        0.2222,
+        0.375,
+        0.1667
+      ],
+      "mean_churn": 0.3028,
+      "late_churn": 0.1667,
+      "false_fraction": [
+        0.3333,
+        0.5,
+        0.625,
+        0.625,
+        0.4,
+        0.5
+      ],
+      "terminal_false_fraction": 0.5,
+      "true_attrition_events": 0,
+      "oscillation_degree": 1,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.5,
+      "terminal_recall": 0.75,
+      "n_defects": 4,
+      "regime": "oscillatory-churn",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0007-d3",
+          "def:probe-0007-d4",
+          "false:0"
+        ],
+        [
+          "def:probe-0007-d1",
+          "def:probe-0007-d3",
+          "def:probe-0007-d4",
+          "false:0",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0007-d1",
+          "def:probe-0007-d3",
+          "def:probe-0007-d4",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3",
+          "false:4"
+        ],
+        [
+          "def:probe-0007-d1",
+          "def:probe-0007-d3",
+          "def:probe-0007-d4",
+          "false:0",
+          "false:1",
+          "false:3",
+          "false:4",
+          "false:5"
+        ],
+        [
+          "def:probe-0007-d1",
+          "def:probe-0007-d3",
+          "def:probe-0007-d4",
+          "false:3",
+          "false:4"
+        ],
+        [
+          "def:probe-0007-d1",
+          "def:probe-0007-d3",
+          "def:probe-0007-d4",
+          "false:0",
+          "false:3",
+          "false:4"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0001__single-mem__1783877009",
+      "artifact_id": "probe-0001",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        5
+      ],
+      "churn": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.2
+      ],
+      "mean_churn": 0.04,
+      "late_churn": 0.2,
+      "false_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.2
+      ],
+      "terminal_false_fraction": 0.2,
+      "true_attrition_events": 0,
+      "oscillation_degree": 0,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.8,
+      "terminal_recall": 1.0,
+      "n_defects": 4,
+      "regime": "divergent",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0001-d1",
+          "def:probe-0001-d2",
+          "def:probe-0001-d3",
+          "def:probe-0001-d4"
+        ],
+        [
+          "def:probe-0001-d1",
+          "def:probe-0001-d2",
+          "def:probe-0001-d3",
+          "def:probe-0001-d4"
+        ],
+        [
+          "def:probe-0001-d1",
+          "def:probe-0001-d2",
+          "def:probe-0001-d3",
+          "def:probe-0001-d4"
+        ],
+        [
+          "def:probe-0001-d1",
+          "def:probe-0001-d2",
+          "def:probe-0001-d3",
+          "def:probe-0001-d4"
+        ],
+        [
+          "def:probe-0001-d1",
+          "def:probe-0001-d2",
+          "def:probe-0001-d3",
+          "def:probe-0001-d4"
+        ],
+        [
+          "def:probe-0001-d1",
+          "def:probe-0001-d2",
+          "def:probe-0001-d3",
+          "def:probe-0001-d4",
+          "false:0"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0008__single-mem__1783904329",
+      "artifact_id": "probe-0008",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        5,
+        4,
+        8,
+        8,
+        8,
+        10
+      ],
+      "churn": [
+        0.5,
+        0.5,
+        0.0,
+        0.0,
+        0.2
+      ],
+      "mean_churn": 0.24,
+      "late_churn": 0.2,
+      "false_fraction": [
+        0.4,
+        0.0,
+        0.5,
+        0.5,
+        0.5,
+        0.6
+      ],
+      "terminal_false_fraction": 0.6,
+      "true_attrition_events": 0,
+      "oscillation_degree": 2,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.4,
+      "terminal_recall": 1.0,
+      "n_defects": 4,
+      "regime": "oscillatory-churn",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0008-d2",
+          "def:probe-0008-d3",
+          "def:probe-0008-d4",
+          "false:0",
+          "false:1"
+        ],
+        [
+          "def:probe-0008-d1",
+          "def:probe-0008-d2",
+          "def:probe-0008-d3",
+          "def:probe-0008-d4"
+        ],
+        [
+          "def:probe-0008-d1",
+          "def:probe-0008-d2",
+          "def:probe-0008-d3",
+          "def:probe-0008-d4",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3"
+        ],
+        [
+          "def:probe-0008-d1",
+          "def:probe-0008-d2",
+          "def:probe-0008-d3",
+          "def:probe-0008-d4",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3"
+        ],
+        [
+          "def:probe-0008-d1",
+          "def:probe-0008-d2",
+          "def:probe-0008-d3",
+          "def:probe-0008-d4",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3"
+        ],
+        [
+          "def:probe-0008-d1",
+          "def:probe-0008-d2",
+          "def:probe-0008-d3",
+          "def:probe-0008-d4",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3",
+          "false:4",
+          "false:5"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0009__single-mem__1783904961",
+      "artifact_id": "probe-0009",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        4,
+        4,
+        4,
+        5,
+        7,
+        7
+      ],
+      "churn": [
+        0.0,
+        0.0,
+        0.2,
+        0.2857,
+        0.25
+      ],
+      "mean_churn": 0.1471,
+      "late_churn": 0.25,
+      "false_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.2,
+        0.4286,
+        0.5714
+      ],
+      "terminal_false_fraction": 0.5714,
+      "true_attrition_events": 1,
+      "oscillation_degree": 0,
+      "stabilized_round": 5,
+      "converged": false,
+      "terminal_precision": 0.4286,
+      "terminal_recall": 0.75,
+      "n_defects": 4,
+      "regime": "divergent",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0009-d1",
+          "def:probe-0009-d2",
+          "def:probe-0009-d3",
+          "def:probe-0009-d4"
+        ],
+        [
+          "def:probe-0009-d1",
+          "def:probe-0009-d2",
+          "def:probe-0009-d3",
+          "def:probe-0009-d4"
+        ],
+        [
+          "def:probe-0009-d1",
+          "def:probe-0009-d2",
+          "def:probe-0009-d3",
+          "def:probe-0009-d4"
+        ],
+        [
+          "def:probe-0009-d1",
+          "def:probe-0009-d2",
+          "def:probe-0009-d3",
+          "def:probe-0009-d4",
+          "false:0"
+        ],
+        [
+          "def:probe-0009-d1",
+          "def:probe-0009-d2",
+          "def:probe-0009-d3",
+          "def:probe-0009-d4",
+          "false:0",
+          "false:1",
+          "false:2"
+        ],
+        [
+          "def:probe-0009-d1",
+          "def:probe-0009-d2",
+          "def:probe-0009-d3",
+          "false:0",
+          "false:1",
+          "false:2",
+          "false:3"
+        ]
+      ]
+    },
+    {
+      "run_id": "probe-0010__single-mem__1783905329",
+      "artifact_id": "probe-0010",
+      "config_id": "single-mem",
+      "model_id": "deepseek-v4-flash",
+      "n_rounds": 6,
+      "set_sizes": [
+        4,
+        4,
+        5,
+        5,
+        5,
+        5
+      ],
+      "churn": [
+        0.4,
+        0.2,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_churn": 0.12,
+      "late_churn": 0.0,
+      "false_fraction": [
+        0.25,
+        0.0,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "terminal_false_fraction": 0.2,
+      "true_attrition_events": 0,
+      "oscillation_degree": 0,
+      "stabilized_round": 2,
+      "converged": true,
+      "terminal_precision": 0.8,
+      "terminal_recall": 1.0,
+      "n_defects": 4,
+      "regime": "contractive-to-correct",
+      "artifact_type": "code",
+      "round_elements": [
+        [
+          "def:probe-0010-d1",
+          "def:probe-0010-d2",
+          "def:probe-0010-d4",
+          "false:0"
+        ],
+        [
+          "def:probe-0010-d1",
+          "def:probe-0010-d2",
+          "def:probe-0010-d3",
+          "def:probe-0010-d4"
+        ],
+        [
+          "def:probe-0010-d1",
+          "def:probe-0010-d2",
+          "def:probe-0010-d3",
+          "def:probe-0010-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0010-d1",
+          "def:probe-0010-d2",
+          "def:probe-0010-d3",
+          "def:probe-0010-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0010-d1",
+          "def:probe-0010-d2",
+          "def:probe-0010-d3",
+          "def:probe-0010-d4",
+          "false:1"
+        ],
+        [
+          "def:probe-0010-d1",
+          "def:probe-0010-d2",
+          "def:probe-0010-d3",
+          "def:probe-0010-d4",
+          "false:1"
+        ]
+      ]
+    }
+  ]
+}

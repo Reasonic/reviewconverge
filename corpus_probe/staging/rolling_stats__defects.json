@@ -1,0 +1,59 @@
+{
+  "module": "rolling_stats.py",
+  "defects": [
+    {
+      "category": "inverted-condition",
+      "severity": "critical",
+      "anchor": "and ts > self._latest_ts:",
+      "correct_form": "        if self._latest_ts is not None and ts < self._latest_ts:",
+      "description": "The out-of-order branch is entered when the new timestamp is greater than the latest instead of less, so normal in-order arrivals take the insert path that never advances `_latest_ts`; the window horizon freezes, nothing is ever evicted, and the sample set grows without bound.",
+      "paraphrases": [
+        "The comparison meant to catch late (older) arrivals is reversed, so fresh newer samples are routed through the ordered-insert path that leaves the newest-timestamp watermark stuck at its first value and the trailing window stops sliding.",
+        "Because newer readings satisfy the `>` test, they bypass the branch that updates the high-water timestamp, so eviction's horizon never moves forward and stale points are retained indefinitely.",
+        "Detecting backfill should compare against `<`; flipping it to `>` means every in-sequence update is treated as a reorder, the latest-time marker is frozen, and the count keeps climbing past the window size."
+      ]
+    },
+    {
+      "category": "percentile-rank-off-by-one",
+      "severity": "major",
+      "anchor": "rank = (p / 100.0) * n",
+      "correct_form": "        rank = (p / 100.0) * (n - 1)",
+      "description": "The interpolated rank is scaled by `n` instead of `n - 1`, so interior percentiles land between the wrong pair of order statistics and return values shifted toward the upper end of the distribution.",
+      "paraphrases": [
+        "Multiplying the fraction by the sample count rather than one less than it misplaces the fractional index, skewing every non-extreme percentile upward.",
+        "The linear-rank formula uses the wrong span: with `n` in place of `n-1`, the median and other quantiles interpolate at an offset position and come out too high.",
+        "Because the rank spans `n` intervals instead of the `n-1` gaps between ordered samples, the computed percentile picks a point further along the sorted values than intended."
+      ]
+    },
+    {
+      "category": "swapped-operands",
+      "severity": "minor",
+      "anchor": "return min(values) - max(values)",
+      "correct_form": "        return max(values) - min(values)",
+      "description": "`range_span` subtracts the maximum from the minimum, returning the negative of the true span rather than the documented `max - min`.",
+      "paraphrases": [
+        "The two extremes are subtracted in the wrong order, so the reported spread is negated instead of being a non-negative width.",
+        "Computing smallest-minus-largest yields a negative magnitude for the window's range whenever the values are not all equal.",
+        "The span comes back with a flipped sign because the minuend and subtrahend are reversed."
+      ]
+    },
+    {
+      "category": "wrong-divisor",
+      "severity": "minor",
+      "anchor": "for v in values) / (n - 1)",
+      "correct_form": "        return sum((v - mu) ** 2 for v in values) / n",
+      "description": "Variance divides the sum of squared deviations by `n - 1`, producing the sample (Bessel-corrected) variance even though the method is documented to return the population variance (divide by `n`).",
+      "paraphrases": [
+        "The estimator applies Bessel's correction, dividing by one fewer than the sample size, which contradicts the promised population-variance definition.",
+        "Using `n - 1` in the denominator overstates the spread relative to the population variance the docstring specifies.",
+        "The squared-deviation average is taken over `n - 1` rather than `n`, so the result is the unbiased sample variance instead of the intended population figure."
+      ]
+    }
+  ],
+  "gray_zones": [
+    {
+      "note": "Eviction drops samples whose timestamp is exactly at the horizon (`_samples[0][0] <= horizon`, i.e. now - t == window_seconds), yet the class docstring says a sample is retained while `now - t <= window`; code and docstring disagree at the exact window boundary. A reviewer could reasonably flag this inconsistency, but it is pre-existing and not one of the injected defects.",
+      "approx_line": 98
+    }
+  ]
+}

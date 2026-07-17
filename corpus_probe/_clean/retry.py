@@ -1,0 +1,319 @@
+"""Retry executor with exponential backoff and jitter.
+
+Wraps a zero-argument callable and re-invokes it according to a configurable
+policy: capped exponential backoff, optional randomized jitter, a maximum
+attempt count, a predicate deciding which exceptions and which return values are
+retryable, and an optional wall-clock deadline that short-circuits further
+attempts.
+
+The public surface is the :func:`retry` helper (call a function through the
+policy) and the :class:`RetryPolicy` object it builds on, so callers can either
+fire a one-off retry or hold onto a reusable, pre-configured policy.
+"""
+
+from __future__ import annotations
+
+import random
+import time
+from dataclasses import dataclass, field
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Type, Union
+
+
+Clock = Callable[[], float]
+Sleeper = Callable[[float], None]
+ExcPredicate = Callable[[BaseException], bool]
+ResultPredicate = Callable[[Any], bool]
+
+
+class RetryError(Exception):
+    """Raised when a call exhausts its retry budget without succeeding.
+
+    Carries the number of attempts made and the last exception (if the failure
+    was an exception) or the last non-accepted result.
+    """
+
+    def __init__(
+        self,
+        attempts: int,
+        last_exception: Optional[BaseException] = None,
+        last_result: Any = None,
+        reason: str = "exhausted",
+    ) -> None:
+        self.attempts = attempts
+        self.last_exception = last_exception
+        self.last_result = last_result
+        self.reason = reason
+        detail = f"after {attempts} attempt(s) ({reason})"
+        if last_exception is not None:
+            detail += f": {type(last_exception).__name__}: {last_exception}"
+        super().__init__(detail)
+
+
+@dataclass
+class Attempt:
+    """Record of a single try, passed to the optional on_retry hook."""
+
+    number: int  # 1-based
+    exception: Optional[BaseException] = None
+    result: Any = None
+    delay: float = 0.0
+    elapsed: float = 0.0
+
+
+def _normalize_exc_types(
+    exc: Union[Type[BaseException], Iterable[Type[BaseException]], None]
+) -> Tuple[Type[BaseException], ...]:
+    if exc is None:
+        return ()
+    if isinstance(exc, type) and issubclass(exc, BaseException):
+        return (exc,)
+    return tuple(exc)  # assume iterable of exception types
+
+
+@dataclass
+class RetryPolicy:
+    """Reusable retry configuration.
+
+    Parameters
+    ----------
+    max_attempts:
+        Total tries allowed, including the first. Must be >= 1.
+    base_delay:
+        Backoff for the first retry, in seconds. Subsequent retries scale by
+        ``multiplier`` up to ``max_delay``.
+    max_delay:
+        Ceiling for any single backoff wait.
+    multiplier:
+        Geometric growth factor between successive backoffs.
+    jitter:
+        ``"full"`` picks a uniform value in ``[0, computed]``; ``"equal"`` picks
+        ``computed/2 + uniform(0, computed/2)``; ``"none"`` uses the raw value.
+    retry_on_exc:
+        Exception type or iterable of types that should trigger a retry. Anything
+        else propagates immediately.
+    retry_on_result:
+        Optional predicate; if it returns ``True`` for a *successful* return
+        value, that value is treated as retryable.
+    deadline:
+        Optional total seconds budget measured from the first attempt. Once
+        exceeded, no further retries are scheduled.
+    """
+
+    max_attempts: int = 3
+    base_delay: float = 0.1
+    max_delay: float = 30.0
+    multiplier: float = 2.0
+    jitter: str = "full"
+    retry_on_exc: Union[
+        Type[BaseException], Iterable[Type[BaseException]], None
+    ] = Exception
+    retry_on_result: Optional[ResultPredicate] = None
+    deadline: Optional[float] = None
+    _exc_types: Tuple[Type[BaseException], ...] = field(
+        init=False, default=()
+    )
+
+    def __post_init__(self) -> None:
+        if self.max_attempts < 1:
+            raise ValueError("max_attempts must be >= 1")
+        if self.base_delay < 0 or self.max_delay < 0:
+            raise ValueError("delays must be non-negative")
+        if self.multiplier < 1:
+            raise ValueError("multiplier must be >= 1")
+        if self.jitter not in ("full", "equal", "none"):
+            raise ValueError("jitter must be one of full|equal|none")
+        self._exc_types = _normalize_exc_types(self.retry_on_exc)
+
+    def _raw_backoff(self, retry_index: int) -> float:
+        """Backoff before the ``retry_index``-th retry (1-based, uncapped)."""
+        delay = self.base_delay * (self.multiplier ** (retry_index - 1))
+        return min(delay, self.max_delay)
+
+    def _apply_jitter(self, delay: float, rng: random.Random) -> float:
+        if delay <= 0 or self.jitter == "none":
+            return delay
+        if self.jitter == "full":
+            return rng.uniform(0.0, delay)
+        # "equal": half fixed, half random.
+        half = delay / 2.0
+        return half + rng.uniform(0.0, half)
+
+    def compute_delay(self, retry_index: int, rng: random.Random) -> float:
+        """Public helper: jittered backoff for a given retry index."""
+        return self._apply_jitter(self._raw_backoff(retry_index), rng)
+
+    def should_retry_exception(self, exc: BaseException) -> bool:
+        if not self._exc_types:
+            return False
+        return isinstance(exc, self._exc_types)
+
+    def should_retry_result(self, result: Any) -> bool:
+        if self.retry_on_result is None:
+            return False
+        return bool(self.retry_on_result(result))
+
+
+def run_with_policy(
+    fn: Callable[[], Any],
+    policy: RetryPolicy,
+    on_retry: Optional[Callable[[Attempt], None]] = None,
+    clock: Optional[Clock] = None,
+    sleeper: Optional[Sleeper] = None,
+    rng: Optional[random.Random] = None,
+) -> Any:
+    """Execute *fn* under *policy*, returning its accepted result.
+
+    Raises the original exception if it is not retryable, or :class:`RetryError`
+    when the attempt budget or deadline is exhausted. ``clock``, ``sleeper`` and
+    ``rng`` are injectable to keep the scheduling deterministic in tests.
+    """
+    now = clock if clock is not None else time.monotonic
+    sleep = sleeper if sleeper is not None else time.sleep
+    rand = rng if rng is not None else random.Random()
+
+    started = now()
+    last_exc: Optional[BaseException] = None
+    last_result: Any = None
+    have_result = False
+
+    for attempt_no in range(1, policy.max_attempts + 1):
+        exception: Optional[BaseException] = None
+        result: Any = None
+        retryable = False
+        try:
+            result = fn()
+        except BaseException as exc:  # noqa: BLE001 - policy decides re-raise
+            exception = exc
+            last_exc = exc
+            if policy.should_retry_exception(exc):
+                retryable = True
+            else:
+                raise
+        else:
+            last_result = result
+            have_result = True
+            if policy.should_retry_result(result):
+                retryable = True
+            else:
+                return result
+
+        if not retryable:
+            # Non-retryable success is already returned above; this guards the
+            # theoretical fall-through.
+            if exception is not None:
+                raise exception
+            return result
+
+        if attempt_no >= policy.max_attempts:
+            break
+
+        delay = policy.compute_delay(attempt_no, rand)
+        elapsed = now() - started
+
+        if policy.deadline is not None:
+            if elapsed >= policy.deadline:
+                raise RetryError(
+                    attempts=attempt_no,
+                    last_exception=last_exc,
+                    last_result=last_result if have_result else None,
+                    reason="deadline",
+                )
+            remaining = policy.deadline - elapsed
+            if delay > remaining:
+                delay = remaining
+
+        if on_retry is not None:
+            on_retry(
+                Attempt(
+                    number=attempt_no,
+                    exception=exception,
+                    result=result,
+                    delay=delay,
+                    elapsed=elapsed,
+                )
+            )
+
+        if delay > 0:
+            sleep(delay)
+
+    raise RetryError(
+        attempts=policy.max_attempts,
+        last_exception=last_exc,
+        last_result=last_result if have_result else None,
+        reason="attempts",
+    )
+
+
+def retry(
+    fn: Callable[[], Any],
+    max_attempts: int = 3,
+    base_delay: float = 0.1,
+    max_delay: float = 30.0,
+    multiplier: float = 2.0,
+    jitter: str = "full",
+    retry_on: Union[
+        Type[BaseException], Iterable[Type[BaseException]], None
+    ] = Exception,
+    retry_on_result: Optional[ResultPredicate] = None,
+    deadline: Optional[float] = None,
+    on_retry: Optional[Callable[[Attempt], None]] = None,
+    clock: Optional[Clock] = None,
+    sleeper: Optional[Sleeper] = None,
+    rng: Optional[random.Random] = None,
+) -> Any:
+    """Convenience wrapper: build a one-shot policy and run *fn* through it."""
+    policy = RetryPolicy(
+        max_attempts=max_attempts,
+        base_delay=base_delay,
+        max_delay=max_delay,
+        multiplier=multiplier,
+        jitter=jitter,
+        retry_on_exc=retry_on,
+        retry_on_result=retry_on_result,
+        deadline=deadline,
+    )
+    return run_with_policy(
+        fn,
+        policy,
+        on_retry=on_retry,
+        clock=clock,
+        sleeper=sleeper,
+        rng=rng,
+    )
+
+
+if __name__ == "__main__":
+    log: List[str] = []
+    virtual_time = {"t": 0.0}
+
+    def fake_clock() -> float:
+        return virtual_time["t"]
+
+    def fake_sleep(d: float) -> None:
+        virtual_time["t"] += d
+        log.append(f"slept {d:.4f}")
+
+    attempts_left = {"n": 3}
+
+    def flaky() -> str:
+        if attempts_left["n"] > 0:
+            attempts_left["n"] -= 1
+            raise ConnectionError("transient")
+        return "ok"
+
+    out = retry(
+        flaky, max_attempts=5, base_delay=0.5, jitter="none",
+        retry_on=ConnectionError, clock=fake_clock, sleeper=fake_sleep,
+        rng=random.Random(7),
+    )
+    print("result:", out)
+    print("sleeps:", log)
+
+    try:
+        retry(
+            lambda: -1, max_attempts=3, base_delay=0.1, jitter="none",
+            retry_on_result=lambda v: v < 0,
+            clock=fake_clock, sleeper=fake_sleep,
+        )
+    except RetryError as err:
+        print("expected failure:", err.reason, "attempts=", err.attempts)

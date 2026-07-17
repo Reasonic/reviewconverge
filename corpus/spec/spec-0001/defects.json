@@ -1,0 +1,81 @@
+{
+  "artifact_id": "spec-0001",
+  "defects": [
+    {
+      "id": "spec-0001-d1",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "replicas.min (5) is greater than replicas.max (3), violating the stated constraint min <= max.",
+      "location": {
+        "unit": "replicas",
+        "start": 11,
+        "end": 12
+      },
+      "anchor": "min: 5",
+      "paraphrases": [
+        "The minimum replica count exceeds the maximum (5 > 3), which is invalid.",
+        "replicas.min and replicas.max are inverted; min should not be larger than max.",
+        "The autoscaling bounds are impossible: floor of 5 with a ceiling of 3."
+      ],
+      "confirmed": true,
+      "rationale": "Directly violates the min<=max constraint stated in the header; findable from the artifact alone."
+    },
+    {
+      "id": "spec-0001-d2",
+      "category": "range-violation",
+      "severity": "minor",
+      "description": "autoscale.target_cpu_percent is 130, outside the allowed range [1, 100].",
+      "location": {
+        "unit": "autoscale.target_cpu_percent",
+        "start": 16,
+        "end": 16
+      },
+      "anchor": "target_cpu_percent: 130",
+      "paraphrases": [
+        "A CPU target of 130% is out of the valid 1-100 percent range.",
+        "target_cpu_percent exceeds 100, which the stated constraint disallows.",
+        "The autoscale CPU threshold is set above its permitted maximum."
+      ],
+      "confirmed": true,
+      "rationale": "Violates the [1,100] range stated in the header comment."
+    },
+    {
+      "id": "spec-0001-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The /refund route's backend `refunds-core` is not defined under `services` (only payments-core and ledger exist).",
+      "location": {
+        "unit": "routes[1].backend",
+        "start": 26,
+        "end": 26
+      },
+      "anchor": "refunds-core",
+      "paraphrases": [
+        "Route /refund points at an undefined service `refunds-core`.",
+        "`refunds-core` is referenced as a backend but never declared in the services list.",
+        "Dangling backend reference: the /refund route names a service that does not exist."
+      ],
+      "confirmed": true,
+      "rationale": "Every backend must be a defined service (header constraint); refunds-core is not, and this is findable from the artifact."
+    },
+    {
+      "id": "spec-0001-d4",
+      "category": "security-misconfig",
+      "severity": "critical",
+      "description": "tls.enabled is false while environment is production, violating the constraint that TLS must be enabled in production.",
+      "location": {
+        "unit": "tls.enabled",
+        "start": 29,
+        "end": 29
+      },
+      "anchor": "enabled: false",
+      "paraphrases": [
+        "Production is running with TLS disabled, which the stated policy forbids.",
+        "tls.enabled=false contradicts the requirement that production must use TLS.",
+        "A production deployment has transport encryption turned off."
+      ],
+      "confirmed": true,
+      "rationale": "environment=production plus tls.enabled=false directly breaks the header's production-TLS constraint."
+    }
+  ]
+}

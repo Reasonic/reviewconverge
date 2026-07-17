@@ -1,0 +1,32 @@
+diff --git a/src/search.py b/src/search.py
+new file mode 100644
+index 0000000..3d5f7a9
+--- /dev/null
++++ b/src/search.py
+@@ -0,0 +1,26 @@
++"""Binary search over a sorted list (rightmost insertion point)."""
++
++
++def bisect_right(a, x, lo=0, hi=None):
++    """Return the index where to insert item x in sorted list a.
++
++    The return value i is such that all e in a[:i] have e <= x, and all e in
++    a[i:] have e > x. If x already appears in a, the insertion point is just
++    after the rightmost x.
++
++        >>> bisect_right([1, 3, 3, 5], 3)
++        3
++        >>> bisect_right([1, 3, 3, 5], 5)
++        4
++    """
++    if lo < 0:
++        raise ValueError('lo must be non-negative')
++    if hi is None:
++        hi = len(a) - 1
++    while lo < hi:
++        mid = (lo + hi) // 2
++        if x <= a[mid]:
++            hi = mid
++        else:
++            lo = mid
++    return lo

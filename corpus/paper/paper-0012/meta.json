@@ -1,0 +1,48 @@
+{
+  "id": "paper-0012",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Urbanization summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/urbanization",
+    "source_ref": "owid-urbanization-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Ritchie, Roser), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data figures (CC-BY): urban overtook rural around 2007 (>half urban); in 1960 rural was >60%; a finer classification gives ~45% cities, 35% towns, 20% villages. Clean version verified internally consistent (rural>60% -> urban<40%; 45+35+20=100; overtaking = majority) before injecting 3 defects findable from the text's own numbers."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Crossing the halfway point",
+      "start": 6,
+      "end": 6,
+      "note": "the 'more than 60% rural in 1960' figure is real and untouched"
+    },
+    {
+      "unit": "A finer breakdown",
+      "start": 10,
+      "end": 10,
+      "note": "the ~45% cities figure is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "A finer breakdown",
+        "start": 10,
+        "end": 10
+      },
+      "note": "This section uses a different (GHSL) definition than the urban/rural split above; a reviewer may note the definitions differ. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

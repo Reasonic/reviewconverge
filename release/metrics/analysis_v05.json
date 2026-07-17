@@ -1,0 +1,257 @@
+{
+  "per_arm_regime": {
+    "nomem": {
+      "n_runs": 180,
+      "n_artifacts": 60,
+      "run_level": {
+        "contractive-to-correct": 0.5444444444444444,
+        "false-convergence": 0.06111111111111111,
+        "oscillatory-churn": 0.37222222222222223,
+        "divergent": 0.022222222222222223
+      },
+      "majority": {
+        "contractive-to-correct": 0.55,
+        "false-convergence": 0.05,
+        "oscillatory-churn": 0.38333333333333336,
+        "divergent": 0.016666666666666666
+      }
+    },
+    "mem": {
+      "n_runs": 180,
+      "n_artifacts": 60,
+      "run_level": {
+        "contractive-to-correct": 0.7277777777777777,
+        "false-convergence": 0.07222222222222222,
+        "oscillatory-churn": 0.15555555555555556,
+        "divergent": 0.044444444444444446
+      },
+      "majority": {
+        "contractive-to-correct": 0.8333333333333334,
+        "false-convergence": 0.06666666666666667,
+        "oscillatory-churn": 0.08333333333333333,
+        "divergent": 0.016666666666666666
+      }
+    },
+    "ledger": {
+      "n_runs": 180,
+      "n_artifacts": 60,
+      "run_level": {
+        "contractive-to-correct": 0.7444444444444445,
+        "false-convergence": 0.12222222222222222,
+        "oscillatory-churn": 0.08888888888888889,
+        "divergent": 0.044444444444444446
+      },
+      "majority": {
+        "contractive-to-correct": 0.8,
+        "false-convergence": 0.13333333333333333,
+        "oscillatory-churn": 0.03333333333333333,
+        "divergent": 0.03333333333333333
+      }
+    },
+    "structured-memory": {
+      "n_runs": 180,
+      "n_artifacts": 60,
+      "run_level": {
+        "contractive-to-correct": 0.7222222222222222,
+        "false-convergence": 0.1388888888888889,
+        "oscillatory-churn": 0.09444444444444444,
+        "divergent": 0.044444444444444446
+      },
+      "majority": {
+        "contractive-to-correct": 0.7666666666666667,
+        "false-convergence": 0.11666666666666667,
+        "oscillatory-churn": 0.1,
+        "divergent": 0.016666666666666666
+      }
+    },
+    "single-nomem": {
+      "n_runs": 60,
+      "n_artifacts": 60,
+      "run_level": {
+        "contractive-to-correct": 0.55,
+        "false-convergence": 0.0,
+        "oscillatory-churn": 0.45,
+        "divergent": 0.0
+      },
+      "majority": {
+        "contractive-to-correct": 0.55,
+        "false-convergence": 0.0,
+        "oscillatory-churn": 0.45,
+        "divergent": 0.0
+      }
+    },
+    "single-mem": {
+      "n_runs": 60,
+      "n_artifacts": 60,
+      "run_level": {
+        "contractive-to-correct": 0.6333333333333333,
+        "false-convergence": 0.15,
+        "oscillatory-churn": 0.18333333333333332,
+        "divergent": 0.03333333333333333
+      },
+      "majority": {
+        "contractive-to-correct": 0.6333333333333333,
+        "false-convergence": 0.15,
+        "oscillatory-churn": 0.18333333333333332,
+        "divergent": 0.03333333333333333
+      }
+    }
+  },
+  "per_arm_fc_runlevel": {
+    "nomem": 0.06111111111111111,
+    "mem": 0.07222222222222222,
+    "ledger": 0.12222222222222222,
+    "structured-memory": 0.1388888888888889,
+    "single-nomem": 0.0,
+    "single-mem": 0.15
+  },
+  "headline": {
+    "run_level": {
+      "mem": 0.7277777777777777,
+      "nomem": 0.5444444444444444,
+      "gap": 0.18333333333333335,
+      "mem_cc": 131,
+      "mem_n": 180,
+      "nom_cc": 98,
+      "nom_n": 180
+    },
+    "majority": {
+      "n": 60,
+      "rate_a": 0.8333333333333334,
+      "rate_b": 0.55,
+      "a_only": 19,
+      "b_only": 2,
+      "p": 0.00022125244140625,
+      "diff": 0.2833333333333333
+    }
+  },
+  "ff_sweep": {
+    "0.34": {
+      "maj_mem": 0.8333333333333334,
+      "maj_nomem": 0.55,
+      "maj_p": 0.00022125244140625,
+      "disc": [
+        19,
+        2
+      ],
+      "rl_mem": 0.7277777777777777,
+      "rl_nomem": 0.5444444444444444,
+      "overall_cc": 0.6714285714285714
+    },
+    "0.25": {
+      "maj_mem": 0.8333333333333334,
+      "maj_nomem": 0.55,
+      "maj_p": 0.00022125244140625,
+      "disc": [
+        19,
+        2
+      ],
+      "rl_mem": 0.7277777777777777,
+      "rl_nomem": 0.5444444444444444,
+      "overall_cc": 0.669047619047619
+    },
+    "0.2": {
+      "maj_mem": 0.6666666666666666,
+      "maj_nomem": 0.5333333333333333,
+      "maj_p": 0.11531829833984375,
+      "disc": [
+        14,
+        6
+      ],
+      "rl_mem": 0.5944444444444444,
+      "rl_nomem": 0.5222222222222223,
+      "overall_cc": 0.5761904761904761
+    }
+  },
+  "equivalence": {
+    "ledger_vs_mem": {
+      "desc": "engineered vs plain memory",
+      "mcnemar_p": 0.75390625,
+      "diff": -0.03333333333333333,
+      "ci95": [
+        -0.13628949084890096,
+        0.06962282418223428
+      ],
+      "ci90": [
+        -0.11974296553389902,
+        0.05307629886723234
+      ],
+      "tost_eq_0.10": false,
+      "tost_eq_0.15": true
+    },
+    "ledger_vs_structured-memory": {
+      "desc": "grounded-retirement isolated",
+      "mcnemar_p": 0.75390625,
+      "diff": 0.03333333333333333,
+      "ci95": [
+        -0.06962282418223428,
+        0.13628949084890096
+      ],
+      "ci90": [
+        -0.05307629886723234,
+        0.11974296553389902
+      ],
+      "tost_eq_0.10": false,
+      "tost_eq_0.15": true
+    },
+    "mem_vs_structured-memory": {
+      "desc": "plain vs carry-forward",
+      "mcnemar_p": 0.34375,
+      "diff": 0.06666666666666667,
+      "ci95": [
+        -0.03524774913477012,
+        0.16858108246810344
+      ],
+      "ci90": [
+        -0.018868646595253488,
+        0.1522019799285868
+      ],
+      "tost_eq_0.10": false,
+      "tost_eq_0.15": false
+    }
+  },
+  "recall_mem_vs_nomem": {
+    "mean_a": 0.9671322222222222,
+    "mean_b": 0.94769,
+    "mean_diff": 0.019442222222222225,
+    "n": 60,
+    "pos": 12,
+    "neg": 5,
+    "tie": 43,
+    "p": 0.143463134765625
+  },
+  "p_fc_given_stab": {
+    "fc": 80,
+    "stab": 644,
+    "p": 0.12422360248447205
+  },
+  "gpt_reviewer": {
+    "run_level": {
+      "mem": 0.8666666666666667,
+      "nomem": 0.7833333333333333,
+      "mem_cc": 156,
+      "mem_n": 180,
+      "nom_cc": 141,
+      "nom_n": 180
+    },
+    "majority": {
+      "mem": 0.9333333333333333,
+      "nomem": 0.8,
+      "p": 0.03857421875,
+      "disc": [
+        10,
+        2
+      ]
+    }
+  },
+  "same50_vpro_gap": {
+    "mem": "17/25",
+    "nomem": "15/25",
+    "gap": 0.08000000000000007
+  },
+  "recall_ceiling": {
+    "perfect": 735,
+    "n": 840,
+    "rate": 0.875
+  }
+}

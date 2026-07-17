@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use ReviewConverge, please cite it as below."
+title: "ReviewConverge: A Convergence Benchmark and Workflow Standard for Iterative Agentic Review"
+abstract: >-
+  A benchmark and metric standard that treats the per-round finding-set of an
+  iterative LLM review loop as the unit of convergence, classifies each run as
+  contractive-to-correct / oscillatory-churn / false-convergence / divergent
+  against seeded ground truth, and compares workflow interventions that make the
+  loop converge to a correct fixed point.
+type: software
+version: 0.0.1
+date-released: 2026-01-01
+license: MIT
+keywords:
+  - large language models
+  - agentic review
+  - convergence
+  - benchmark
+  - evaluation
+authors:
+  - family-names: "Phanvilai"
+    given-names: "Sittiphol"
+    orcid: "https://orcid.org/0009-0003-6956-0233"
+# A preprint reference (arXiv) will be added to `preferred-citation` on release.

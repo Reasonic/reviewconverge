@@ -1,0 +1,27 @@
+diff --git a/src/bubble.py b/src/bubble.py
+new file mode 100644
+index 0000000..2e8c4a5
+--- /dev/null
++++ b/src/bubble.py
+@@ -0,0 +1,21 @@
++"""Bubble sort (ascending)."""
++
++
++def bubble_sort(collection):
++    """Sort a list in ascending order, in place, and return it.
++
++        >>> bubble_sort([0, 5, 2, 3, 2])
++        [0, 2, 2, 3, 5]
++        >>> bubble_sort([-2, -45, -5])
++        [-45, -5, -2]
++    """
++    length = len(collection)
++    for i in reversed(range(length)):
++        swapped = False
++        for j in range(i - 1):
++            if collection[j] < collection[j + 1]:
++                swapped = True
++                collection[j], collection[j + 1] = collection[j], collection[j + 1]
++        if not swapped:
++            break
++    return collection

@@ -1,0 +1,42 @@
+diff --git a/src/to_roman.py b/src/to_roman.py
+new file mode 100644
+index 0000000..6a1c9e4
+--- /dev/null
++++ b/src/to_roman.py
+@@ -0,0 +1,36 @@
++"""Convert an integer to a Roman numeral string."""
++
++ROMAN = [
++    (1000, "M"),
++    (900, "CM"),
++    (500, "D"),
++    (400, "CD"),
++    (100, "C"),
++    (90, "XC"),
++    (50, "L"),
++    (40, "XL"),
++    (10, "X"),
++    (9, "IX"),
++    (5, "V"),
++    (4, "IV"),
++    (1, "I"),
++]
++
++
++def int_to_roman(number):
++    """Convert an integer (1-3999) to a Roman numeral.
++
++        >>> int_to_roman(3)
++        'III'
++        >>> int_to_roman(154)
++        'CLIV'
++        >>> int_to_roman(1009)
++        'MIX'
++    """
++    result = []
++    for arabic, roman in ROMAN:
++        (factor, number) = divmod(arabic, number)
++        result.append(roman * (factor + 1))
++        if number != 0:
++            break
++    return "".join(result)

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0011",
+  "defects": [
+    {
+      "id": "spec-0011-d1",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The backend expects POSTGRES_DB=appdb, but the db service creates the database `example` (POSTGRES_DB=example), so the app targets a database that does not exist.",
+      "location": {"unit": "services.backend.environment", "start": 7, "end": 7},
+      "anchor": "POSTGRES_DB=appdb",
+      "paraphrases": [
+        "backend POSTGRES_DB (appdb) does not match the db's POSTGRES_DB (example).",
+        "The app connects to database `appdb` but the server only creates `example`.",
+        "Database name is inconsistent between the backend and the db service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the backend POSTGRES_DB (line 7) to the db POSTGRES_DB (line 20); should be example."
+    },
+    {
+      "id": "spec-0011-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The backend joins network `springnet`, which is not declared under the top-level `networks` key (only `spring-postgres` exists).",
+      "location": {"unit": "services.backend.networks", "start": 9, "end": 9},
+      "anchor": "- springnet",
+      "paraphrases": [
+        "backend uses network `springnet`, but only `spring-postgres` is defined.",
+        "Undefined network: `springnet` should be `spring-postgres`.",
+        "Dangling network reference in the backend service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking the backend network against the top-level networks (spring-postgres); springnet is undefined."
+    },
+    {
+      "id": "spec-0011-d3",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The db service mounts secret `db-secret`, which is not defined under the top-level `secrets` key (only `db-password` exists).",
+      "location": {"unit": "services.db.secrets", "start": 14, "end": 14},
+      "anchor": "- db-secret",
+      "paraphrases": [
+        "db mounts a secret `db-secret` that is never declared in the top-level secrets.",
+        "Undefined secret: `db-secret` should be `db-password`.",
+        "Dangling secret reference in the db service (note POSTGRES_PASSWORD_FILE still points at db-password)."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking the db secret against the top-level secrets (db-password); db-secret is undefined."
+    }
+  ]
+}

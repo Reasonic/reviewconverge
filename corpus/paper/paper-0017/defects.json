@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0017",
+  "defects": [
+    {
+      "id": "paper-0017-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The smoking share is given as 'one in four — roughly 45%', but one in four is 25%, not 45%.",
+      "location": {"unit": "How many smoke", "start": 4, "end": 4},
+      "anchor": "roughly 45%",
+      "paraphrases": [
+        "One in four is 25%, so 'roughly 45%' does not match.",
+        "The fraction (one in four) and the percentage (45%) disagree.",
+        "45% is closer to one in two than one in four."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 25%' (one in four). Findable from the fraction and figure in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0017-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "If more than one-third of men smoke, then fewer than two-thirds do not, but the text says 'fewer than one-quarter do not'.",
+      "location": {"unit": "The gender gap", "start": 7, "end": 8},
+      "anchor": "fewer than one-quarter",
+      "paraphrases": [
+        "More than a third smoking leaves nearly two-thirds not smoking, not fewer than a quarter.",
+        "'Fewer than one-quarter do not' would imply more than three-quarters smoke.",
+        "The smoker and non-smoker shares for men do not add up."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'fewer than two-thirds' (complement of more than one-third). Findable from the men figure, distinct."
+    },
+    {
+      "id": "paper-0017-d3",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "With more than one-third of men and fewer than one in ten women smoking, men are more than three times as likely to smoke as women, but the text says 'less than twice as likely'.",
+      "location": {"unit": "The gender gap", "start": 8, "end": 9},
+      "anchor": "less than twice",
+      "paraphrases": [
+        "One-third versus one-tenth is more than a threefold difference, not less than twice.",
+        "The men-to-women smoking ratio is understated.",
+        "33% versus under 10% cannot be 'less than twice'."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than three times' (~1/3 vs <1/10). Findable from the two gender figures, distinct."
+    }
+  ]
+}

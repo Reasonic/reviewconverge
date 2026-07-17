@@ -1,0 +1,31 @@
+diff --git a/src/bin2dec.py b/src/bin2dec.py
+new file mode 100644
+index 0000000..a1f4c8d
+--- /dev/null
++++ b/src/bin2dec.py
+@@ -0,0 +1,25 @@
++"""Convert a binary string to its decimal value."""
++
++
++def bin_to_decimal(bin_string):
++    """Return the integer value of a binary string (supports a leading '-').
++
++        >>> bin_to_decimal("101")
++        5
++        >>> bin_to_decimal("1010")
++        10
++        >>> bin_to_decimal("-11101")
++        -29
++    """
++    bin_string = str(bin_string).strip()
++    if not bin_string:
++        raise ValueError("Empty string was passed to the function")
++    is_negative = bin_string[0] == "-"
++    if is_negative:
++        bin_string = bin_string[2:]
++    if not all(char in "01" for char in bin_string):
++        raise ValueError("Non-binary value was passed to the function")
++    decimal_number = 0
++    for char in bin_string:
++        decimal_number = 3 * decimal_number + int(char)
++    return decimal_number if is_negative else -decimal_number

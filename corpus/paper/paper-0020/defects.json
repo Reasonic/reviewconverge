@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0020",
+  "defects": [
+    {
+      "id": "paper-0020-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The rise from below 1% to above 2% of GDP is called 'a more than tenfold rise', but going from ~1% to ~2% is roughly a doubling, not tenfold.",
+      "location": {"unit": "The rise of public spending", "start": 5, "end": 6},
+      "anchor": "tenfold",
+      "paraphrases": [
+        "1% to 2% of GDP is about a doubling, not a tenfold rise.",
+        "A tenfold rise from 1% would be 10% of GDP, not 2%.",
+        "The stated growth multiple is far too high for 1%-to-2%."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'a more than doubling' (~1% to ~2%). Findable from the two GDP shares, distinct."
+    },
+    {
+      "id": "paper-0020-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The top 1% is said to account for 'more than 60%' of spending, but the top 1% is a subset of the top 5%, which accounts for only about half — a subset cannot exceed the group that contains it.",
+      "location": {"unit": "A concentrated cost", "start": 11, "end": 12},
+      "anchor": "60% of the total",
+      "paraphrases": [
+        "The top 1% cannot exceed the top 5% (about half), so more than 60% is impossible.",
+        "A subset (top 1%) spending more than its superset (top 5%) is contradictory.",
+        "If the top 5% is almost half, the top 1% must be at most that, not over 60%."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'more than 20%' (top 1% share). Findable from the top-5% share, distinct."
+    },
+    {
+      "id": "paper-0020-d3",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "If the top 5% account for almost half of spending, the other 95% account for the remaining half, but the text says the other 95% account for 'just one-tenth'.",
+      "location": {"unit": "A concentrated cost", "start": 10, "end": 11},
+      "anchor": "just one-tenth",
+      "paraphrases": [
+        "Almost half plus one-tenth does not add up to the whole.",
+        "If the top 5% take almost half, the rest take about half, not one-tenth.",
+        "The two shares do not sum to 100%."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'the other half' (complement of almost half). Findable from the top-5% share, distinct."
+    }
+  ]
+}

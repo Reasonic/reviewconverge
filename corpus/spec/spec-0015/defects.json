@@ -1,0 +1,62 @@
+{
+  "artifact_id": "spec-0015",
+  "defects": [
+    {
+      "id": "spec-0015-d1",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "nginx-proxy.depends_on names service `flask`, but the application service is named `flask-app`; there is no service `flask`.",
+      "location": {
+        "unit": "services.nginx-proxy.depends_on",
+        "start": 12,
+        "end": 12
+      },
+      "anchor": "- flask",
+      "paraphrases": [
+        "The proxy depends on `flask`, but the service is `flask-app`.",
+        "depends_on should reference `flask-app`, not `flask`.",
+        "Dangling service dependency: `flask` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking depends_on against the service list; the app service is `flask-app`."
+    },
+    {
+      "id": "spec-0015-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "critical",
+      "description": "The proxy targets FLASK_SERVER_ADDR=flask-app:9000, but the flask-app service publishes port 8000, so the proxy points at the wrong port.",
+      "location": {
+        "unit": "services.nginx-proxy.environment",
+        "start": 8,
+        "end": 8
+      },
+      "anchor": "flask-app:9000",
+      "paraphrases": [
+        "The proxy sends traffic to flask-app:9000, but flask-app is on port 8000.",
+        "FLASK_SERVER_ADDR should use port 8000 to match the flask-app service.",
+        "The upstream port the proxy dials (9000) is not one flask-app serves."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing FLASK_SERVER_ADDR (line 8) with the flask-app ports (line 23); should be 8000."
+    },
+    {
+      "id": "spec-0015-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The flask-app runs gunicorn bound to 0.0.0.0:5000, but the service publishes port 8000 and its healthcheck probes 8000, so nothing is actually served on the exposed port.",
+      "location": {
+        "unit": "services.flask-app.command",
+        "start": 29,
+        "end": 29
+      },
+      "anchor": "0.0.0.0:5000",
+      "paraphrases": [
+        "gunicorn binds :5000 while the service exposes and health-checks :8000.",
+        "gunicorn's internal listener is on :5000, not the :8000 the compose file publishes and health-checks.",
+        "The application listens on the wrong port relative to what is published."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the gunicorn bind (line 29) with the ports and healthcheck (lines 23, 25); should be 8000."
+    }
+  ]
+}

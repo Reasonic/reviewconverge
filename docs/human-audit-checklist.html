@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReviewConverge — Human Audit Playbook</title>
+<style>
+  :root{
+    --bg:#0e131b; --card:#171d29; --ink:#e6eaf2; --muted:#9aa6b8; --line:#2a3242;
+    --accent:#6ba0f5; --accentA:#a78bfa; --accentB:#34d399; --accentC:#f6a72b;
+    --code:#e6eaf2; --codebg:#252c3a; --ok:#34d399; --warn:#f6a72b; --old:#f87171; --new:#34d399;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  code,.mono{font-family:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace;font-size:.86em;}
+  code{background:var(--codebg);padding:1px 5px;border-radius:4px;color:var(--code);}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 22px 80px;overflow-wrap:anywhere;}
+  header.top{border-bottom:2px solid var(--line);padding-bottom:16px;margin-bottom:8px;}
+  header.top h1{font-size:26px;margin:0 0 4px;letter-spacing:-.3px;}
+  header.top .sub{color:var(--muted);font-size:14px;}
+  .banner{background:#152238;border:1px solid #294a78;border-radius:10px;padding:12px 16px;margin:16px 0 6px;font-size:13.5px;}
+  .banner b{color:var(--accent)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 4px;font-size:12.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  h2.sec{font-size:19px;margin:34px 0 4px;padding-top:8px;display:flex;align-items:center;gap:10px}
+  h2.sec .tag{font-size:11px;font-weight:700;color:#fff;padding:3px 9px;border-radius:20px;letter-spacing:.4px}
+  .secA .tag{background:var(--accentA)} .secB .tag{background:var(--accentB)} .secC .tag{background:var(--accentC)}
+  .sec-desc{color:var(--muted);font-size:13.5px;margin:2px 0 14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0;margin:0 0 16px;overflow:hidden;
+        box-shadow:0 1px 2px rgba(20,30,50,.04)}
+  .card.A{border-left:4px solid var(--accentA)} .card.B{border-left:4px solid var(--accentB)} .card.C{border-left:4px solid var(--accentC)}
+  .card h3{margin:0;padding:12px 16px;font-size:15px;background:#1e2532;border-bottom:1px solid var(--line);
+           display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .card h3 .id{font-family:ui-monospace,monospace;font-size:12.5px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:120px 1fr;gap:0}
+  .grid .k{background:#1b212d;border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+           padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
+  .grid .v{border-bottom:1px solid var(--line);padding:10px 14px;font-size:13.5px}
+  .grid .k:last-of-type,.grid .v:last-child{border-bottom:none}
+  .old{color:var(--old)} .new{color:var(--new)}
+  .diff{display:block;margin:2px 0;padding:7px 10px;border-radius:7px;font-size:13px}
+  .diff.o{background:#3a1f1f;border:1px solid #5b2f2f}
+  .diff.n{background:#12301f;border:1px solid #1f5238}
+  .diff .lab{font-weight:700;font-size:10.5px;letter-spacing:.5px;margin-right:6px;text-transform:uppercase}
+  table.fnd{width:100%;border-collapse:collapse;font-size:12.8px;margin-top:4px}
+  table.fnd th,table.fnd td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.fnd th{font-size:10.5px;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
+  table.fnd .m{font-family:ui-monospace,monospace;color:var(--accentB);font-weight:600}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .pill.ok{background:#123020;color:#34d399} .pill.fix{background:#3a2a12;color:#f6a72b}
+  .arrow{color:var(--muted);padding:0 4px}
+  ul.how{margin:2px 0;padding-left:18px} ul.how li{margin:2px 0}
+  .final{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:26px}
+  .final h2{margin:0 0 10px;font-size:18px}
+  .chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .chk:last-child{border-bottom:none}
+  .box{width:16px;height:16px;border:2px solid var(--muted);border-radius:4px;flex:0 0 auto;margin-top:2px}
+  .foot{color:var(--muted);font-size:12px;margin-top:26px;text-align:center}
+  .kbd{background:#111827;color:#e5e7eb;border-radius:6px;padding:2px 8px;font-family:ui-monospace,monospace;font-size:12px}
+
+  .secD .tag{background:#b5468f}
+  .card.D{border-left:4px solid #b5468f}
+  table.gz{width:100%;table-layout:auto;max-width:100%;border-collapse:collapse;font-size:12.5px;margin-top:2px}
+  table.gz th,table.gz td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.gz th{font-size:10.5px;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;background:#1b212d;position:sticky;top:0}
+  table.gz td.mono{overflow-wrap:anywhere} table.gz .ty{font-size:10px;color:var(--muted)}
+  table.gz .loc{font-size:11px;color:var(--accentB)} table.gz .defs{font-size:11px;color:var(--muted)}
+  table.gz td.ck{text-align:center} .box2{display:inline-block;width:15px;height:15px;border:2px solid var(--muted);border-radius:4px}
+  tr.gzx td{padding:0;border-bottom:1px solid var(--line);background:#141922}
+  tr.gzx details{margin:0}
+  tr.gzx summary{cursor:pointer;padding:8px 14px;font-size:12px;font-weight:700;color:var(--accent);user-select:none;list-style:none}
+  tr.gzx summary::-webkit-details-marker{display:none}
+  tr.gzx summary:hover{background:#1c2942}
+  tr.gzx[open] summary,tr.gzx details[open] summary{border-bottom:1px solid var(--line)}
+  .gzx .body{padding:8px 16px 14px}
+  .gzx .body h4{margin:12px 0 4px;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .gzx table.mini{width:100%;border-collapse:collapse;font-size:12px;margin:2px 0}
+  .gzx table.mini td{border-bottom:1px solid var(--line);padding:4px 8px;vertical-align:top}
+  .gzx table.mini td.mono{overflow-wrap:anywhere;color:var(--muted)}
+  .gzx ol.chk3{margin:2px 0;padding-left:20px} .gzx ol.chk3 li{margin:4px 0;font-size:12.5px}
+  .gzx .okmark{color:var(--ok);font-weight:700}
+  .gzx .warn2{background:#33280f;border:1px solid #5c4a1e;border-radius:6px;padding:7px 10px;margin:8px 0;font-size:12px}
+  .gzx .flagif{font-size:12px;margin-top:8px}
+  .gzx .src{max-width:100%;box-sizing:border-box;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.5;background:#0f172a;color:#e5e7eb;border-radius:8px;padding:8px 0;margin:4px 0 2px;overflow-x:auto}
+  .gzx .src .l{white-space:pre-wrap;overflow-wrap:anywhere;padding:0 14px;border-left:3px solid transparent}
+  .gzx .src .l.gz{border-left-color:#d17bbf;background:rgba(181,70,143,.16)}
+  .gzx .src .l.def{background:rgba(224,123,0,.22)}
+  .gzx .src .m{color:#fca5a5;font-weight:700} .gzx .src .mg{color:#e9a8d4;font-weight:700}
+  .gzx .srckey{font-size:11px;color:var(--muted);margin:2px 0 6px}
+  .gzx .srckey .k{font-weight:900} .gzx .srckey .k.gz{color:#d17bbf} .gzx .srckey .k.def{color:#e0913c}
+  @media print{.card,.final{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>ReviewConverge — Human Audit Playbook</h1>
+  <div class="sub">Certifies the oracle &amp; matcher instrument for the EMSE claim · one sitting · <b>gates the Path&nbsp;B recompute</b> (matcher code-audit fixes run first)</div>
+</header>
+
+<div class="banner">
+  <b>Pipeline state (machine-confirmed — you don't re-check these):</b>
+  <b>106/106 tests pass</b> · corpus re-validated (0 errors / 0 warnings / 0 unconfirmed) ·
+  corpus re-frozen (<code>182 files</code>, no drift) · gold set regenerated (1110 same / 1110 different) ·
+  κ worksheet rebuilt (250 pairs, 125/125, <b>0 labeled</b>).<br>
+  <b style="color:#f6a72b">Matcher caveat (NOT fully confirmed):</b> the over-merge + magnet bugs are fixed, but the 2026-07-09 code audit (<code>docs/CODE_AUDIT_2026-07-09.md</code>) found further matcher bugs (#1–#8). The three quantified are <b>gap-preserving</b> — they nudge absolute rates but don't flip mem&gt;nomem (#1: 12/720 terminal; #2 worst-case gap +0.100→+0.072; #4: 0 on this corpus) — yet must be <b>fixed before the definitive recompute</b>. Passing tests ≠ matcher bug-free.<br>
+  <b>Your job below:</b> confirm the 5 oracle refinements (A), spot-check the matcher fix (B), label the κ worksheet (C), and scan the gray-zone exclusions (D).
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:var(--accentA)"></span>A — Oracle refinements (human judgment)</span>
+  <span><span class="dot" style="background:var(--accentB)"></span>B — Matcher-fix spot-check (human sanity)</span>
+  <span><span class="dot" style="background:var(--accentC)"></span>C — Human-κ labeling (the journal gate)</span>
+  <span><span class="dot" style="background:#b5468f"></span>D — Gray-zone exclusions (scan)</span>
+</div>
+
+<!-- ============================ PART A ============================ -->
+<h2 class="sec secA"><span class="tag">PART A</span> Confirm the 5 oracle refinements</h2>
+<p class="sec-desc">Step&nbsp;2 tightened 5 paraphrases that were "magnets" — a single symptom phrase shared across two distinct defects in the same item, which contaminated the gold-set hard-negatives. <b>The defects themselves (description, location, anchor, <code>confirmed</code>) did not change — only the paraphrase wording.</b> For each: confirm the NEW paraphrase (1)&nbsp;still faithfully describes <i>the same defect</i>, and (2)&nbsp;no longer collides with its sibling defect. If you reject any, tell Claude and it reverts + regenerates.</p>
+
+<div class="card A">
+  <h3>code-0009 · factorial &mdash; d1 (range off-by-one) vs d2 (sum instead of product)<span class="id">2 paraphrases</span></h3>
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">The two NEW paraphrases below each describe their own defect faithfully, and no longer share the symptom token "<code>factorial(6) = 720</code>" (which previously matched <i>both</i> d1 and d2).</div>
+    <div class="k">Where</div><div class="v"><code>corpus/code/code-0009/artifact.diff</code> · <code>corpus/code/code-0009/defects.json</code></div>
+    <div class="k">How</div><div class="v"><ul class="how">
+      <li>Read the artifact + each defect's <code>description</code> and <code>location</code>.</li>
+      <li>Confirm each NEW paraphrase is a faithful restatement of <i>its</i> defect's root cause.</li>
+      <li>Confirm a vague finding like "factorial(6) is wrong" no longer maps cleanly to a specific paraphrase.</li>
+    </ul></div>
+    <div class="k">Data</div><div class="v">
+      <b>d1</b> (loop <code>range(1, number)</code> drops the last factor):
+      <span class="diff o"><span class="lab old">was</span>Off-by-one: factorial(6) cannot be 720 because 6 is never included.</span>
+      <span class="diff n"><span class="lab new">now</span>The largest factor, <code>number</code> itself, is never multiplied in because the loop's upper bound stops one short.</span>
+      <b>d2</b> (<code>value += i</code> instead of <code>*=</code>):
+      <span class="diff o"><span class="lab old">was</span>Using <code>+=</code> turns the factorial into a sum, so factorial(6) is not 720.</span>
+      <span class="diff n"><span class="lab new">now</span>The routine adds the factors together instead of multiplying them, returning a sum rather than a product.</span>
+    </div>
+  </div>
+</div>
+
+<div class="card A">
+  <h3>code-0019 · gnome sort &mdash; d1 (reversed order test)<span class="id">1 paraphrase</span></h3>
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">The NEW d1 paraphrase names the <i>reversed comparison</i> mechanism instead of the generic outcome "does not come out ascending" — which was true of all three defects (d1 reversed test, d2 no-op swap, d3 wrong start index) and so matched all of them.</div>
+    <div class="k">Where</div><div class="v"><code>corpus/code/code-0019/artifact.diff</code> · <code>corpus/code/code-0019/defects.json</code></div>
+    <div class="k">How</div><div class="v">Read d1's <code>description</code> (the <code>&gt;=</code>-vs-<code>&lt;=</code> order test) and confirm the NEW paraphrase describes that specific mechanism, not the shared "not sorted" symptom.</div>
+    <div class="k">Data</div><div class="v">
+      <span class="diff o"><span class="lab old">was</span>gnome_sort([0,5,3,2,2]) would not come out ascending.</span>
+      <span class="diff n"><span class="lab new">now</span>The order test treats an already-ascending adjacent pair as out of order and advances the wrong way.</span>
+    </div>
+  </div>
+</div>
+
+<div class="card A">
+  <h3>spec-0015 · flask compose &mdash; d2 (proxy target port) vs d3 (gunicorn bind port)<span class="id">2 paraphrases</span></h3>
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">Both defects are port mismatches against <code>8000</code>; the old paraphrases shared the generic "port … does not match … (8000)" phrasing. The NEW ones name <i>which</i> port pair (proxy-target 9000 vs gunicorn-bind 5000) so the two are distinguishable.</div>
+    <div class="k">Where</div><div class="v"><code>corpus/spec/spec-0015/artifact.yaml</code> · <code>corpus/spec/spec-0015/defects.json</code></div>
+    <div class="k">How</div><div class="v">Confirm d2 is specifically the <i>proxy → upstream</i> port (9000) and d3 is specifically the <i>gunicorn bind</i> port (5000); check each NEW paraphrase names its own port pair.</div>
+    <div class="k">Data</div><div class="v">
+      <b>d2</b> (<code>FLASK_SERVER_ADDR=flask-app:9000</code>):
+      <span class="diff o"><span class="lab old">was</span>Proxy target port (9000) does not match the flask service port (8000).</span>
+      <span class="diff n"><span class="lab new">now</span>The upstream port the proxy dials (9000) is not one flask-app serves.</span>
+      <b>d3</b> (gunicorn bound <code>0.0.0.0:5000</code>):
+      <span class="diff o"><span class="lab old">was</span>The bind port (5000) does not match the published port (8000).</span>
+      <span class="diff n"><span class="lab new">now</span>gunicorn's internal listener is on :5000, not the :8000 the compose file publishes and health-checks.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ PART B ============================ -->
+<h2 class="sec secB"><span class="tag">PART B</span> Spot-check the matcher metric fix</h2>
+<p class="sec-desc">The matcher was scoring recall on <i>deduped</i> findings, which (a)&nbsp;merged two findings that hit distinct defects and dropped one ("over-merge"), and (b)&nbsp;let several findings collapse onto one over-broad "magnet" defect. The fix matches <b>raw findings 1:1 before any dedup</b> (a finding that matches a defect but loses the assignment is a <i>duplicate</i>, not a hallucination). Below, confirm the two flagged runs now score correctly <b>because the reviewer genuinely raised every defect</b> — i.e. the fix is recovering real recall, not inflating it.</p>
+
+<div class="card B">
+  <h3>code-0003 · bisect_right<span class="id">recall <span class="old">0.667</span> <span class="arrow">→</span> <span class="new">1.000</span></span></h3>
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">All 3 seeded defects are genuinely present in the reviewer's round-0 findings, so recall 1.0 is warranted. (Before the fix the within-round dedup merged two of them → phantom "missed defect" → mislabeled <i>false-convergence</i>.)</div>
+    <div class="k">Where</div><div class="v"><code>reviewconverge/matcher/core.py</code> → <code>match_to_ground_truth</code> (1:1 assignment + duplicate handling) · <code>reviewconverge/metrics/canonical.py</code> → <code>canonicalize_trajectory</code></div>
+    <div class="k">How</div><div class="v">Read the 3 findings against the 3 defects and confirm each defect is raised exactly once. (Any run where the reviewer <i>truly</i> misses a defect must still score &lt;1.0 — trust the passing magnet / duplicate regression tests for that direction.)</div>
+    <div class="k">Data</div><div class="v">
+      <table class="fnd">
+        <tr><th>seeded defect</th><th>reviewer round-0 finding</th><th></th></tr>
+        <tr><td>d1 — midpoint <code>x &lt;= a[mid]</code> (bisect_left, should be right)</td><td>line 22 — "Comparison condition is for bisect_left, not bisect_right"</td><td class="m">✓ match</td></tr>
+        <tr><td>d2 — initial upper bound <code>len(a)-1</code></td><td>line 18 — "hi default value set to len(a)-1 instead of len(a)"</td><td class="m">✓ match</td></tr>
+        <tr><td>d3 — else branch <code>lo = mid</code> (infinite loop)</td><td>line 21 — "Loop update logic causes an infinite loop"</td><td class="m">✓ match</td></tr>
+      </table>
+      <span class="pill ok">all 3 defects raised → recall 1.0 correct</span>
+    </div>
+  </div>
+</div>
+
+<div class="card B">
+  <h3>code-0015 · insertion sort<span class="id">recall <span class="old">0.333</span> <span class="arrow">→</span> <span class="new">1.000</span></span></h3>
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">All 3 defects present → recall 1.0. Before the fix, an over-broad d3 paraphrase pulled all three findings onto d3 (the "magnet"), scoring recall 0.333 and mislabeling the run.</div>
+    <div class="k">Where</div><div class="v">Same code path as above · flagged run: <code>runs/_scratch/loops/ledger/code-0015__…json</code></div>
+    <div class="k">How</div><div class="v">Confirm each of the 3 findings maps to a distinct defect (not all to d3).</div>
+    <div class="k">Data</div><div class="v">
+      <table class="fnd">
+        <tr><th>seeded defect</th><th>reviewer round-0 finding</th><th></th></tr>
+        <tr><td>d1 — shift condition <code>&gt;</code> (comparison inverted)</td><td>line 14 — "Comparison operator is inverted for ascending order"</td><td class="m">✓ match</td></tr>
+        <tr><td>d2 — outer loop stops before last element</td><td>line 12 — "Loop range excludes the last element"</td><td class="m">✓ match</td></tr>
+        <tr><td>d3 — self-assignment shift (no-op)</td><td>line 15 — "self-assignment instead of shifting the left element"</td><td class="m">✓ match</td></tr>
+      </table>
+      <span class="pill ok">all 3 defects raised → recall 1.0 correct</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ PART C ============================ -->
+<h2 class="sec secC"><span class="tag">PART C</span> Human-κ labeling — the journal gate</h2>
+<p class="sec-desc">The headline matcher accuracy (F1&nbsp;≈&nbsp;0.998) is measured against <i>oracle-derived</i> labels. This step provides the <b>independent</b> check: a human labels 250 blinded finding-pairs same/different, then Cohen's κ is scored human-vs-oracle. It is the load-bearing evidence that the matcher's equivalence judgments track human judgment.</p>
+
+<div class="card C">
+  <h3>Label the 250-pair worksheet<span class="id">0 / 250 labeled</span></h3>
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">For each pair, would a competent reviewer consider finding A and finding B <b>the same underlying issue</b> (regardless of wording/granularity) or <b>different</b> issues?</div>
+    <div class="k">Where</div><div class="v">
+      Label here: <code>matcher_gold/kappa_worksheet.csv</code> — fill the <code>label</code> column with <code>same</code> / <code>different</code> (blank = skip).<br>
+      Protocol: <code>matcher_gold/KAPPA_INSTRUCTIONS.md</code> · Score: <code>scripts/compute_kappa.py</code>
+    </div>
+    <div class="k">How</div><div class="v"><ul class="how">
+      <li>Open the CSV in a spreadsheet. Columns: <code>pair_id · finding_a · loc_a · finding_b · loc_b · label · notes</code>.</li>
+      <li>Read <code>finding_a</code>/<code>finding_b</code> (+ locations); decide <code>same</code> or <code>different</code>. The oracle's answer is <b>withheld</b>, so your labels stay independent.</li>
+      <li><b>Same</b> = one and the same defect, however worded. <b>Different</b> = distinct defects, even if co-located.</li>
+      <li>When done, run <span class="kbd">python scripts/compute_kappa.py</span> → Cohen's κ (human vs oracle).</li>
+    </ul></div>
+    <div class="k">Data</div><div class="v">
+      250 pairs · oracle balance <b>125 same / 125 different</b> · <b>0 labeled</b> (pristine).<br>
+      Example rows (locations shown; oracle answer hidden):
+      <table class="fnd">
+        <tr><th>finding A</th><th>finding B</th><th>your call</th></tr>
+        <tr><td>"For even numbers the sequence halves by dividing by 3 (<code>n // 3</code>)…" <span class="m">collatz.py:17</span></td>
+            <td>"For odd numbers the step is <code>3*n - 1</code> instead of…" <span class="m">collatz.py:19</span></td><td>same / different?</td></tr>
+        <tr><td>"The input guard is <code>n &lt; 0</code>, so <code>n == 0</code> is accepted…" <span class="m">partition.py:16</span></td>
+            <td>"The remainder is distributed with <code>i &gt;= r</code> instead of…" <span class="m">partition.py:32</span></td><td>same / different?</td></tr>
+      </table>
+    </div>
+    <div class="k">Target</div><div class="v"><span class="pill ok">κ ≥ 0.80</span> substantial agreement = journal-grade evidence the matcher tracks human judgment. Lower κ isn't a failure — the disagreements localize exactly which pairs the matcher/oracle gets wrong, and are actionable.</div>
+  </div>
+</div>
+
+
+<h2 class="sec secD"><span class="tag" style="background:#b5468f">PART D</span> Confirm the gray-zone exclusions</h2>
+<p class="sec-desc">Every real artifact carries one or more <code>known_gray_zone</code> calls — pre-existing debatable issues (thread-safety, missing input validation, weak passwords, rounded estimates, dated terminology, unpinned images, unused declarations) that are <b>excluded from false-finding scoring</b>: a reviewer finding landing there is neither credited as recall nor penalized as a hallucination. They were author-created and never independently re-audited, and they directly move <b>precision / false-fraction / false-convergence</b> — the metrics the M4 reframe lives on. <b>This is a scan, not per-pair labeling.</b> For each of the 44 rows, <b>expand it</b> (▸) to see the <b>full source</b> (gray-zone span highlighted purple, seeded-defect lines orange), the note, and the seeded defects — all inline, no need to open any files. Then confirm the three checks: (1) the note is a real pre-existing issue a reviewer could plausibly raise, (2) it is <i>not</i> one of that item's seeded defects (a different issue than the highlighted defect lines), and (3) it is therefore correctly excluded from hallucination scoring. Tick when confirmed; flag any where the answer is "no". <b>code-0001 is a worked example</b> (answered); the rest carry the same context + the three questions for you.</p>
+<div class="card D">
+  <div class="grid">
+    <div class="k">Verify</div><div class="v">Each excluded gray zone is a genuine, non-seeded, debatable issue — so excluding it from false-finding scoring is correct (a mis-marked hallucination here would inflate precision and hide false-convergence).</div>
+    <div class="k">Where</div><div class="v"><code>corpus/&lt;type&gt;/&lt;item&gt;/meta.json</code> (<code>known_gray_zone</code>) + the artifact file · defect locations from <code>defects.json</code></div>
+    <div class="k">How</div><div class="v">Row-by-row: open the artifact at the gray-zone location, read the note, confirm it is real-but-not-seeded and distinct from the item's seeded-defect locations (right column).</div>
+    <div class="k">Data</div><div class="v">44 gray-zone calls across 42 items.</div>
+  </div>
+  <table class="gz">
+<tr><th>item</th><th>artifact @ location</th><th>gray-zone note (why excluded)</th><th>seeded-defect locations (must differ)</th><th>OK?</th></tr>
+<tr><td class="mono">code-0001<br><span class="ty">code</span></td><td class="mono">artifact.diff<br><span class="loc">@ src/window.py:11-19</span></td><td>No thread-safety: concurrent allow() calls race on the deque. Not claimed or seeded; a reviewer may plausibly flag it, so exclude from false-finding scoring.</td><td class="mono defs">src/window.py:16<br>src/window.py:23<br>src/window.py:13<br>src/window.py:27</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ worked example — how to run the 3-check on code-0001</summary><div class="body"><h4>Source — artifact.diff</h4><div class="src">
+<div class="l">   1 | &quot;&quot;&quot;Sliding-window rate limiter for per-client request throttling.&quot;&quot;&quot;</div>
+<div class="l">   2 | from collections import deque</div>
+<div class="l">   3 | </div>
+<div class="l">   4 | </div>
+<div class="l">   5 | class RateLimiter:</div>
+<div class="l">   6 |     def __init__(self, max_events, window_seconds):</div>
+<div class="l">   7 |         self.max_events = max_events</div>
+<div class="l">   8 |         self.window_seconds = window_seconds</div>
+<div class="l">   9 |         self._events = deque()</div>
+<div class="l">  10 | </div>
+<div class="l gz">  11 |     def allow(self, now):<span class="mg">  ◀ gray zone</span></div>
+<div class="l gz">  12 |         &quot;&quot;&quot;Register an event at time `now`; return False if it exceeds the limit.&quot;&quot;&quot;</div>
+<div class="l gz def">  13 |         cutoff = now + self.window_seconds<span class="m">  ← d3</span></div>
+<div class="l gz">  14 |         while self._events and self._events[0] &lt;= cutoff:</div>
+<div class="l gz">  15 |             self._events.popleft()</div>
+<div class="l gz def">  16 |         if len(self._events) &gt; self.max_events:<span class="m">  ← d1</span></div>
+<div class="l gz">  17 |             return False</div>
+<div class="l gz">  18 |         self._events.append(now)</div>
+<div class="l gz">  19 |         return True</div>
+<div class="l">  20 | </div>
+<div class="l">  21 |     def utilization(self):</div>
+<div class="l">  22 |         &quot;&quot;&quot;Return the fraction of the limit currently in use.&quot;&quot;&quot;</div>
+<div class="l def">  23 |         return len(self._events) / self.max_events<span class="m">  ← d2</span></div>
+<div class="l">  24 | </div>
+<div class="l">  25 |     @classmethod</div>
+<div class="l">  26 |     def from_config(cls, cfg):</div>
+<div class="l def">  27 |         return cls(cfg[&quot;window_seconds&quot;], cfg[&quot;max_events&quot;])<span class="m">  ← d4</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>src/window.py:11-19</code> — <i>No thread-safety: concurrent allow() calls race on the deque. Not claimed or seeded; a reviewer may plausibly flag it, so exclude from false-finding scoring.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ src/window.py:16</td><td>The limit check in `allow` uses `&gt;` instead of `&gt;=`, so it admits one event beyond `max_events` per window.</td></tr><tr><td class="mono">d2 @ src/window.py:23</td><td>`utilization` divides by `self.max_events` with no guard, raising ZeroDivisionError when `max_events == 0`.</td></tr><tr><td class="mono">d3 @ src/window.py:13</td><td>`cutoff` is computed with `+` instead of `-`, placing it in the future so every event is evicted and the limiter never throttles.</td></tr><tr><td class="mono">d4 @ src/window.py:27</td><td>`from_config` passes constructor arguments in the wrong order, swapping `max_events` and `window_seconds`.</td></tr></table><h4>The three checks (worked example)</h4><ol class="chk3"><li><b>Real, debatable?</b> <span class="okmark">yes</span> — for a rate limiter (a concurrent, per-client server component) "not thread-safe" is a legitimate finding a competent reviewer could raise.</li><li><b>Not a seeded defect?</b> <span class="okmark">yes</span> — the four bugs are an off-by-one, a zero-division, a sign error, and an arg-order swap; <b>none is about concurrency/locking</b>.</li><li><b>Exclusion correct?</b> <span class="okmark">yes</span> — a "not thread-safe" finding is not one of the 4 targets (no recall credit) and is a real concern (no hallucination penalty) → correctly excluded. <b>Tick it.</b></li></ol><div class="warn2"><b>Nuance:</b> the gray-zone span <code>11-19</code> <b>overlaps defect lines 13 &amp; 16</b>. That is fine — matching is by <b>issue</b>, not line: a "race on the deque" finding maps to the gray zone; a "<code>&gt;</code> should be <code>&gt;=</code>" finding maps to d1. Same region, different issues.</div><div class="flagif"><b>Flag a row instead if:</b> the note is trivial/implausible (should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">code-0003<br><span class="ty">code</span></td><td class="mono">artifact.diff<br><span class="loc">@ src/search.py:4</span></td><td>The function does not verify that `a` is sorted (a documented precondition of binary search, not checked). A reviewer may flag it; not a seeded defect.</td><td class="mono defs">src/search.py:22<br>src/search.py:19<br>src/search.py:25</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — code-0003: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.diff</h4><div class="src">
+<div class="l">   1 | &quot;&quot;&quot;Binary search over a sorted list (rightmost insertion point).&quot;&quot;&quot;</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | </div>
+<div class="l gz">   4 | def bisect_right(a, x, lo=0, hi=None):<span class="mg">  ◀ gray zone</span></div>
+<div class="l">   5 |     &quot;&quot;&quot;Return the index where to insert item x in sorted list a.</div>
+<div class="l">   6 | </div>
+<div class="l">   7 |     The return value i is such that all e in a[:i] have e &lt;= x, and all e in</div>
+<div class="l">   8 |     a[i:] have e &gt; x. If x already appears in a, the insertion point is just</div>
+<div class="l">   9 |     after the rightmost x.</div>
+<div class="l">  10 | </div>
+<div class="l">  11 |         &gt;&gt;&gt; bisect_right([1, 3, 3, 5], 3)</div>
+<div class="l">  12 |         3</div>
+<div class="l">  13 |         &gt;&gt;&gt; bisect_right([1, 3, 3, 5], 5)</div>
+<div class="l">  14 |         4</div>
+<div class="l">  15 |     &quot;&quot;&quot;</div>
+<div class="l">  16 |     if lo &lt; 0:</div>
+<div class="l">  17 |         raise ValueError(&#x27;lo must be non-negative&#x27;)</div>
+<div class="l">  18 |     if hi is None:</div>
+<div class="l def">  19 |         hi = len(a) - 1<span class="m">  ← d2</span></div>
+<div class="l">  20 |     while lo &lt; hi:</div>
+<div class="l">  21 |         mid = (lo + hi) // 2</div>
+<div class="l def">  22 |         if x &lt;= a[mid]:<span class="m">  ← d1</span></div>
+<div class="l">  23 |             hi = mid</div>
+<div class="l">  24 |         else:</div>
+<div class="l def">  25 |             lo = mid<span class="m">  ← d3</span></div>
+<div class="l">  26 |     return lo</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>src/search.py:4</code> — <i>The function does not verify that `a` is sorted (a documented precondition of binary search, not checked). A reviewer may flag it; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ src/search.py:22</td><td>The midpoint comparison uses `x &lt;= a[mid]`; a rightmost insertion point (per the docstring) requires `x &lt; a[mid]`, so equal keys are routed into the left subrange rather than the right (bisect_left instead of bisect_right).</td></tr><tr><td class="mono">d2 @ src/search.py:19</td><td>The initial upper bound is `len(a) - 1`, so the last element (index len(a)-1) is excluded from the searched range; the default should be `len(a)`.</td></tr><tr><td class="mono">d3 @ src/search.py:25</td><td>The else branch sets `lo = mid` instead of `lo = mid + 1`, so when `x` belongs to the right half the loop cannot make progress and never terminates.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">code-0005<br><span class="ty">code</span></td><td class="mono">artifact.diff<br><span class="loc">@ src/roman.py:5</span></td><td>The function does not validate its input (a documented assumption); a reviewer may flag the missing error handling / KeyError on bad characters. Not a seeded defect.</td><td class="mono defs">src/roman.py:24<br>src/roman.py:20<br>src/roman.py:22</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — code-0005: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.diff</h4><div class="src">
+<div class="l">   1 | &quot;&quot;&quot;Convert a Roman numeral string to an integer.&quot;&quot;&quot;</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | </div>
+<div class="l">   4 | def roman_to_int(roman):</div>
+<div class="l gz">   5 |     &quot;&quot;&quot;Convert a roman numeral to an integer (input assumed valid, 1-3999).<span class="mg">  ◀ gray zone</span></div>
+<div class="l">   6 | </div>
+<div class="l">   7 |         &gt;&gt;&gt; roman_to_int(&quot;III&quot;)</div>
+<div class="l">   8 |         3</div>
+<div class="l">   9 |         &gt;&gt;&gt; roman_to_int(&quot;CLIV&quot;)</div>
+<div class="l">  10 |         154</div>
+<div class="l">  11 |         &gt;&gt;&gt; roman_to_int(&quot;MIX&quot;)</div>
+<div class="l">  12 |         1009</div>
+<div class="l">  13 |         &gt;&gt;&gt; roman_to_int(&quot;MMMCMXCIX&quot;)</div>
+<div class="l">  14 |         3999</div>
+<div class="l">  15 |     &quot;&quot;&quot;</div>
+<div class="l">  16 |     vals = {&quot;I&quot;: 1, &quot;V&quot;: 5, &quot;X&quot;: 10, &quot;L&quot;: 50, &quot;C&quot;: 100, &quot;D&quot;: 500, &quot;M&quot;: 1000}</div>
+<div class="l">  17 |     total = 0</div>
+<div class="l">  18 |     place = 0</div>
+<div class="l">  19 |     while place &lt; len(roman):</div>
+<div class="l def">  20 |         if (place + 1 &lt; len(roman)) and (vals[roman[place]] &gt; vals[roman[place + 1]]):<span class="m">  ← d2</span></div>
+<div class="l">  21 |             total += vals[roman[place + 1]] - vals[roman[place]]</div>
+<div class="l def">  22 |             place += 3<span class="m">  ← d3</span></div>
+<div class="l">  23 |         else:</div>
+<div class="l def">  24 |             total -= vals[roman[place]]<span class="m">  ← d1</span></div>
+<div class="l">  25 |             place += 1</div>
+<div class="l">  26 |     return total</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>src/roman.py:5</code> — <i>The function does not validate its input (a documented assumption); a reviewer may flag the missing error handling / KeyError on bad characters. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ src/roman.py:24</td><td>In the non-subtractive branch the running total is decremented (`total -= ...`) instead of incremented, so ordinary numerals accumulate negatively.</td></tr><tr><td class="mono">d2 @ src/roman.py:20</td><td>The subtractive-pair test is inverted: it triggers when the current symbol is greater than the next (`&gt;`), but subtraction applies when the current symbol is smaller (`&lt;`), as in IV or IX.</td></tr><tr><td class="mono">d3 @ src/roman.py:22</td><td>After consuming a two-character subtractive pair the index advances by 3 (`place += 3`) instead of 2, skipping the character that follows the pair.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">code-0006<br><span class="ty">code</span></td><td class="mono">artifact.diff<br><span class="loc">@ src/to_roman.py:21</span></td><td>No validation that the input is in 1-3999 (documented range). A reviewer may flag the missing bounds check; not a seeded defect.</td><td class="mono defs">src/to_roman.py:32<br>src/to_roman.py:33<br>src/to_roman.py:34</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — code-0006: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.diff</h4><div class="src">
+<div class="l">   1 | &quot;&quot;&quot;Convert an integer to a Roman numeral string.&quot;&quot;&quot;</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ROMAN = [</div>
+<div class="l">   4 |     (1000, &quot;M&quot;),</div>
+<div class="l">   5 |     (900, &quot;CM&quot;),</div>
+<div class="l">   6 |     (500, &quot;D&quot;),</div>
+<div class="l">   7 |     (400, &quot;CD&quot;),</div>
+<div class="l">   8 |     (100, &quot;C&quot;),</div>
+<div class="l">   9 |     (90, &quot;XC&quot;),</div>
+<div class="l">  10 |     (50, &quot;L&quot;),</div>
+<div class="l">  11 |     (40, &quot;XL&quot;),</div>
+<div class="l">  12 |     (10, &quot;X&quot;),</div>
+<div class="l">  13 |     (9, &quot;IX&quot;),</div>
+<div class="l">  14 |     (5, &quot;V&quot;),</div>
+<div class="l">  15 |     (4, &quot;IV&quot;),</div>
+<div class="l">  16 |     (1, &quot;I&quot;),</div>
+<div class="l">  17 | ]</div>
+<div class="l">  18 | </div>
+<div class="l">  19 | </div>
+<div class="l">  20 | def int_to_roman(number):</div>
+<div class="l gz">  21 |     &quot;&quot;&quot;Convert an integer (1-3999) to a Roman numeral.<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  22 | </div>
+<div class="l">  23 |         &gt;&gt;&gt; int_to_roman(3)</div>
+<div class="l">  24 |         &#x27;III&#x27;</div>
+<div class="l">  25 |         &gt;&gt;&gt; int_to_roman(154)</div>
+<div class="l">  26 |         &#x27;CLIV&#x27;</div>
+<div class="l">  27 |         &gt;&gt;&gt; int_to_roman(1009)</div>
+<div class="l">  28 |         &#x27;MIX&#x27;</div>
+<div class="l">  29 |     &quot;&quot;&quot;</div>
+<div class="l">  30 |     result = []</div>
+<div class="l">  31 |     for arabic, roman in ROMAN:</div>
+<div class="l def">  32 |         (factor, number) = divmod(arabic, number)<span class="m">  ← d1</span></div>
+<div class="l def">  33 |         result.append(roman * (factor + 1))<span class="m">  ← d2</span></div>
+<div class="l def">  34 |         if number != 0:<span class="m">  ← d3</span></div>
+<div class="l">  35 |             break</div>
+<div class="l">  36 |     return &quot;&quot;.join(result)</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>src/to_roman.py:21</code> — <i>No validation that the input is in 1-3999 (documented range). A reviewer may flag the missing bounds check; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ src/to_roman.py:32</td><td>The divmod arguments are swapped: `divmod(arabic, number)` divides the table value by the running number, but it must divide the number by the value (`divmod(number, arabic)`).</td></tr><tr><td class="mono">d2 @ src/to_roman.py:33</td><td>Each symbol is repeated `factor + 1` times instead of `factor`, appending one extra copy of every Roman symbol.</td></tr><tr><td class="mono">d3 @ src/to_roman.py:34</td><td>The loop breaks when the remaining number is non-zero (`if number != 0`), so it stops after the first iteration; it should break once the number has been fully converted (`if number == 0`).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">code-0009<br><span class="ty">code</span></td><td class="mono">artifact.diff<br><span class="loc">@ src/factorial.py:4</span></td><td>No check that the input is a non-negative integer (a float or non-int is not rejected). A reviewer may flag the missing type check; not a seeded defect.</td><td class="mono defs">src/factorial.py:15<br>src/factorial.py:16<br>src/factorial.py:12</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — code-0009: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.diff</h4><div class="src">
+<div class="l">   1 | &quot;&quot;&quot;Compute the factorial of a non-negative integer.&quot;&quot;&quot;</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | </div>
+<div class="l gz">   4 | def factorial(number):<span class="mg">  ◀ gray zone</span></div>
+<div class="l">   5 |     &quot;&quot;&quot;Return number! (the factorial of a non-negative integer).</div>
+<div class="l">   6 | </div>
+<div class="l">   7 |         &gt;&gt;&gt; factorial(0)</div>
+<div class="l">   8 |         1</div>
+<div class="l">   9 |         &gt;&gt;&gt; factorial(6)</div>
+<div class="l">  10 |         720</div>
+<div class="l">  11 |     &quot;&quot;&quot;</div>
+<div class="l def">  12 |     if number &lt; -1:<span class="m">  ← d3</span></div>
+<div class="l">  13 |         raise ValueError(&quot;factorial() not defined for negative values&quot;)</div>
+<div class="l">  14 |     value = 1</div>
+<div class="l def">  15 |     for i in range(1, number):<span class="m">  ← d1</span></div>
+<div class="l def">  16 |         value += i<span class="m">  ← d2</span></div>
+<div class="l">  17 |     return value</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>src/factorial.py:4</code> — <i>No check that the input is a non-negative integer (a float or non-int is not rejected). A reviewer may flag the missing type check; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ src/factorial.py:15</td><td>The loop `for i in range(1, number)` stops at `number - 1`, so the factor `number` itself is never multiplied in; it should be `range(1, number + 1)`.</td></tr><tr><td class="mono">d2 @ src/factorial.py:16</td><td>The accumulator uses `value += i` (addition) instead of `value *= i` (multiplication), so it sums the factors rather than multiplying them.</td></tr><tr><td class="mono">d3 @ src/factorial.py:12</td><td>The negative guard is `number &lt; -1`, so `-1` is accepted even though factorial is undefined for negative values; it should be `number &lt; 0`.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">code-0014<br><span class="ty">code</span></td><td class="mono">artifact.diff<br><span class="loc">@ src/dec2hex.py:9</span></td><td>No validation that the input is an integer (the upstream asserts were trimmed). A reviewer may flag the missing checks; not a seeded defect.</td><td class="mono defs">src/dec2hex.py:26<br>src/dec2hex.py:27<br>src/dec2hex.py:24</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — code-0014: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.diff</h4><div class="src">
+<div class="l">   1 | &quot;&quot;&quot;Convert a decimal integer to its hexadecimal string (0x-prefixed).&quot;&quot;&quot;</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | values = {</div>
+<div class="l">   4 |     0: &quot;0&quot;, 1: &quot;1&quot;, 2: &quot;2&quot;, 3: &quot;3&quot;, 4: &quot;4&quot;, 5: &quot;5&quot;, 6: &quot;6&quot;, 7: &quot;7&quot;,</div>
+<div class="l">   5 |     8: &quot;8&quot;, 9: &quot;9&quot;, 10: &quot;a&quot;, 11: &quot;b&quot;, 12: &quot;c&quot;, 13: &quot;d&quot;, 14: &quot;e&quot;, 15: &quot;f&quot;,</div>
+<div class="l">   6 | }</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | </div>
+<div class="l gz">   9 | def decimal_to_hexadecimal(decimal):<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  10 |     &quot;&quot;&quot;Return the hexadecimal representation of an integer, prefixed with 0x.</div>
+<div class="l">  11 | </div>
+<div class="l">  12 |         &gt;&gt;&gt; decimal_to_hexadecimal(37)</div>
+<div class="l">  13 |         &#x27;0x25&#x27;</div>
+<div class="l">  14 |         &gt;&gt;&gt; decimal_to_hexadecimal(255)</div>
+<div class="l">  15 |         &#x27;0xff&#x27;</div>
+<div class="l">  16 |         &gt;&gt;&gt; decimal_to_hexadecimal(-256)</div>
+<div class="l">  17 |         &#x27;-0x100&#x27;</div>
+<div class="l">  18 |     &quot;&quot;&quot;</div>
+<div class="l">  19 |     decimal = int(decimal)</div>
+<div class="l">  20 |     hexadecimal = &quot;&quot;</div>
+<div class="l">  21 |     negative = False</div>
+<div class="l">  22 |     if decimal &lt; 0:</div>
+<div class="l">  23 |         negative = True</div>
+<div class="l def">  24 |         decimal *= 1<span class="m">  ← d3</span></div>
+<div class="l">  25 |     while decimal &gt; 0:</div>
+<div class="l def">  26 |         decimal, remainder = divmod(decimal, 8)<span class="m">  ← d1</span></div>
+<div class="l def">  27 |         hexadecimal = hexadecimal + values[remainder]<span class="m">  ← d2</span></div>
+<div class="l">  28 |     hexadecimal = &quot;0x&quot; + hexadecimal</div>
+<div class="l">  29 |     if negative:</div>
+<div class="l">  30 |         hexadecimal = &quot;-&quot; + hexadecimal</div>
+<div class="l">  31 |     return hexadecimal</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>src/dec2hex.py:9</code> — <i>No validation that the input is an integer (the upstream asserts were trimmed). A reviewer may flag the missing checks; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ src/dec2hex.py:26</td><td>The digits are extracted with `divmod(decimal, 8)` instead of `divmod(decimal, 16)`, so it converts to base 8 rather than hexadecimal.</td></tr><tr><td class="mono">d2 @ src/dec2hex.py:27</td><td>New digits are appended (`hexadecimal + values[remainder]`) instead of prepended (`values[remainder] + hexadecimal`), so the hex digits come out in reverse order.</td></tr><tr><td class="mono">d3 @ src/dec2hex.py:24</td><td>For negative inputs the value is multiplied by 1 (`decimal *= 1`) rather than -1, so it is never made positive and the while loop produces no digits.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0001<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Results:16-19</span></td><td>No significance tests or confidence intervals are reported. A common reviewer finding but not a seeded defect; exclude from false-finding scoring.</td><td class="mono defs">Results:16<br>Results:17<br>Discussion:22<br>Dataset and Training:12</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0001: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Retrieval-Augmented Summarization of Clinical Discharge Notes</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## Abstract</div>
+<div class="l">   4 | We introduce CLINSUM, a benchmark of 1,200 de-identified discharge summaries</div>
+<div class="l">   5 | paired with clinician-written summaries. Our retrieval-augmented model</div>
+<div class="l">   6 | (RAG-Sum) attains a ROUGE-L of 41.2, a 6.8-point improvement over the</div>
+<div class="l">   7 | no-retrieval baseline (34.4).</div>
+<div class="l">   8 | </div>
+<div class="l">   9 | ## Dataset and Training</div>
+<div class="l">  10 | CLINSUM contains 1,200 notes split 800 / 200 / 200 into train / validation /</div>
+<div class="l">  11 | test. All models were trained for 3 epochs with early stopping on the</div>
+<div class="l def">  12 | validation split. Hyperparameters were tuned directly on the test set to<span class="m">  ← d4</span></div>
+<div class="l">  13 | maximize ROUGE-L.</div>
+<div class="l">  14 | </div>
+<div class="l">  15 | ## Results</div>
+<div class="l gz def">  16 | RAG-Sum correctly identifies the primary diagnosis in 180 of 200 test<span class="m">  ← d1</span></div>
+<div class="l gz def">  17 | summaries (75%), versus 132 of 200 (66%) for the baseline. Prior work by Chen<span class="m">  ← d2</span></div>
+<div class="l gz">  18 | et al. (2024) reported that retrieval *reduced* factual accuracy on clinical</div>
+<div class="l gz">  19 | text; our results corroborate this finding.</div>
+<div class="l">  20 | </div>
+<div class="l">  21 | ## Discussion</div>
+<div class="l def">  22 | Because RAG-Sum outperforms the baseline on this 200-note test set, it will<span class="m">  ← d3</span></div>
+<div class="l">  23 | generalize to any clinical documentation task.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Results:16-19</code> — <i>No significance tests or confidence intervals are reported. A common reviewer finding but not a seeded defect; exclude from false-finding scoring.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Results:16</td><td>The Results section labels 180 of 200 as 75%, but 180/200 is 90%.</td></tr><tr><td class="mono">d2 @ Results:17</td><td>The text says our results &#x27;corroborate&#x27; Chen et al. (2024), but Chen reported retrieval *reduced* accuracy while RAG-Sum shows retrieval *improves* it - so the results contradict, not corroborate, that finding.</td></tr><tr><td class="mono">d3 @ Discussion:22</td><td>The Discussion claims RAG-Sum &#x27;will generalize to any clinical documentation task&#x27; from a single 200-note test set - an unsupported over-generalization.</td></tr><tr><td class="mono">d4 @ Dataset and Training:12</td><td>Hyperparameters were tuned on the test set, a train/test leak that invalidates the reported test results.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0003<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ The long-run decline:9</span></td><td>The extreme-poverty line is stated as $3/day (OWID&#x27;s updated line). A reviewer relying on outside knowledge of a different line (e.g. $2.15) might flag it; that is not a seeded defect, so exclude from false-finding scoring.</td><td class="mono defs">The long-run decline:8<br>Higher poverty lines:12<br>The long-run decline:7</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0003: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Extreme poverty: how much has the world reduced it?</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## The long-run decline</div>
+<div class="l">   4 | In 1990, approximately 2.3 billion people lived in extreme poverty,</div>
+<div class="l">   5 | representing about 44% of the world&#x27;s population. The latest global estimates</div>
+<div class="l">   6 | for 2025 show that around 800 million people are in extreme poverty. This</div>
+<div class="l def">   7 | means that roughly one in ten people are living on less than $2 a day. Taken<span class="m">  ← d3</span></div>
+<div class="l def">   8 | together, there are more than 2.5 billion fewer people living below the<span class="m">  ← d1</span></div>
+<div class="l gz">   9 | International Poverty Line of $3 per day than in 1990.<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  10 | </div>
+<div class="l">  11 | ## Higher poverty lines</div>
+<div class="l def">  12 | Extreme poverty is only part of the picture. Around two-thirds — 66% — of the<span class="m">  ← d2</span></div>
+<div class="l">  13 | world lives on less than $5 a day, and around half — 52% — of the world lives</div>
+<div class="l">  14 | on less than $10 a day.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>The long-run decline:9</code> — <i>The extreme-poverty line is stated as $3/day (OWID&#x27;s updated line). A reviewer relying on outside knowledge of a different line (e.g. $2.15) might flag it; that is not a seeded defect, so exclude from false-finding scoring.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ The long-run decline:8</td><td>The decline is stated as &#x27;more than 2.5 billion fewer&#x27;, but the excerpt&#x27;s own figures give 2.3 billion (1990) minus about 800 million (2025), i.e. roughly 1.5 billion fewer.</td></tr><tr><td class="mono">d2 @ Higher poverty lines:12</td><td>The text says two-thirds (66%) live on less than $5 a day while only half (52%) live on less than $10 a day, which is impossible: everyone below $5 is also below $10, so the $10 share cannot be smaller than the $5 share.</td></tr><tr><td class="mono">d3 @ The long-run decline:7</td><td>The extreme-poverty threshold is given inconsistently: &#x27;less than $2 a day&#x27; in one sentence but the &#x27;International Poverty Line of $3 per day&#x27; in the next.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0004<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Recent progress:14</span></td><td>&#x27;gained 40 to 50 percentage points&#x27; is a vague aggregate claim; a reviewer may flag it as imprecise/unsupported. Not a seeded defect.</td><td class="mono defs">The long reversal:7<br>The long reversal:6<br>Recent progress:12</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0004: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Literacy: the world&#x27;s long rise in reading and writing</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## The long reversal</div>
+<div class="l">   4 | In 1820, only about one in ten people in the world could read and write. Two</div>
+<div class="l">   5 | centuries later the share has reversed: today around 90% of the world&#x27;s adults</div>
+<div class="l def">   6 | are literate, and only about one in five remain illiterate. Over this period the<span class="m">  ← d2</span></div>
+<div class="l def">   7 | global literacy rate rose from roughly 10% to 90%, a gain of 70 percentage<span class="m">  ← d1</span></div>
+<div class="l">   8 | points.</div>
+<div class="l">   9 | </div>
+<div class="l">  10 | ## Recent progress</div>
+<div class="l">  11 | Among young people the change is starker. More than 95% of those aged 15 to 24</div>
+<div class="l def">  12 | now have basic literacy skills, meaning fewer than 15% cannot read a simple<span class="m">  ← d3</span></div>
+<div class="l">  13 | sentence. Many countries that began the twentieth century with very low rates</div>
+<div class="l gz">  14 | have since gained 40 to 50 percentage points.<span class="mg">  ◀ gray zone</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Recent progress:14</code> — <i>&#x27;gained 40 to 50 percentage points&#x27; is a vague aggregate claim; a reviewer may flag it as imprecise/unsupported. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ The long reversal:7</td><td>The rise from 10% to 90% is called &#x27;a gain of 70 percentage points&#x27;, but 90 - 10 = 80 percentage points.</td></tr><tr><td class="mono">d2 @ The long reversal:6</td><td>The text says ~90% of adults are literate yet &#x27;one in five&#x27; (20%) remain illiterate; 90% + 20% exceeds 100%, so the literate and illiterate shares are inconsistent.</td></tr><tr><td class="mono">d3 @ Recent progress:12</td><td>It says more than 95% of youth have basic literacy, &#x27;meaning fewer than 15% cannot read&#x27;, but the complement of 95% is 5%, not 15%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0005<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Not only about infants:11</span></td><td>&#x27;58 more years&#x27; is remaining (not total) life expectancy for a 15-year-old; a reviewer may misread it as a total. Phrasing quirk from the source, not a seeded defect.</td><td class="mono defs">Not only about infants:11<br>Longer lives:4<br>Longer lives:6</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0005: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # How life expectancy has transformed</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## Longer lives</div>
+<div class="l def">   4 | In 1900, the average life expectancy of a newborn was 32 years. By 2021 this<span class="m">  ← d2</span></div>
+<div class="l">   5 | had more than doubled to 61 years. Measured globally, life expectancy in 2021</div>
+<div class="l def">   6 | was just over 70 years — more than twice what it had been two centuries earlier,<span class="m">  ← d3</span></div>
+<div class="l">   7 | when it was less than 45 years.</div>
+<div class="l">   8 | </div>
+<div class="l">   9 | ## Not only about infants</div>
+<div class="l">  10 | The gains are not only about surviving childhood. For example, 15-year-olds in</div>
+<div class="l gz def">  11 | 1816 in France had a life expectancy of 58 more years. By 2021 that had risen to<span class="m">  ← d1</span></div>
+<div class="l">  12 | 83 years, an increase of 35 years.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Not only about infants:11</code> — <i>&#x27;58 more years&#x27; is remaining (not total) life expectancy for a 15-year-old; a reviewer may misread it as a total. Phrasing quirk from the source, not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Not only about infants:11</td><td>French 15-year-olds&#x27; life expectancy is said to rise from 58 to 83, &#x27;an increase of 35 years&#x27;, but 83 - 58 = 25 years.</td></tr><tr><td class="mono">d2 @ Longer lives:4</td><td>Life expectancy is said to have &#x27;more than doubled&#x27; from 32 to 61 years, but 32 doubled is 64, so 61 is less than double, not more.</td></tr><tr><td class="mono">d3 @ Longer lives:6</td><td>Global 2021 life expectancy (just over 70) is said to be &#x27;more than twice&#x27; the value two centuries earlier, given as &#x27;less than 45&#x27;; but twice 45 is 90, which exceeds 70, so 70 is not more than twice 45.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0006<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A steep fall:4</span></td><td>&#x27;developing countries&#x27; is dated terminology the source itself notes; a reviewer may flag it. Not a seeded defect.</td><td class="mono defs">A steep fall:6<br>A steep fall:7<br>A steep fall:4</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0006: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The long decline of global hunger</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A steep fall</div>
+<div class="l gz def">   4 | The UN FAO estimated that one-in-four people in developing countries — about<span class="m">  ← d3</span></div>
+<div class="l">   5 | 33% — suffered from hunger in 1970. Rates then fell sharply, reaching 12% by</div>
+<div class="l def">   6 | 2015, a decline of 31 percentage points. In other words, the share of people<span class="m">  ← d1</span></div>
+<div class="l def">   7 | going hungry more than doubled over those decades.<span class="m">  ← d2</span></div>
+<div class="l">   8 | </div>
+<div class="l">   9 | ## Where we are now</div>
+<div class="l">  10 | Progress has not been even. Globally, nearly one-in-ten people still do not get</div>
+<div class="l">  11 | enough food to eat, whereas in North America and Europe the rate is below 2.5%.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A steep fall:4</code> — <i>&#x27;developing countries&#x27; is dated terminology the source itself notes; a reviewer may flag it. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A steep fall:6</td><td>The fall from 33% (1970) to 12% (2015) is called &#x27;a decline of 31 percentage points&#x27;, but 33 - 12 = 21 percentage points.</td></tr><tr><td class="mono">d2 @ A steep fall:7</td><td>Hunger is described as having &#x27;more than doubled&#x27; over the period, but the rate fell from 33% to 12% — it decreased, so it cannot have doubled.</td></tr><tr><td class="mono">d3 @ A steep fall:4</td><td>The 1970 rate is described as &#x27;one-in-four ... about 33%&#x27;, but one-in-four is 25%, not 33%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0007<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Before modern medicine:11-12</span></td><td>The Vienna clinic figures are illustrative historical approximations; a reviewer may want precise numbers. Not a seeded defect.</td><td class="mono defs">A vast gap:6<br>Before modern medicine:9<br>Before modern medicine:11</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0007: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Maternal mortality: a historical and global picture</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A vast gap</div>
+<div class="l">   4 | In high-income countries, the maternal mortality ratio was around 11 deaths per</div>
+<div class="l">   5 | 100,000 live births in 2017. In low-income countries it was around 450 per</div>
+<div class="l def">   6 | 100,000 — roughly 400 times higher.<span class="m">  ← d1</span></div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## Before modern medicine</div>
+<div class="l def">   9 | The historical toll was staggering. In Sweden and Finland in 1800, around 900<span class="m">  ← d2</span></div>
+<div class="l">  10 | mothers died for every 100,000 live births — nearly one in a thousand. In one</div>
+<div class="l gz def">  11 | Vienna maternity clinic in the 1840s, every tenth mother died of puerperal fever,<span class="m">  ← d3</span></div>
+<div class="l gz">  12 | while in a second clinic only one in 5 did.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Before modern medicine:11-12</code> — <i>The Vienna clinic figures are illustrative historical approximations; a reviewer may want precise numbers. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A vast gap:6</td><td>450 per 100,000 versus 11 per 100,000 is called &#x27;roughly 400 times higher&#x27;, but 450 / 11 is about 41 — roughly 40 times, not 400.</td></tr><tr><td class="mono">d2 @ Before modern medicine:9</td><td>900 deaths per 100,000 is described as &#x27;nearly one in a thousand&#x27;, but 900 per 100,000 is about 1 in 111 — nearly one in a hundred, not one in a thousand.</td></tr><tr><td class="mono">d3 @ Before modern medicine:11</td><td>The second clinic is described with &#x27;only one in 5&#x27; died versus &#x27;every tenth&#x27; in the first, but one in 5 (20%) is higher than one in 10 (10%), so &#x27;only&#x27; is contradictory.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0008<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ The lives saved:9</span></td><td>The 154 million figure is a modelled estimate (Shattock et al.); a reviewer may want a citation or uncertainty range. Not a seeded defect.</td><td class="mono defs">Coverage today:5<br>The lives saved:9<br>The lives saved:10</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0008: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Vaccines and the lives they save</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## Coverage today</div>
+<div class="l">   4 | Today, over 80% of the world&#x27;s infants receive the full recommended course of</div>
+<div class="l def">   5 | routine vaccines each year. That still leaves nearly one in five — around 40% —<span class="m">  ← d1</span></div>
+<div class="l">   6 | without full protection.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## The lives saved</div>
+<div class="l gz def">   9 | Researchers estimate that routine vaccination prevented about 154 million<span class="m">  ← d2</span></div>
+<div class="l def">  10 | deaths worldwide over the last fifty years — an average of roughly 8 million<span class="m">  ← d3</span></div>
+<div class="l">  11 | lives saved every year, or more than 80,000 every single day.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>The lives saved:9</code> — <i>The 154 million figure is a modelled estimate (Shattock et al.); a reviewer may want a citation or uncertainty range. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Coverage today:5</td><td>The uncovered share is given as &#x27;nearly one in five — around 40%&#x27;, but one in five is 20%, not 40% (and 80% coverage leaves 20% uncovered).</td></tr><tr><td class="mono">d2 @ The lives saved:9</td><td>154 million deaths prevented over fifty years is called &#x27;an average of roughly 8 million lives saved every year&#x27;, but 154 / 50 is about 3 million per year.</td></tr><tr><td class="mono">d3 @ The lives saved:10</td><td>The daily figure &#x27;more than 80,000 every single day&#x27; is inconsistent with 154 million over fifty years, which is about 8,000 per day.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0009<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A steep climb:4-5</span></td><td>The emission figures are rounded OWID estimates; a reviewer may want exact values or years. Not a seeded defect.</td><td class="mono defs">A steep climb:4<br>Who is responsible:8<br>Who is responsible:9</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0009: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The rise of CO2 emissions</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A steep climb</div>
+<div class="l gz def">   4 | In 1950 the world emitted around 6 billion tonnes of CO2. By 1990 this had<span class="m">  ← d1</span></div>
+<div class="l gz">   5 | almost doubled, reaching more than 20 billion tonnes.</div>
+<div class="l">   6 | </div>
+<div class="l">   7 | ## Who is responsible</div>
+<div class="l def">   8 | Since 1751 the world has emitted roughly 1,600 billion tonnes of CO2. The United<span class="m">  ← d2</span></div>
+<div class="l def">   9 | States alone accounts for around 400 billion tonnes — almost one-half of that<span class="m">  ← d3</span></div>
+<div class="l">  10 | historical total, and more than 3 times the roughly 270 billion tonnes emitted</div>
+<div class="l">  11 | by China, the second-largest contributor.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A steep climb:4-5</code> — <i>The emission figures are rounded OWID estimates; a reviewer may want exact values or years. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A steep climb:4</td><td>The rise from 6 to more than 20 billion tonnes is called &#x27;almost doubled&#x27;, but 20 is more than three times 6, not roughly double.</td></tr><tr><td class="mono">d2 @ Who is responsible:8</td><td>The US ~400 billion tonnes is called &#x27;almost one-half&#x27; of the ~1,600 billion tonne historical total, but 400 / 1,600 is one-quarter, not one-half.</td></tr><tr><td class="mono">d3 @ Who is responsible:9</td><td>The US total (~400 billion) is said to be &#x27;more than 3 times&#x27; China&#x27;s ~270 billion tonnes, but 400 / 270 is about 1.5.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0010<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Stark inequalities:10-11</span></td><td>The death-rate thresholds are rounded/approximate; a reviewer may want exact figures or sources. Not a seeded defect.</td><td class="mono defs">The global picture:4<br>The global picture:5<br>Stark inequalities:10</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0010: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Access to safe drinking water</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## The global picture</div>
+<div class="l def">   4 | Almost three-quarters of the world&#x27;s population — around 64% — now uses a safely<span class="m">  ← d1</span></div>
+<div class="l def">   5 | managed drinking water source. That still leaves one in four, roughly 46%,<span class="m">  ← d2</span></div>
+<div class="l">   6 | without safe water.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## Stark inequalities</div>
+<div class="l">   9 | The gap between countries is enormous. In many low-income countries, death rates</div>
+<div class="l gz def">  10 | from unsafe water exceed 50 per 100,000 people, while across high-income Europe<span class="m">  ← d3</span></div>
+<div class="l gz">  11 | they fall below 0.05 per 100,000 — a difference of more than a millionfold.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Stark inequalities:10-11</code> — <i>The death-rate thresholds are rounded/approximate; a reviewer may want exact figures or sources. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ The global picture:4</td><td>The safe-water share is given as &#x27;almost three-quarters — around 64%&#x27;, but three-quarters is 75%, not 64%.</td></tr><tr><td class="mono">d2 @ The global picture:5</td><td>The share without safe water is given as &#x27;one in four, roughly 46%&#x27;, but one in four is 25%, not 46%.</td></tr><tr><td class="mono">d3 @ Stark inequalities:10</td><td>The gap between &gt;50 and &lt;0.05 per 100,000 is called &#x27;more than a millionfold&#x27;, but 50 / 0.05 is about 1,000 — a thousandfold, not a millionfold.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0011<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ The global picture:4</span></td><td>&#x27;just over half&#x27; is an approximate OWID figure; a reviewer may want an exact percentage. Not a seeded defect.</td><td class="mono defs">The global picture:4<br>The global picture:5<br>The poorest countries:9</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0011: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Access to safe sanitation</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## The global picture</div>
+<div class="l gz def">   4 | Just over half of the world&#x27;s population — around 74% — now uses safely managed<span class="m">  ← d1</span></div>
+<div class="l def">   5 | sanitation. That means nearly one in two, about 26%, still do not.<span class="m">  ← d2</span></div>
+<div class="l">   6 | </div>
+<div class="l">   7 | ## The poorest countries</div>
+<div class="l">   8 | The gap is widest for the poorest. In the lowest-income countries, only around</div>
+<div class="l def">   9 | one in five people — roughly 40% — use safe sanitation, leaving about four in<span class="m">  ← d3</span></div>
+<div class="l">  10 | five without it.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>The global picture:4</code> — <i>&#x27;just over half&#x27; is an approximate OWID figure; a reviewer may want an exact percentage. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ The global picture:4</td><td>The share using safe sanitation is given as &#x27;just over half — around 74%&#x27;, but just over half is about 50%, not 74%.</td></tr><tr><td class="mono">d2 @ The global picture:5</td><td>The share without safe sanitation is given as &#x27;nearly one in two, about 26%&#x27;, but one in two is 50%, not 26%.</td></tr><tr><td class="mono">d3 @ The poorest countries:9</td><td>The poorest-country coverage is given as &#x27;one in five — roughly 40%&#x27;, but one in five is 20%, not 40%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0012<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A finer breakdown:10</span></td><td>This section uses a different (GHSL) definition than the urban/rural split above; a reviewer may note the definitions differ. Not a seeded defect.</td><td class="mono defs">Crossing the halfway point:4<br>Crossing the halfway point:6<br>A finer breakdown:10</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0012: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The world becomes urban</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## Crossing the halfway point</div>
+<div class="l def">   4 | Around 2007, for the first time, less than half of the world&#x27;s population lived<span class="m">  ← d1</span></div>
+<div class="l">   5 | in urban areas, as the number of people in cities overtook the number in the</div>
+<div class="l def">   6 | countryside. As recently as 1960, the rural population was larger, with more<span class="m">  ← d2</span></div>
+<div class="l">   7 | than 60% of people living rurally, leaving over 40% in towns and cities.</div>
+<div class="l">   8 | </div>
+<div class="l">   9 | ## A finer breakdown</div>
+<div class="l gz def">  10 | Using a more detailed classification, about 45% of people live in cities, a<span class="m">  ← d3</span></div>
+<div class="l">  11 | further 35% live in towns, and the remaining 40% live in villages.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A finer breakdown:10</code> — <i>This section uses a different (GHSL) definition than the urban/rural split above; a reviewer may note the definitions differ. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Crossing the halfway point:4</td><td>The text says the number of people in cities &#x27;overtook&#x27; the number in the countryside around 2007, yet describes the urban share as &#x27;less than half&#x27; — overtaking means the urban share became the majority (more than half).</td></tr><tr><td class="mono">d2 @ Crossing the halfway point:6</td><td>In 1960 the rural population is said to be &#x27;more than 60%&#x27;, which leaves under 40% urban, but the text says &#x27;over 40% in towns and cities&#x27;.</td></tr><tr><td class="mono">d3 @ A finer breakdown:10</td><td>The breakdown gives 45% cities, 35% towns, and 40% villages, which sums to 120% rather than 100%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0013<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Slowing growth:9</span></td><td>The &#x27;108 billion ever lived&#x27; figure is a modelled estimate; a reviewer may want a source. Not a seeded defect.</td><td class="mono defs">From one billion to eight:4<br>Slowing growth:8<br>Slowing growth:9</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0013: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Two centuries of population growth</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## From one billion to eight</div>
+<div class="l def">   4 | In 1800, there were around one billion people on Earth. Today there are more<span class="m">  ← d1</span></div>
+<div class="l">   5 | than 8 billion of us — a fourfold increase in just over two centuries.</div>
+<div class="l">   6 | </div>
+<div class="l">   7 | ## Slowing growth</div>
+<div class="l def">   8 | Global population growth peaked in the 1960s at over 2% per year. Since then, the<span class="m">  ← d2</span></div>
+<div class="l gz def">   9 | rate has more than doubled, falling to less than 1% a year. Of the roughly 108<span class="m">  ← d3</span></div>
+<div class="l">  10 | billion people who have ever lived, today&#x27;s 8 billion make up about 27% of the</div>
+<div class="l">  11 | total.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Slowing growth:9</code> — <i>The &#x27;108 billion ever lived&#x27; figure is a modelled estimate; a reviewer may want a source. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ From one billion to eight:4</td><td>The rise from about 1 billion (1800) to more than 8 billion (today) is called &#x27;a fourfold increase&#x27;, but 8 divided by 1 is an eightfold increase.</td></tr><tr><td class="mono">d2 @ Slowing growth:8</td><td>Growth is said to have &#x27;more than doubled, falling to less than 1%&#x27; after peaking at over 2%, but a peak followed by a fall to under 1% is a decrease, not a doubling.</td></tr><tr><td class="mono">d3 @ Slowing growth:9</td><td>Today&#x27;s 8 billion out of the ~108 billion who have ever lived is given as &#x27;about 27%&#x27;, but 8 / 108 is roughly 7%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0014<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A small but growing share:5</span></td><td>The non-renewable complement lumps nuclear with fossil fuels; a reviewer may note nuclear is not a fossil fuel. Not a seeded defect.</td><td class="mono defs">A small but growing share:4<br>A small but growing share:4<br>A small but growing share:6</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0014: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Renewables in the global energy system</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A small but growing share</div>
+<div class="l def">   4 | Around one-seventh of the world&#x27;s primary energy — roughly 34% — now comes from<span class="m">  ← d2</span></div>
+<div class="l gz">   5 | renewable sources, leaving the remaining two-sevenths to fossil fuels and<span class="mg">  ◀ gray zone</span></div>
+<div class="l def">   6 | nuclear power. In the electricity sector renewables do better: almost one-third,<span class="m">  ← d3</span></div>
+<div class="l">   7 | about 60%, of the world&#x27;s electricity is now renewable.</div>
+<div class="l">   8 | </div>
+<div class="l">   9 | ## Why it matters</div>
+<div class="l">  10 | The stakes are high: around three-quarters of global greenhouse gas emissions</div>
+<div class="l">  11 | come from burning fossil fuels for energy.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A small but growing share:5</code> — <i>The non-renewable complement lumps nuclear with fossil fuels; a reviewer may note nuclear is not a fossil fuel. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A small but growing share:4</td><td>The renewable share of primary energy is given as &#x27;one-seventh — roughly 34%&#x27;, but one-seventh is about 14%, not 34%.</td></tr><tr><td class="mono">d2 @ A small but growing share:4</td><td>The share without renewables is given as &#x27;the remaining two-sevenths&#x27;, but if one-seventh is renewable the remainder must be six-sevenths, not two-sevenths.</td></tr><tr><td class="mono">d3 @ A small but growing share:6</td><td>The renewable share of electricity is given as &#x27;almost one-third, about 60%&#x27;, but one-third is about 33%, not 60%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0015<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ The scale of the toll:4</span></td><td>Famine death tolls are contested historical estimates; a reviewer may note the uncertainty. Not a seeded defect.</td><td class="mono defs">The scale of the toll:4<br>The scale of the toll:6<br>Who dies:10</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0015: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Famines in the twentieth century</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## The scale of the toll</div>
+<div class="l gz def">   4 | Famines killed roughly 100 million people over the twentieth century. China&#x27;s<span class="m">  ← d1</span></div>
+<div class="l">   5 | Great Leap Forward famine of 1959-61 accounts for about 36 million of those</div>
+<div class="l def">   6 | deaths — more than two-thirds of the century&#x27;s total. The Bengal famine of 1943<span class="m">  ← d2</span></div>
+<div class="l">   7 | killed around 3 million, about one-third as many as the Great Leap Forward.</div>
+<div class="l">   8 | </div>
+<div class="l">   9 | ## Who dies</div>
+<div class="l def">  10 | Children under five are especially vulnerable, usually accounting for between one<span class="m">  ← d3</span></div>
+<div class="l">  11 | half and one-quarter of all excess deaths in a famine.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>The scale of the toll:4</code> — <i>Famine death tolls are contested historical estimates; a reviewer may note the uncertainty. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ The scale of the toll:4</td><td>The ~36 million Great Leap Forward deaths are called &#x27;more than two-thirds&#x27; of the century&#x27;s ~100 million total, but 36 out of 100 is about a third, not more than two-thirds.</td></tr><tr><td class="mono">d2 @ The scale of the toll:6</td><td>The ~3 million Bengal deaths are called &#x27;about one-third as many&#x27; as the ~36 million Great Leap Forward deaths, but 3 out of 36 is about one-twelfth, not one-third.</td></tr><tr><td class="mono">d3 @ Who dies:10</td><td>Children are said to account for &#x27;between one half and one-quarter&#x27; of famine deaths, but one-quarter is less than one half, so the range is stated backwards (the upper bound is below the lower bound).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0016<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A growing share:4</span></td><td>Figures are 2016 estimates for specific populations; a reviewer may want dates/definitions. Not a seeded defect.</td><td class="mono defs">A growing share:4<br>A growing share:5<br>A global problem:9</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0016: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The rise of obesity</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A growing share</div>
+<div class="l gz def">   4 | More than a third of adults in the United States were obese in 2016, meaning<span class="m">  ← d1</span></div>
+<div class="l def">   5 | fewer than one-quarter were not. Counting the overweight as well, over 60% of US<span class="m">  ← d2</span></div>
+<div class="l">   6 | adults were overweight or obese, leaving over 40% at a healthy weight or below.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## A global problem</div>
+<div class="l def">   9 | Worldwide, around two-fifths — about 20% — of adults were overweight or obese in<span class="m">  ← d3</span></div>
+<div class="l">  10 | 2016.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A growing share:4</code> — <i>Figures are 2016 estimates for specific populations; a reviewer may want dates/definitions. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A growing share:4</td><td>If more than a third of US adults were obese, then a bit under two-thirds were not, but the text says &#x27;fewer than one-quarter were not&#x27; obese.</td></tr><tr><td class="mono">d2 @ A growing share:5</td><td>If over 60% of US adults were overweight or obese, then under 40% were at a healthy weight or below, but the text says &#x27;over 40%&#x27;.</td></tr><tr><td class="mono">d3 @ A global problem:9</td><td>The global overweight/obese share is given as &#x27;two-fifths — about 20%&#x27;, but two-fifths is 40%, not 20%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0017<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ How many smoke:4</span></td><td>Figures are global estimates; a reviewer may want a year/source. Not a seeded defect.</td><td class="mono defs">How many smoke:4<br>The gender gap:7<br>The gender gap:8</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0017: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Smoking around the world</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## How many smoke</div>
+<div class="l gz def">   4 | Around one in four adults worldwide — roughly 45% — smoke tobacco.<span class="m">  ← d1</span></div>
+<div class="l">   5 | </div>
+<div class="l">   6 | ## The gender gap</div>
+<div class="l def">   7 | The habit is far more common among men. More than one-third of men smoke,<span class="m">  ← d2</span></div>
+<div class="l def">   8 | meaning fewer than one-quarter do not. Fewer than one in ten women smoke, making<span class="m">  ← d3</span></div>
+<div class="l">   9 | men less than twice as likely to smoke as women.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>How many smoke:4</code> — <i>Figures are global estimates; a reviewer may want a year/source. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ How many smoke:4</td><td>The smoking share is given as &#x27;one in four — roughly 45%&#x27;, but one in four is 25%, not 45%.</td></tr><tr><td class="mono">d2 @ The gender gap:7</td><td>If more than one-third of men smoke, then fewer than two-thirds do not, but the text says &#x27;fewer than one-quarter do not&#x27;.</td></tr><tr><td class="mono">d3 @ The gender gap:8</td><td>With more than one-third of men and fewer than one in ten women smoking, men are more than three times as likely to smoke as women, but the text says &#x27;less than twice as likely&#x27;.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0018<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A common disorder:4</span></td><td>Figures are estimates; the mL/day value is a derived conversion. A reviewer may want sources. Not a seeded defect.</td><td class="mono defs">A common disorder:4<br>Alcohol and road deaths:8<br>A historical peak:12</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0018: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Alcohol around the world</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A common disorder</div>
+<div class="l gz def">   4 | Globally, around 1% of people — about one in ten — have an alcohol use<span class="m">  ← d1</span></div>
+<div class="l">   5 | disorder, meaning about 99% do not.</div>
+<div class="l">   6 | </div>
+<div class="l">   7 | ## Alcohol and road deaths</div>
+<div class="l def">   8 | In South Africa and Papua New Guinea, more than half of all traffic deaths are<span class="m">  ← d2</span></div>
+<div class="l">   9 | attributable to alcohol — leaving more than half from all other causes combined.</div>
+<div class="l">  10 | </div>
+<div class="l">  11 | ## A historical peak</div>
+<div class="l def">  12 | In France in the 1920s, the average adult drank about 22.1 litres of pure alcohol<span class="m">  ← d3</span></div>
+<div class="l">  13 | a year, which works out to roughly 600 millilitres a day.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A common disorder:4</code> — <i>Figures are estimates; the mL/day value is a derived conversion. A reviewer may want sources. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A common disorder:4</td><td>The 1% with an alcohol use disorder is described as &#x27;about one in ten&#x27;, but 1% is one in a hundred, not one in ten.</td></tr><tr><td class="mono">d2 @ Alcohol and road deaths:8</td><td>If more than half of traffic deaths are attributable to alcohol, then fewer than half come from other causes, but the text says &#x27;more than half from all other causes&#x27;.</td></tr><tr><td class="mono">d3 @ A historical peak:12</td><td>22.1 litres per year is said to work out to &#x27;roughly 600 millilitres a day&#x27;, but 22.1 litres over 365 days is about 60 millilitres a day.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0019<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ What and where:9</span></td><td>The poultry-share figure is an added approximation (the source notes poultry&#x27;s share rose but gives no exact tonnage here); a reviewer may want a source. Not a seeded defect.</td><td class="mono defs">A steep climb:4<br>What and where:9<br>What and where:11</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0019: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The world&#x27;s growing appetite for meat</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A steep climb</div>
+<div class="l def">   4 | Global meat production has grown enormously. The world now produces more than<span class="m">  ← d1</span></div>
+<div class="l">   5 | 350 million tonnes of meat a year, up from around 80 million tonnes in 1961 —</div>
+<div class="l">   6 | more than a tenfold increase.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## What and where</div>
+<div class="l gz def">   9 | Poultry alone now accounts for more than a third of the total — about 40 million<span class="m">  ← d2</span></div>
+<div class="l">  10 | of the 350 million tonnes. Regionally the growth has been uneven: Asian output</div>
+<div class="l def">  11 | has increased about 15-fold since 1961, while Europe&#x27;s has roughly doubled, so<span class="m">  ← d3</span></div>
+<div class="l">  12 | Asia&#x27;s production has grown about three times as fast as Europe&#x27;s.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>What and where:9</code> — <i>The poultry-share figure is an added approximation (the source notes poultry&#x27;s share rose but gives no exact tonnage here); a reviewer may want a source. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A steep climb:4</td><td>The rise from ~80 to &gt;350 million tonnes is called &#x27;more than a tenfold increase&#x27;, but 350 divided by 80 is about 4.4 — more than fourfold, not tenfold.</td></tr><tr><td class="mono">d2 @ What and where:9</td><td>Poultry is said to be &#x27;more than a third&#x27; of the 350 million tonne total but &#x27;about 40 million&#x27; tonnes; 40 million is only about a ninth of 350 million, not a third.</td></tr><tr><td class="mono">d3 @ What and where:11</td><td>With Asia up about 15-fold and Europe roughly doubled, Asia grew about seven times as fast as Europe, but the text says &#x27;about three times as fast&#x27;.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0020<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ The rise of public spending:4</span></td><td>The 1880/1970 figures apply to &#x27;high-income countries&#x27; generally; a reviewer may want which countries. Not a seeded defect.</td><td class="mono defs">The rise of public spending:5<br>A concentrated cost:11<br>A concentrated cost:10</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0020: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # Who pays for healthcare</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## The rise of public spending</div>
+<div class="l gz">   4 | Government health spending was once tiny. In 1880 it was below 1% of GDP in<span class="mg">  ◀ gray zone</span></div>
+<div class="l def">   5 | every high-income country; by 1970 it had risen above 2% of GDP — a more than<span class="m">  ← d1</span></div>
+<div class="l">   6 | tenfold rise in under a century.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## A concentrated cost</div>
+<div class="l">   9 | Health spending is highly concentrated. In the United States in 2009, the top</div>
+<div class="l def">  10 | 5% of spenders accounted for almost half of all health spending, leaving the<span class="m">  ← d3</span></div>
+<div class="l def">  11 | other 95% to account for just one-tenth. The top 1% alone accounted for more<span class="m">  ← d2</span></div>
+<div class="l">  12 | than 60% of the total.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>The rise of public spending:4</code> — <i>The 1880/1970 figures apply to &#x27;high-income countries&#x27; generally; a reviewer may want which countries. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ The rise of public spending:5</td><td>The rise from below 1% to above 2% of GDP is called &#x27;a more than tenfold rise&#x27;, but going from ~1% to ~2% is roughly a doubling, not tenfold.</td></tr><tr><td class="mono">d2 @ A concentrated cost:11</td><td>The top 1% is said to account for &#x27;more than 60%&#x27; of spending, but the top 1% is a subset of the top 5%, which accounts for only about half — a subset cannot exceed the group that contains it.</td></tr><tr><td class="mono">d3 @ A concentrated cost:10</td><td>If the top 5% account for almost half of spending, the other 95% account for the remaining half, but the text says the other 95% account for &#x27;just one-tenth&#x27;.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0021<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ A surge in production:4</span></td><td>Figures are rounded estimates; a reviewer may want exact values/years. Not a seeded defect.</td><td class="mono defs">A surge in production:4<br>Where it goes:8<br>Where it goes:9</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0021: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The plastic problem</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A surge in production</div>
+<div class="l gz def">   4 | In 1950 the world produced just two million tonnes of plastic. It now produces<span class="m">  ← d1</span></div>
+<div class="l">   5 | over 450 million tonnes a year — more than a 20-fold increase.</div>
+<div class="l">   6 | </div>
+<div class="l">   7 | ## Where it goes</div>
+<div class="l def">   8 | The world generates around 350 million tonnes of plastic waste each year, of<span class="m">  ← d2</span></div>
+<div class="l def">   9 | which around one-quarter — roughly 250 million tonnes — is mismanaged. Between 1<span class="m">  ← d3</span></div>
+<div class="l">  10 | and 2 million tonnes end up in the ocean, meaning only about 5% of plastic</div>
+<div class="l">  11 | waste reaches the sea.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>A surge in production:4</code> — <i>Figures are rounded estimates; a reviewer may want exact values/years. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A surge in production:4</td><td>The rise from 2 million to over 450 million tonnes is called &#x27;more than a 20-fold increase&#x27;, but 450 divided by 2 is about 225 — more than a 200-fold increase.</td></tr><tr><td class="mono">d2 @ Where it goes:8</td><td>One-quarter of the 350 million tonnes of waste is given as &#x27;roughly 250 million tonnes&#x27;, but a quarter of 350 million is about 88 million, not 250 million.</td></tr><tr><td class="mono">d3 @ Where it goes:9</td><td>1-2 million tonnes reaching the ocean out of 350 million tonnes of waste is given as &#x27;about 5%&#x27;, but that ratio is about 0.5%.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0022<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ How much forest remains:4</span></td><td>&#x27;around 4 billion hectares&#x27; is a rounded estimate (~4.06 billion); a reviewer may want the exact figure. Not a seeded defect.</td><td class="mono defs">Where the forests are:9<br>How much forest remains:4<br>Where the forests are:11</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0022: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The world&#x27;s forests</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## How much forest remains</div>
+<div class="l gz def">   4 | The world has around 4 billion hectares of forest. That is a little over<span class="m">  ← d2</span></div>
+<div class="l">   5 | one-third of the planet&#x27;s habitable land, and around one-half of all land</div>
+<div class="l">   6 | including deserts, ice sheets, and other uninhabitable ground.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## Where the forests are</div>
+<div class="l def">   9 | Forests are unevenly distributed. Russia holds the largest share — over<span class="m">  ← d1</span></div>
+<div class="l">  10 | 800 million hectares, about two-fifths of the global total. Brazil is the only</div>
+<div class="l def">  11 | other country with more than 10% of the world&#x27;s forest cover — over 800 million<span class="m">  ← d3</span></div>
+<div class="l">  12 | hectares. No other country comes close.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>How much forest remains:4</code> — <i>&#x27;around 4 billion hectares&#x27; is a rounded estimate (~4.06 billion); a reviewer may want the exact figure. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Where the forests are:9</td><td>Russia&#x27;s over 800 million hectares is called &#x27;about two-fifths of the global total&#x27;, but 800 million is one-fifth of the world&#x27;s roughly 4 billion hectares, not two-fifths.</td></tr><tr><td class="mono">d2 @ How much forest remains:4</td><td>Forest is said to be a little over one-third of habitable land and &#x27;around one-half of all land&#x27;, but habitable land is a subset of all land, so one-third of habitable land must be less than one-third of all land, not one-half of it.</td></tr><tr><td class="mono">d3 @ Where the forests are:11</td><td>Russia is stated to hold the largest share at over 800 million hectares, yet Brazil (the only OTHER country above 10%) is also given &#x27;over 800 million hectares&#x27;, which would tie or exceed the country said to be largest.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">paper-0023<br><span class="ty">paper</span></td><td class="mono">artifact.md<br><span class="loc">@ Still deeply unequal:11</span></td><td>&#x27;close to 85 years&#x27; for Japan is a rounded approximation; a reviewer may want the exact value. Not a seeded defect.</td><td class="mono defs">A long climb:4<br>A long climb:5<br>Still deeply unequal:10</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — paper-0023: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.md</h4><div class="src">
+<div class="l">   1 | # The rise of life expectancy</div>
+<div class="l">   2 | </div>
+<div class="l">   3 | ## A long climb</div>
+<div class="l def">   4 | In 1900, the average life expectancy of a newborn was 32 years. By 2021 this<span class="m">  ← d1</span></div>
+<div class="l def">   5 | had more than tripled to 71 years. Two hundred years ago the global figure was<span class="m">  ← d2</span></div>
+<div class="l">   6 | less than half of today&#x27;s — around 45 years.</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | ## Still deeply unequal</div>
+<div class="l">   9 | Progress has been uneven. In 2021 the global average was just over 70 years,</div>
+<div class="l def">  10 | yet Nigeria&#x27;s life expectancy was thirty years lower than Japan&#x27;s. With Japan<span class="m">  ← d3</span></div>
+<div class="l gz">  11 | close to 85 years, that puts Nigeria at around 65 years — still well below the<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  12 | global average.</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Still deeply unequal:11</code> — <i>&#x27;close to 85 years&#x27; for Japan is a rounded approximation; a reviewer may want the exact value. Not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ A long climb:4</td><td>The rise from 32 years in 1900 to 71 in 2021 is called &#x27;more than tripled&#x27;, but 71 is about 2.2 times 32 — a bit more than a doubling, not a tripling.</td></tr><tr><td class="mono">d2 @ A long climb:5</td><td>The global figure two hundred years ago is said to be &#x27;less than half of today&#x27;s&#x27; (today&#x27;s is just over 70), yet it is then given as &#x27;around 45 years&#x27;, which is well over half of 70.</td></tr><tr><td class="mono">d3 @ Still deeply unequal:10</td><td>With Japan close to 85 and Nigeria thirty years lower, Nigeria should be around 55, but the text puts Nigeria at &#x27;around 65 years&#x27;.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0001<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services:20</span></td><td>Service `ledger` is declared but no route references it (unused). Not a seeded defect; a reviewer may flag it, so exclude from false-finding scoring.</td><td class="mono defs">replicas:11<br>autoscale.target_cpu_percent:16<br>routes[1].backend:26<br>tls.enabled:29</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0001: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | # Service deployment config for the `payments-api`.</div>
+<div class="l">   2 | # Constraints (enforced by the platform):</div>
+<div class="l">   3 | #   - replicas.min must be &lt;= replicas.max</div>
+<div class="l">   4 | #   - autoscale.target_cpu_percent must be in [1, 100]</div>
+<div class="l">   5 | #   - every route&#x27;s `backend` must name a service defined under `services`</div>
+<div class="l">   6 | #   - tls.enabled must be true in the `production` environment</div>
+<div class="l">   7 | </div>
+<div class="l">   8 | environment: production</div>
+<div class="l">   9 | </div>
+<div class="l">  10 | replicas:</div>
+<div class="l def">  11 |   min: 5<span class="m">  ← d1</span></div>
+<div class="l">  12 |   max: 3</div>
+<div class="l">  13 | </div>
+<div class="l">  14 | autoscale:</div>
+<div class="l">  15 |   enabled: true</div>
+<div class="l def">  16 |   target_cpu_percent: 130<span class="m">  ← d2</span></div>
+<div class="l">  17 | </div>
+<div class="l">  18 | services:</div>
+<div class="l">  19 |   - name: payments-core</div>
+<div class="l gz">  20 |   - name: ledger<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  21 | </div>
+<div class="l">  22 | routes:</div>
+<div class="l">  23 |   - path: /charge</div>
+<div class="l">  24 |     backend: payments-core</div>
+<div class="l">  25 |   - path: /refund</div>
+<div class="l def">  26 |     backend: refunds-core<span class="m">  ← d3</span></div>
+<div class="l">  27 | </div>
+<div class="l">  28 | tls:</div>
+<div class="l def">  29 |   enabled: false<span class="m">  ← d4</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services:20</code> — <i>Service `ledger` is declared but no route references it (unused). Not a seeded defect; a reviewer may flag it, so exclude from false-finding scoring.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ replicas:11</td><td>replicas.min (5) is greater than replicas.max (3), violating the stated constraint min &lt;= max.</td></tr><tr><td class="mono">d2 @ autoscale.target_cpu_percent:16</td><td>autoscale.target_cpu_percent is 130, outside the allowed range [1, 100].</td></tr><tr><td class="mono">d3 @ routes[1].backend:26</td><td>The /refund route&#x27;s backend `refunds-core` is not defined under `services` (only payments-core and ledger exist).</td></tr><tr><td class="mono">d4 @ tls.enabled:29</td><td>tls.enabled is false while environment is production, violating the constraint that TLS must be enabled in production.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0002<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.backend.environment:12</span></td><td>Upstream: DATABASE_PASSWORD is set to a file path string, not a password value. Real upstream design, untouched; a reviewer may flag it, so exclude from false-finding scoring.</td><td class="mono defs">services.backend.depends_on:30<br>services.frontend.networks:57<br>services.frontend.ports:52</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0002: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   backend:</div>
+<div class="l">   3 |     build:</div>
+<div class="l">   4 |       args:</div>
+<div class="l">   5 |       - NODE_ENV=development</div>
+<div class="l">   6 |       context: backend</div>
+<div class="l">   7 |       target: development</div>
+<div class="l">   8 |     command: npm run start-watch</div>
+<div class="l">   9 |     environment:</div>
+<div class="l">  10 |       - DATABASE_DB=example</div>
+<div class="l">  11 |       - DATABASE_USER=root</div>
+<div class="l gz">  12 |       - DATABASE_PASSWORD=/run/secrets/db-password<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  13 |       - DATABASE_HOST=db</div>
+<div class="l">  14 |       - NODE_ENV=development</div>
+<div class="l">  15 |     ports:</div>
+<div class="l">  16 |       - 80:80</div>
+<div class="l">  17 |       - 9229:9229</div>
+<div class="l">  18 |       - 9230:9230</div>
+<div class="l">  19 |     secrets:</div>
+<div class="l">  20 |       - db-password</div>
+<div class="l">  21 |     volumes:</div>
+<div class="l">  22 |       - ./backend/src:/code/src:ro</div>
+<div class="l">  23 |       - ./backend/package.json:/code/package.json</div>
+<div class="l">  24 |       - ./backend/package-lock.json:/code/package-lock.json</div>
+<div class="l">  25 |       - back-notused:/opt/app/node_modules</div>
+<div class="l">  26 |     networks:</div>
+<div class="l">  27 |       - public</div>
+<div class="l">  28 |       - private</div>
+<div class="l">  29 |     depends_on:</div>
+<div class="l def">  30 |       - database<span class="m">  ← d1</span></div>
+<div class="l">  31 |   db:</div>
+<div class="l">  32 |     # We use a mariadb image which supports both amd64 &amp; arm64 architecture</div>
+<div class="l">  33 |     image: mariadb:10.6.4-focal</div>
+<div class="l">  34 |     # If you really want to use MySQL, uncomment the following line</div>
+<div class="l">  35 |     #image: mysql:8.0.27</div>
+<div class="l">  36 |     command: &#x27;--default-authentication-plugin=mysql_native_password&#x27;</div>
+<div class="l">  37 |     restart: always</div>
+<div class="l">  38 |     secrets:</div>
+<div class="l">  39 |       - db-password</div>
+<div class="l">  40 |     volumes:</div>
+<div class="l">  41 |       - db-data:/var/lib/mysql</div>
+<div class="l">  42 |     networks:</div>
+<div class="l">  43 |       - private</div>
+<div class="l">  44 |     environment:</div>
+<div class="l">  45 |       - MYSQL_DATABASE=example</div>
+<div class="l">  46 |       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password</div>
+<div class="l">  47 |   frontend:</div>
+<div class="l">  48 |     build:</div>
+<div class="l">  49 |       context: frontend</div>
+<div class="l">  50 |       target: development</div>
+<div class="l">  51 |     ports:</div>
+<div class="l def">  52 |       - 80:3000<span class="m">  ← d3</span></div>
+<div class="l">  53 |     volumes:</div>
+<div class="l">  54 |       - ./frontend/src:/code/src</div>
+<div class="l">  55 |       - /code/node_modules</div>
+<div class="l">  56 |     networks:</div>
+<div class="l def">  57 |       - frontend-net<span class="m">  ← d2</span></div>
+<div class="l">  58 |     depends_on:</div>
+<div class="l">  59 |       - backend</div>
+<div class="l">  60 | networks:</div>
+<div class="l">  61 |   public:</div>
+<div class="l">  62 |   private:</div>
+<div class="l">  63 | volumes:</div>
+<div class="l">  64 |   back-notused:</div>
+<div class="l">  65 |   db-data:</div>
+<div class="l">  66 | secrets:</div>
+<div class="l">  67 |   db-password:</div>
+<div class="l">  68 |     file: db/password.txt</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.backend.environment:12</code> — <i>Upstream: DATABASE_PASSWORD is set to a file path string, not a password value. Real upstream design, untouched; a reviewer may flag it, so exclude from false-finding scoring.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.backend.depends_on:30</td><td>backend.depends_on names `database`, but no service by that name is defined (the database service is named `db`).</td></tr><tr><td class="mono">d2 @ services.frontend.networks:57</td><td>frontend.networks references `frontend-net`, which is not declared under the top-level `networks` key (only `public` and `private` exist).</td></tr><tr><td class="mono">d3 @ services.frontend.ports:52</td><td>frontend publishes host port 80 (`80:3000`), colliding with backend&#x27;s host port 80 (`80:80`); two services cannot bind the same host port.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0002<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ volumes:64</span></td><td>Upstream volume name `back-notused` is confusing but is declared and mounted. Untouched upstream smell, not a seeded defect.</td><td class="mono defs">services.backend.depends_on:30<br>services.frontend.networks:57<br>services.frontend.ports:52</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0002: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   backend:</div>
+<div class="l">   3 |     build:</div>
+<div class="l">   4 |       args:</div>
+<div class="l">   5 |       - NODE_ENV=development</div>
+<div class="l">   6 |       context: backend</div>
+<div class="l">   7 |       target: development</div>
+<div class="l">   8 |     command: npm run start-watch</div>
+<div class="l">   9 |     environment:</div>
+<div class="l">  10 |       - DATABASE_DB=example</div>
+<div class="l">  11 |       - DATABASE_USER=root</div>
+<div class="l">  12 |       - DATABASE_PASSWORD=/run/secrets/db-password</div>
+<div class="l">  13 |       - DATABASE_HOST=db</div>
+<div class="l">  14 |       - NODE_ENV=development</div>
+<div class="l">  15 |     ports:</div>
+<div class="l">  16 |       - 80:80</div>
+<div class="l">  17 |       - 9229:9229</div>
+<div class="l">  18 |       - 9230:9230</div>
+<div class="l">  19 |     secrets:</div>
+<div class="l">  20 |       - db-password</div>
+<div class="l">  21 |     volumes:</div>
+<div class="l">  22 |       - ./backend/src:/code/src:ro</div>
+<div class="l">  23 |       - ./backend/package.json:/code/package.json</div>
+<div class="l">  24 |       - ./backend/package-lock.json:/code/package-lock.json</div>
+<div class="l">  25 |       - back-notused:/opt/app/node_modules</div>
+<div class="l">  26 |     networks:</div>
+<div class="l">  27 |       - public</div>
+<div class="l">  28 |       - private</div>
+<div class="l">  29 |     depends_on:</div>
+<div class="l def">  30 |       - database<span class="m">  ← d1</span></div>
+<div class="l">  31 |   db:</div>
+<div class="l">  32 |     # We use a mariadb image which supports both amd64 &amp; arm64 architecture</div>
+<div class="l">  33 |     image: mariadb:10.6.4-focal</div>
+<div class="l">  34 |     # If you really want to use MySQL, uncomment the following line</div>
+<div class="l">  35 |     #image: mysql:8.0.27</div>
+<div class="l">  36 |     command: &#x27;--default-authentication-plugin=mysql_native_password&#x27;</div>
+<div class="l">  37 |     restart: always</div>
+<div class="l">  38 |     secrets:</div>
+<div class="l">  39 |       - db-password</div>
+<div class="l">  40 |     volumes:</div>
+<div class="l">  41 |       - db-data:/var/lib/mysql</div>
+<div class="l">  42 |     networks:</div>
+<div class="l">  43 |       - private</div>
+<div class="l">  44 |     environment:</div>
+<div class="l">  45 |       - MYSQL_DATABASE=example</div>
+<div class="l">  46 |       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password</div>
+<div class="l">  47 |   frontend:</div>
+<div class="l">  48 |     build:</div>
+<div class="l">  49 |       context: frontend</div>
+<div class="l">  50 |       target: development</div>
+<div class="l">  51 |     ports:</div>
+<div class="l def">  52 |       - 80:3000<span class="m">  ← d3</span></div>
+<div class="l">  53 |     volumes:</div>
+<div class="l">  54 |       - ./frontend/src:/code/src</div>
+<div class="l">  55 |       - /code/node_modules</div>
+<div class="l">  56 |     networks:</div>
+<div class="l def">  57 |       - frontend-net<span class="m">  ← d2</span></div>
+<div class="l">  58 |     depends_on:</div>
+<div class="l">  59 |       - backend</div>
+<div class="l">  60 | networks:</div>
+<div class="l">  61 |   public:</div>
+<div class="l">  62 |   private:</div>
+<div class="l">  63 | volumes:</div>
+<div class="l gz">  64 |   back-notused:<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  65 |   db-data:</div>
+<div class="l">  66 | secrets:</div>
+<div class="l">  67 |   db-password:</div>
+<div class="l">  68 |     file: db/password.txt</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>volumes:64</code> — <i>Upstream volume name `back-notused` is confusing but is declared and mounted. Untouched upstream smell, not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.backend.depends_on:30</td><td>backend.depends_on names `database`, but no service by that name is defined (the database service is named `db`).</td></tr><tr><td class="mono">d2 @ services.frontend.networks:57</td><td>frontend.networks references `frontend-net`, which is not declared under the top-level `networks` key (only `public` and `private` exist).</td></tr><tr><td class="mono">d3 @ services.frontend.ports:52</td><td>frontend publishes host port 80 (`80:3000`), colliding with backend&#x27;s host port 80 (`80:80`); two services cannot bind the same host port.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0005<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ volumes:25</span></td><td>The top-level volume `prom_data` is left unused once d3 renames the mount; declared-but-unused, not a seeded defect.</td><td class="mono defs">services.grafana.ports:17<br>services.prometheus.volumes:11<br>services.prometheus.volumes:12</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0005: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   prometheus:</div>
+<div class="l">   3 |     image: prom/prometheus</div>
+<div class="l">   4 |     container_name: prometheus</div>
+<div class="l">   5 |     command:</div>
+<div class="l">   6 |       - &#x27;--config.file=/etc/prometheus/prometheus.yml&#x27;</div>
+<div class="l">   7 |     ports:</div>
+<div class="l">   8 |       - 9090:9090</div>
+<div class="l">   9 |     restart: unless-stopped</div>
+<div class="l">  10 |     volumes:</div>
+<div class="l def">  11 |       - ./prometheus:/config<span class="m">  ← d2</span></div>
+<div class="l def">  12 |       - metrics_data:/prometheus<span class="m">  ← d3</span></div>
+<div class="l">  13 |   grafana:</div>
+<div class="l">  14 |     image: grafana/grafana</div>
+<div class="l">  15 |     container_name: grafana</div>
+<div class="l">  16 |     ports:</div>
+<div class="l def">  17 |       - 9090:3000<span class="m">  ← d1</span></div>
+<div class="l">  18 |     restart: unless-stopped</div>
+<div class="l">  19 |     environment:</div>
+<div class="l">  20 |       - GF_SECURITY_ADMIN_USER=admin</div>
+<div class="l">  21 |       - GF_SECURITY_ADMIN_PASSWORD=grafana</div>
+<div class="l">  22 |     volumes:</div>
+<div class="l">  23 |       - ./grafana:/etc/grafana/provisioning/datasources</div>
+<div class="l">  24 | volumes:</div>
+<div class="l gz">  25 |   prom_data:<span class="mg">  ◀ gray zone</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>volumes:25</code> — <i>The top-level volume `prom_data` is left unused once d3 renames the mount; declared-but-unused, not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.grafana.ports:17</td><td>grafana publishes host port 9090 (`9090:3000`), colliding with prometheus&#x27;s host port 9090 (`9090:9090`); two services cannot bind the same host port.</td></tr><tr><td class="mono">d2 @ services.prometheus.volumes:11</td><td>The prometheus config directory is mounted at `/config`, but the command loads the config from `/etc/prometheus/prometheus.yml`, so the config file will not be found at the path the command expects.</td></tr><tr><td class="mono">d3 @ services.prometheus.volumes:12</td><td>prometheus mounts the named volume `metrics_data`, which is not declared under the top-level `volumes` key (only `prom_data` exists there).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0005<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.grafana.environment:21</span></td><td>GF_SECURITY_ADMIN_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect, so exclude from false-finding scoring.</td><td class="mono defs">services.grafana.ports:17<br>services.prometheus.volumes:11<br>services.prometheus.volumes:12</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0005: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   prometheus:</div>
+<div class="l">   3 |     image: prom/prometheus</div>
+<div class="l">   4 |     container_name: prometheus</div>
+<div class="l">   5 |     command:</div>
+<div class="l">   6 |       - &#x27;--config.file=/etc/prometheus/prometheus.yml&#x27;</div>
+<div class="l">   7 |     ports:</div>
+<div class="l">   8 |       - 9090:9090</div>
+<div class="l">   9 |     restart: unless-stopped</div>
+<div class="l">  10 |     volumes:</div>
+<div class="l def">  11 |       - ./prometheus:/config<span class="m">  ← d2</span></div>
+<div class="l def">  12 |       - metrics_data:/prometheus<span class="m">  ← d3</span></div>
+<div class="l">  13 |   grafana:</div>
+<div class="l">  14 |     image: grafana/grafana</div>
+<div class="l">  15 |     container_name: grafana</div>
+<div class="l">  16 |     ports:</div>
+<div class="l def">  17 |       - 9090:3000<span class="m">  ← d1</span></div>
+<div class="l">  18 |     restart: unless-stopped</div>
+<div class="l">  19 |     environment:</div>
+<div class="l">  20 |       - GF_SECURITY_ADMIN_USER=admin</div>
+<div class="l gz">  21 |       - GF_SECURITY_ADMIN_PASSWORD=grafana<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  22 |     volumes:</div>
+<div class="l">  23 |       - ./grafana:/etc/grafana/provisioning/datasources</div>
+<div class="l">  24 | volumes:</div>
+<div class="l">  25 |   prom_data:</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.grafana.environment:21</code> — <i>GF_SECURITY_ADMIN_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect, so exclude from false-finding scoring.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.grafana.ports:17</td><td>grafana publishes host port 9090 (`9090:3000`), colliding with prometheus&#x27;s host port 9090 (`9090:9090`); two services cannot bind the same host port.</td></tr><tr><td class="mono">d2 @ services.prometheus.volumes:11</td><td>The prometheus config directory is mounted at `/config`, but the command loads the config from `/etc/prometheus/prometheus.yml`, so the config file will not be found at the path the command expects.</td></tr><tr><td class="mono">d3 @ services.prometheus.volumes:12</td><td>prometheus mounts the named volume `metrics_data`, which is not declared under the top-level `volumes` key (only `prom_data` exists there).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0006<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.db.environment:12</span></td><td>MYSQL_ROOT_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect.</td><td class="mono defs">services.wordpress.environment:25<br>services.wordpress.environment:28<br>services.wordpress.environment:27</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0006: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   db:</div>
+<div class="l">   3 |     # We use a mariadb image which supports both amd64 &amp; arm64 architecture</div>
+<div class="l">   4 |     image: mariadb:10.6.4-focal</div>
+<div class="l">   5 |     # If you really want to use MySQL, uncomment the following line</div>
+<div class="l">   6 |     #image: mysql:8.0.27</div>
+<div class="l">   7 |     command: &#x27;--default-authentication-plugin=mysql_native_password&#x27;</div>
+<div class="l">   8 |     volumes:</div>
+<div class="l">   9 |       - db_data:/var/lib/mysql</div>
+<div class="l">  10 |     restart: always</div>
+<div class="l">  11 |     environment:</div>
+<div class="l gz">  12 |       - MYSQL_ROOT_PASSWORD=somewordpress<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  13 |       - MYSQL_DATABASE=wordpress</div>
+<div class="l">  14 |       - MYSQL_USER=wordpress</div>
+<div class="l">  15 |       - MYSQL_PASSWORD=wordpress</div>
+<div class="l">  16 |     expose:</div>
+<div class="l">  17 |       - 3306</div>
+<div class="l">  18 |       - 33060</div>
+<div class="l">  19 |   wordpress:</div>
+<div class="l">  20 |     image: wordpress:latest</div>
+<div class="l">  21 |     ports:</div>
+<div class="l">  22 |       - 80:80</div>
+<div class="l">  23 |     restart: always</div>
+<div class="l">  24 |     environment:</div>
+<div class="l def">  25 |       - WORDPRESS_DB_HOST=database<span class="m">  ← d1</span></div>
+<div class="l">  26 |       - WORDPRESS_DB_USER=wordpress</div>
+<div class="l def">  27 |       - WORDPRESS_DB_PASSWORD=secret<span class="m">  ← d3</span></div>
+<div class="l def">  28 |       - WORDPRESS_DB_NAME=wp<span class="m">  ← d2</span></div>
+<div class="l">  29 | volumes:</div>
+<div class="l">  30 |   db_data:</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.db.environment:12</code> — <i>MYSQL_ROOT_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.wordpress.environment:25</td><td>WORDPRESS_DB_HOST is set to `database`, but the database service is named `db`; there is no service or host `database`.</td></tr><tr><td class="mono">d2 @ services.wordpress.environment:28</td><td>WORDPRESS_DB_NAME is `wp`, but the database created by the db service is `wordpress` (MYSQL_DATABASE=wordpress), so WordPress targets a database that does not exist.</td></tr><tr><td class="mono">d3 @ services.wordpress.environment:27</td><td>WORDPRESS_DB_PASSWORD is `secret`, but the db user&#x27;s password is `wordpress` (MYSQL_PASSWORD=wordpress), so authentication will fail.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0007<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.db.environment:19</span></td><td>POSTGRES_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect.</td><td class="mono defs">services.gitea.environment:6<br>services.gitea.environment:8<br>services.gitea.environment:7</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0007: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   gitea:</div>
+<div class="l">   3 |     image: gitea/gitea:latest</div>
+<div class="l">   4 |     environment:</div>
+<div class="l">   5 |       - DB_TYPE=postgres</div>
+<div class="l def">   6 |       - DB_HOST=postgres:5432<span class="m">  ← d1</span></div>
+<div class="l def">   7 |       - DB_NAME=giteadb<span class="m">  ← d3</span></div>
+<div class="l def">   8 |       - DB_USER=admin<span class="m">  ← d2</span></div>
+<div class="l">   9 |       - DB_PASSWD=gitea</div>
+<div class="l">  10 |     restart: always</div>
+<div class="l">  11 |     volumes:</div>
+<div class="l">  12 |       - git_data:/data</div>
+<div class="l">  13 |     ports:</div>
+<div class="l">  14 |       - 3000:3000</div>
+<div class="l">  15 |   db:</div>
+<div class="l">  16 |     image: postgres:alpine</div>
+<div class="l">  17 |     environment:</div>
+<div class="l">  18 |       - POSTGRES_USER=gitea</div>
+<div class="l gz">  19 |       - POSTGRES_PASSWORD=gitea<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  20 |       - POSTGRES_DB=gitea</div>
+<div class="l">  21 |     restart: always</div>
+<div class="l">  22 |     volumes:</div>
+<div class="l">  23 |       - db_data:/var/lib/postgresql/data</div>
+<div class="l">  24 |     expose:</div>
+<div class="l">  25 |       - 5432</div>
+<div class="l">  26 | volumes:</div>
+<div class="l">  27 |   db_data:</div>
+<div class="l">  28 |   git_data:</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.db.environment:19</code> — <i>POSTGRES_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.gitea.environment:6</td><td>DB_HOST points at `postgres:5432`, but the database service is named `db` (its image is postgres, but there is no service or host `postgres`).</td></tr><tr><td class="mono">d2 @ services.gitea.environment:8</td><td>DB_USER is `admin`, but the Postgres role created by the db service is `gitea` (POSTGRES_USER=gitea), so the login role does not exist.</td></tr><tr><td class="mono">d3 @ services.gitea.environment:7</td><td>DB_NAME is `giteadb`, but the database created by the db service is `gitea` (POSTGRES_DB=gitea), so Gitea targets a database that does not exist.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0008<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ Deployment.spec.template.spec.containers:16-19</span></td><td>The container declares no resource requests/limits. A reviewer may flag the missing limits as a best-practice issue; not a seeded defect.</td><td class="mono defs">Deployment.spec.selector.matchLabels:8<br>Deployment.spec.template.spec.containers.ports:19<br>Service.spec.selector:32</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0008: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | apiVersion: apps/v1</div>
+<div class="l">   2 | kind: Deployment</div>
+<div class="l">   3 | metadata:</div>
+<div class="l">   4 |   name: my-nginx</div>
+<div class="l">   5 | spec:</div>
+<div class="l">   6 |   selector:</div>
+<div class="l">   7 |     matchLabels:</div>
+<div class="l def">   8 |       run: web<span class="m">  ← d1</span></div>
+<div class="l">   9 |   replicas: 2</div>
+<div class="l">  10 |   template:</div>
+<div class="l">  11 |     metadata:</div>
+<div class="l">  12 |       labels:</div>
+<div class="l">  13 |         run: my-nginx</div>
+<div class="l">  14 |     spec:</div>
+<div class="l">  15 |       containers:</div>
+<div class="l gz">  16 |       - name: my-nginx<span class="mg">  ◀ gray zone</span></div>
+<div class="l gz">  17 |         image: nginx</div>
+<div class="l gz">  18 |         ports:</div>
+<div class="l gz def">  19 |         - containerPort: 8080<span class="m">  ← d2</span></div>
+<div class="l">  20 | ---</div>
+<div class="l">  21 | apiVersion: v1</div>
+<div class="l">  22 | kind: Service</div>
+<div class="l">  23 | metadata:</div>
+<div class="l">  24 |   name: my-nginx</div>
+<div class="l">  25 |   labels:</div>
+<div class="l">  26 |     run: my-nginx</div>
+<div class="l">  27 | spec:</div>
+<div class="l">  28 |   ports:</div>
+<div class="l">  29 |   - port: 80</div>
+<div class="l">  30 |     protocol: TCP</div>
+<div class="l">  31 |   selector:</div>
+<div class="l def">  32 |     run: nginx<span class="m">  ← d3</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Deployment.spec.template.spec.containers:16-19</code> — <i>The container declares no resource requests/limits. A reviewer may flag the missing limits as a best-practice issue; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Deployment.spec.selector.matchLabels:8</td><td>The Deployment&#x27;s selector matchLabels is `run: web`, but the pod template labels are `run: my-nginx`; a Deployment&#x27;s selector must match its template labels.</td></tr><tr><td class="mono">d2 @ Deployment.spec.template.spec.containers.ports:19</td><td>The container listens on `containerPort: 8080`, but the Service exposes port 80 with no targetPort (so it routes to pod port 80); the container port and the Service&#x27;s target port do not match.</td></tr><tr><td class="mono">d3 @ Service.spec.selector:32</td><td>The Service selector is `run: nginx`, which matches no pods: the Deployment labels its pods `run: my-nginx`, so the Service selects nothing.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0009<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ Pod.spec.containers:18</span></td><td>The image is pinned to an old busybox tag (1.27.2). A reviewer may flag the outdated image; not a seeded defect.</td><td class="mono defs">Pod.spec.containers.env.configMapKeyRef:24<br>Pod.spec.containers.env.configMapKeyRef:25<br>Pod.metadata.namespace:14</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0009: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | apiVersion: v1</div>
+<div class="l">   2 | kind: ConfigMap</div>
+<div class="l">   3 | metadata:</div>
+<div class="l">   4 |   name: special-config</div>
+<div class="l">   5 |   namespace: default</div>
+<div class="l">   6 | data:</div>
+<div class="l">   7 |   SPECIAL_LEVEL: very</div>
+<div class="l">   8 |   SPECIAL_TYPE: charm</div>
+<div class="l">   9 | ---</div>
+<div class="l">  10 | apiVersion: v1</div>
+<div class="l">  11 | kind: Pod</div>
+<div class="l">  12 | metadata:</div>
+<div class="l">  13 |   name: dapi-test-pod</div>
+<div class="l def">  14 |   namespace: production<span class="m">  ← d3</span></div>
+<div class="l">  15 | spec:</div>
+<div class="l">  16 |   containers:</div>
+<div class="l">  17 |     - name: test-container</div>
+<div class="l gz">  18 |       image: registry.k8s.io/busybox:1.27.2<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  19 |       command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;env&quot; ]</div>
+<div class="l">  20 |       env:</div>
+<div class="l">  21 |         - name: SPECIAL_LEVEL_KEY</div>
+<div class="l">  22 |           valueFrom:</div>
+<div class="l">  23 |             configMapKeyRef:</div>
+<div class="l def">  24 |               name: app-config<span class="m">  ← d1</span></div>
+<div class="l def">  25 |               key: SPECIAL_MODE<span class="m">  ← d2</span></div>
+<div class="l">  26 |   restartPolicy: Never</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Pod.spec.containers:18</code> — <i>The image is pinned to an old busybox tag (1.27.2). A reviewer may flag the outdated image; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Pod.spec.containers.env.configMapKeyRef:24</td><td>The Pod&#x27;s configMapKeyRef names ConfigMap `app-config`, but the ConfigMap defined in this manifest is named `special-config`; no `app-config` exists.</td></tr><tr><td class="mono">d2 @ Pod.spec.containers.env.configMapKeyRef:25</td><td>The configMapKeyRef requests key `SPECIAL_MODE`, but the ConfigMap only defines keys `SPECIAL_LEVEL` and `SPECIAL_TYPE`.</td></tr><tr><td class="mono">d3 @ Pod.metadata.namespace:14</td><td>The Pod is in namespace `production`, but the ConfigMap it references is in namespace `default`; ConfigMaps are namespace-scoped, so the reference cannot resolve across namespaces.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0010<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ Secret.data:6-7</span></td><td>Secret values are stored as base64 (not encrypted) in the manifest; a reviewer may flag committing secrets. Upstream example convention, not a seeded defect.</td><td class="mono defs">Pod...SECRET_USERNAME.secretKeyRef:21<br>Pod...SECRET_USERNAME.secretKeyRef:22<br>Pod...SECRET_PASSWORD.secretKeyRef:27</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0010: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | apiVersion: v1</div>
+<div class="l">   2 | kind: Secret</div>
+<div class="l">   3 | metadata:</div>
+<div class="l">   4 |   name: test-secret</div>
+<div class="l">   5 | data:</div>
+<div class="l gz">   6 |   username: bXktYXBw<span class="mg">  ◀ gray zone</span></div>
+<div class="l gz">   7 |   password: Mzk1MjgkdmRnN0pi</div>
+<div class="l">   8 | ---</div>
+<div class="l">   9 | apiVersion: v1</div>
+<div class="l">  10 | kind: Pod</div>
+<div class="l">  11 | metadata:</div>
+<div class="l">  12 |   name: secret-envars-test-pod</div>
+<div class="l">  13 | spec:</div>
+<div class="l">  14 |   containers:</div>
+<div class="l">  15 |   - name: envars-test-container</div>
+<div class="l">  16 |     image: nginx</div>
+<div class="l">  17 |     env:</div>
+<div class="l">  18 |     - name: SECRET_USERNAME</div>
+<div class="l">  19 |       valueFrom:</div>
+<div class="l">  20 |         secretKeyRef:</div>
+<div class="l def">  21 |           name: app-secret<span class="m">  ← d1</span></div>
+<div class="l def">  22 |           key: user<span class="m">  ← d2</span></div>
+<div class="l">  23 |     - name: SECRET_PASSWORD</div>
+<div class="l">  24 |       valueFrom:</div>
+<div class="l">  25 |         secretKeyRef:</div>
+<div class="l">  26 |           name: test-secret</div>
+<div class="l def">  27 |           key: passwd<span class="m">  ← d3</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Secret.data:6-7</code> — <i>Secret values are stored as base64 (not encrypted) in the manifest; a reviewer may flag committing secrets. Upstream example convention, not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Pod...SECRET_USERNAME.secretKeyRef:21</td><td>The SECRET_USERNAME env var&#x27;s secretKeyRef names Secret `app-secret`, but the Secret defined in this manifest is named `test-secret`.</td></tr><tr><td class="mono">d2 @ Pod...SECRET_USERNAME.secretKeyRef:22</td><td>The SECRET_USERNAME env var requests key `user`, but the Secret defines keys `username` and `password` — there is no `user` key.</td></tr><tr><td class="mono">d3 @ Pod...SECRET_PASSWORD.secretKeyRef:27</td><td>The SECRET_PASSWORD env var requests key `passwd`, but the Secret defines the key as `password`.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0011<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ secrets:27</span></td><td>The top-level secret `db-password` is left unused once d3 renames the db&#x27;s secret; declared-but-unused, not a seeded defect.</td><td class="mono defs">services.backend.environment:7<br>services.backend.networks:9<br>services.db.secrets:14</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0011: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   backend:</div>
+<div class="l">   3 |     build: backend</div>
+<div class="l">   4 |     ports:</div>
+<div class="l">   5 |       - 8080:8080</div>
+<div class="l">   6 |     environment:</div>
+<div class="l def">   7 |       - POSTGRES_DB=appdb<span class="m">  ← d1</span></div>
+<div class="l">   8 |     networks:</div>
+<div class="l def">   9 |       - springnet<span class="m">  ← d2</span></div>
+<div class="l">  10 |   db:</div>
+<div class="l">  11 |     image: postgres</div>
+<div class="l">  12 |     restart: always</div>
+<div class="l">  13 |     secrets:</div>
+<div class="l def">  14 |       - db-secret<span class="m">  ← d3</span></div>
+<div class="l">  15 |     volumes:</div>
+<div class="l">  16 |       - db-data:/var/lib/postgresql/data</div>
+<div class="l">  17 |     networks:</div>
+<div class="l">  18 |       - spring-postgres</div>
+<div class="l">  19 |     environment:</div>
+<div class="l">  20 |       - POSTGRES_DB=example</div>
+<div class="l">  21 |       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password</div>
+<div class="l">  22 |     expose:</div>
+<div class="l">  23 |       - 5432</div>
+<div class="l">  24 | volumes:</div>
+<div class="l">  25 |   db-data:</div>
+<div class="l">  26 | secrets:</div>
+<div class="l gz">  27 |   db-password:<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  28 |     file: db/password.txt</div>
+<div class="l">  29 | networks:</div>
+<div class="l">  30 |   spring-postgres:</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>secrets:27</code> — <i>The top-level secret `db-password` is left unused once d3 renames the db&#x27;s secret; declared-but-unused, not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.backend.environment:7</td><td>The backend expects POSTGRES_DB=appdb, but the db service creates the database `example` (POSTGRES_DB=example), so the app targets a database that does not exist.</td></tr><tr><td class="mono">d2 @ services.backend.networks:9</td><td>The backend joins network `springnet`, which is not declared under the top-level `networks` key (only `spring-postgres` exists).</td></tr><tr><td class="mono">d3 @ services.db.secrets:14</td><td>The db service mounts secret `db-secret`, which is not defined under the top-level `secrets` key (only `db-password` exists).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0012<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ Pod.spec.containers:26</span></td><td>The image uses an unpinned tag (nginx). A reviewer may flag the missing version tag; not a seeded defect.</td><td class="mono defs">Pod.spec.volumes.persistentVolumeClaim:23<br>Pod.spec.containers.volumeMounts:32<br>Pod.metadata.namespace:18</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0012: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | apiVersion: v1</div>
+<div class="l">   2 | kind: PersistentVolumeClaim</div>
+<div class="l">   3 | metadata:</div>
+<div class="l">   4 |   name: task-pv-claim</div>
+<div class="l">   5 |   namespace: default</div>
+<div class="l">   6 | spec:</div>
+<div class="l">   7 |   storageClassName: manual</div>
+<div class="l">   8 |   accessModes:</div>
+<div class="l">   9 |     - ReadWriteOnce</div>
+<div class="l">  10 |   resources:</div>
+<div class="l">  11 |     requests:</div>
+<div class="l">  12 |       storage: 3Gi</div>
+<div class="l">  13 | ---</div>
+<div class="l">  14 | apiVersion: v1</div>
+<div class="l">  15 | kind: Pod</div>
+<div class="l">  16 | metadata:</div>
+<div class="l">  17 |   name: task-pv-pod</div>
+<div class="l def">  18 |   namespace: production<span class="m">  ← d3</span></div>
+<div class="l">  19 | spec:</div>
+<div class="l">  20 |   volumes:</div>
+<div class="l">  21 |     - name: task-pv-storage</div>
+<div class="l">  22 |       persistentVolumeClaim:</div>
+<div class="l def">  23 |         claimName: pv-claim<span class="m">  ← d1</span></div>
+<div class="l">  24 |   containers:</div>
+<div class="l">  25 |     - name: task-pv-container</div>
+<div class="l gz">  26 |       image: nginx<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  27 |       ports:</div>
+<div class="l">  28 |         - containerPort: 80</div>
+<div class="l">  29 |           name: &quot;http-server&quot;</div>
+<div class="l">  30 |       volumeMounts:</div>
+<div class="l">  31 |         - mountPath: &quot;/usr/share/nginx/html&quot;</div>
+<div class="l def">  32 |           name: pv-storage<span class="m">  ← d2</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>Pod.spec.containers:26</code> — <i>The image uses an unpinned tag (nginx). A reviewer may flag the missing version tag; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ Pod.spec.volumes.persistentVolumeClaim:23</td><td>The Pod volume&#x27;s persistentVolumeClaim.claimName is `pv-claim`, but the PVC defined in this manifest is named `task-pv-claim`.</td></tr><tr><td class="mono">d2 @ Pod.spec.containers.volumeMounts:32</td><td>The container&#x27;s volumeMount references volume `pv-storage`, but the Pod defines the volume as `task-pv-storage`.</td></tr><tr><td class="mono">d3 @ Pod.metadata.namespace:18</td><td>The Pod is in namespace `production`, but the PVC it claims is in namespace `default`; PVCs are namespace-scoped, so a Pod can only bind a PVC in its own namespace.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0013<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.db.environment:17</span></td><td>POSTGRES_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect.</td><td class="mono defs">services.nc.environment:5<br>services.nc.environment:6<br>services.nc.environment:7</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0013: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   nc:</div>
+<div class="l">   3 |     image: nextcloud:apache</div>
+<div class="l">   4 |     environment:</div>
+<div class="l def">   5 |       - POSTGRES_HOST=database<span class="m">  ← d1</span></div>
+<div class="l def">   6 |       - POSTGRES_PASSWORD=secret<span class="m">  ← d2</span></div>
+<div class="l def">   7 |       - POSTGRES_DB=cloud<span class="m">  ← d3</span></div>
+<div class="l">   8 |       - POSTGRES_USER=nextcloud</div>
+<div class="l">   9 |     ports:</div>
+<div class="l">  10 |       - 80:80</div>
+<div class="l">  11 |     restart: always</div>
+<div class="l">  12 |     volumes:</div>
+<div class="l">  13 |       - nc_data:/var/www/html</div>
+<div class="l">  14 |   db:</div>
+<div class="l">  15 |     image: postgres:alpine</div>
+<div class="l">  16 |     environment:</div>
+<div class="l gz">  17 |       - POSTGRES_PASSWORD=nextcloud<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  18 |       - POSTGRES_DB=nextcloud</div>
+<div class="l">  19 |       - POSTGRES_USER=nextcloud</div>
+<div class="l">  20 |     restart: always</div>
+<div class="l">  21 |     volumes:</div>
+<div class="l">  22 |       - db_data:/var/lib/postgresql/data</div>
+<div class="l">  23 |     expose:</div>
+<div class="l">  24 |       - 5432</div>
+<div class="l">  25 | volumes:</div>
+<div class="l">  26 |   db_data:</div>
+<div class="l">  27 |   nc_data:</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.db.environment:17</code> — <i>POSTGRES_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.nc.environment:5</td><td>The nc app sets POSTGRES_HOST=database, but the database service is named `db`; there is no service or host `database`.</td></tr><tr><td class="mono">d2 @ services.nc.environment:6</td><td>The nc app&#x27;s POSTGRES_PASSWORD is `secret`, but the db service&#x27;s POSTGRES_PASSWORD is `nextcloud`, so authentication will fail.</td></tr><tr><td class="mono">d3 @ services.nc.environment:7</td><td>The nc app&#x27;s POSTGRES_DB is `cloud`, but the db service creates database `nextcloud`, so the app targets a database that does not exist.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0014<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.mongo:34</span></td><td>The mongo image is pinned to an old version (4.2.0). A reviewer may flag the outdated image; not a seeded defect.</td><td class="mono defs">services.frontend.depends_on:16<br>services.backend.depends_on:26<br>services.backend.networks:28</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0014: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   frontend:</div>
+<div class="l">   3 |     build:</div>
+<div class="l">   4 |       context: frontend</div>
+<div class="l">   5 |       target: development</div>
+<div class="l">   6 |     ports:</div>
+<div class="l">   7 |       - 3000:3000</div>
+<div class="l">   8 |     stdin_open: true</div>
+<div class="l">   9 |     volumes:</div>
+<div class="l">  10 |       - ./frontend:/usr/src/app</div>
+<div class="l">  11 |       - /usr/src/app/node_modules</div>
+<div class="l">  12 |     restart: always</div>
+<div class="l">  13 |     networks:</div>
+<div class="l">  14 |       - react-express</div>
+<div class="l">  15 |     depends_on:</div>
+<div class="l def">  16 |       - api<span class="m">  ← d1</span></div>
+<div class="l">  17 |   backend:</div>
+<div class="l">  18 |     restart: always</div>
+<div class="l">  19 |     build:</div>
+<div class="l">  20 |       context: backend</div>
+<div class="l">  21 |       target: development</div>
+<div class="l">  22 |     volumes:</div>
+<div class="l">  23 |       - ./backend:/usr/src/app</div>
+<div class="l">  24 |       - /usr/src/app/node_modules</div>
+<div class="l">  25 |     depends_on:</div>
+<div class="l def">  26 |       - db<span class="m">  ← d2</span></div>
+<div class="l">  27 |     networks:</div>
+<div class="l def">  28 |       - mongo-net<span class="m">  ← d3</span></div>
+<div class="l">  29 |       - react-express</div>
+<div class="l">  30 |     expose:</div>
+<div class="l">  31 |       - 3000</div>
+<div class="l">  32 |   mongo:</div>
+<div class="l">  33 |     restart: always</div>
+<div class="l gz">  34 |     image: mongo:4.2.0<span class="mg">  ◀ gray zone</span></div>
+<div class="l">  35 |     volumes:</div>
+<div class="l">  36 |       - mongo_data:/data/db</div>
+<div class="l">  37 |     networks:</div>
+<div class="l">  38 |       - express-mongo</div>
+<div class="l">  39 |     expose:</div>
+<div class="l">  40 |       - 27017</div>
+<div class="l">  41 | networks:</div>
+<div class="l">  42 |   react-express:</div>
+<div class="l">  43 |   express-mongo:</div>
+<div class="l">  44 | volumes:</div>
+<div class="l">  45 |   mongo_data:</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.mongo:34</code> — <i>The mongo image is pinned to an old version (4.2.0). A reviewer may flag the outdated image; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.frontend.depends_on:16</td><td>frontend.depends_on names service `api`, but no such service is defined (the application service is named `backend`).</td></tr><tr><td class="mono">d2 @ services.backend.depends_on:26</td><td>backend.depends_on names service `db`, but the database service is named `mongo`; there is no service `db`.</td></tr><tr><td class="mono">d3 @ services.backend.networks:28</td><td>backend.networks references `mongo-net`, which is not declared under the top-level `networks` key (only `react-express` and `express-mongo` exist).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0016<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.elasticsearch:3</span></td><td>Images are pinned to an old version (7.16.1). A reviewer may flag the outdated images; not a seeded defect.</td><td class="mono defs">services.logstash.depends_on:33<br>services.kibana.depends_on:43<br>services.kibana.networks:45</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0016: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   elasticsearch:</div>
+<div class="l gz">   3 |     image: elasticsearch:7.16.1<span class="mg">  ◀ gray zone</span></div>
+<div class="l">   4 |     container_name: es</div>
+<div class="l">   5 |     environment:</div>
+<div class="l">   6 |       discovery.type: single-node</div>
+<div class="l">   7 |       ES_JAVA_OPTS: &quot;-Xms512m -Xmx512m&quot;</div>
+<div class="l">   8 |     ports:</div>
+<div class="l">   9 |       - &quot;9200:9200&quot;</div>
+<div class="l">  10 |       - &quot;9300:9300&quot;</div>
+<div class="l">  11 |     healthcheck:</div>
+<div class="l">  12 |       test: [&quot;CMD-SHELL&quot;, &quot;curl --silent --fail localhost:9200/_cluster/health || exit 1&quot;]</div>
+<div class="l">  13 |       interval: 10s</div>
+<div class="l">  14 |       timeout: 10s</div>
+<div class="l">  15 |       retries: 3</div>
+<div class="l">  16 |     networks:</div>
+<div class="l">  17 |       - elastic</div>
+<div class="l">  18 |   logstash:</div>
+<div class="l">  19 |     image: logstash:7.16.1</div>
+<div class="l">  20 |     container_name: log</div>
+<div class="l">  21 |     environment:</div>
+<div class="l">  22 |       discovery.seed_hosts: logstash</div>
+<div class="l">  23 |       LS_JAVA_OPTS: &quot;-Xms512m -Xmx512m&quot;</div>
+<div class="l">  24 |     volumes:</div>
+<div class="l">  25 |       - ./logstash/pipeline/logstash-nginx.config:/usr/share/logstash/pipeline/logstash-nginx.config</div>
+<div class="l">  26 |       - ./logstash/nginx.log:/home/nginx.log</div>
+<div class="l">  27 |     ports:</div>
+<div class="l">  28 |       - &quot;5000:5000/tcp&quot;</div>
+<div class="l">  29 |       - &quot;5000:5000/udp&quot;</div>
+<div class="l">  30 |       - &quot;5044:5044&quot;</div>
+<div class="l">  31 |       - &quot;9600:9600&quot;</div>
+<div class="l">  32 |     depends_on:</div>
+<div class="l def">  33 |       - search<span class="m">  ← d1</span></div>
+<div class="l">  34 |     networks:</div>
+<div class="l">  35 |       - elastic</div>
+<div class="l">  36 |     command: logstash -f /usr/share/logstash/pipeline/logstash-nginx.config</div>
+<div class="l">  37 |   kibana:</div>
+<div class="l">  38 |     image: kibana:7.16.1</div>
+<div class="l">  39 |     container_name: kib</div>
+<div class="l">  40 |     ports:</div>
+<div class="l">  41 |       - &quot;5601:5601&quot;</div>
+<div class="l">  42 |     depends_on:</div>
+<div class="l def">  43 |       - store<span class="m">  ← d2</span></div>
+<div class="l">  44 |     networks:</div>
+<div class="l def">  45 |       - elk<span class="m">  ← d3</span></div>
+<div class="l">  46 | networks:</div>
+<div class="l">  47 |   elastic:</div>
+<div class="l">  48 |     driver: bridge</div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.elasticsearch:3</code> — <i>Images are pinned to an old version (7.16.1). A reviewer may flag the outdated images; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.logstash.depends_on:33</td><td>logstash.depends_on names service `search`, but no such service is defined (the search engine service is named `elasticsearch`).</td></tr><tr><td class="mono">d2 @ services.kibana.depends_on:43</td><td>kibana.depends_on names service `store`, but no such service is defined (it should be `elasticsearch`).</td></tr><tr><td class="mono">d3 @ services.kibana.networks:45</td><td>kibana.networks references `elk`, which is not declared under the top-level `networks` key (only `elastic` exists).</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+<tr><td class="mono">spec-0017<br><span class="ty">spec</span></td><td class="mono">artifact.yaml<br><span class="loc">@ services.mongo:25</span></td><td>The mongo image is unpinned (no version tag). A reviewer may flag it; not a seeded defect.</td><td class="mono defs">services.web.environment:7<br>services.web.depends_on:12<br>services.backend.depends_on:23</td><td class="ck"><span class="box2"></span></td></tr>
+<tr class="gzx"><td colspan="5"><details><summary>▸ context — spec-0017: source, gray zone &amp; seeded defects</summary><div class="body"><h4>Source — artifact.yaml</h4><div class="src">
+<div class="l">   1 | services:</div>
+<div class="l">   2 |   web:</div>
+<div class="l">   3 |     image: nginx</div>
+<div class="l">   4 |     volumes:</div>
+<div class="l">   5 |       - ./nginx/nginx.conf:/tmp/nginx.conf</div>
+<div class="l">   6 |     environment:</div>
+<div class="l def">   7 |       - FLASK_SERVER_ADDR=backend:8080<span class="m">  ← d1</span></div>
+<div class="l">   8 |     command: /bin/bash -c &quot;envsubst &lt; /tmp/nginx.conf &gt; /etc/nginx/conf.d/default.conf &amp;&amp; nginx -g &#x27;daemon off;&#x27;&quot;</div>
+<div class="l">   9 |     ports:</div>
+<div class="l">  10 |       - 80:80</div>
+<div class="l">  11 |     depends_on:</div>
+<div class="l def">  12 |       - api<span class="m">  ← d2</span></div>
+<div class="l">  13 |   backend:</div>
+<div class="l">  14 |     build:</div>
+<div class="l">  15 |       context: flask</div>
+<div class="l">  16 |       target: builder</div>
+<div class="l">  17 |     stop_signal: SIGINT</div>
+<div class="l">  18 |     environment:</div>
+<div class="l">  19 |       - FLASK_SERVER_PORT=9091</div>
+<div class="l">  20 |     volumes:</div>
+<div class="l">  21 |       - ./flask:/src</div>
+<div class="l">  22 |     depends_on:</div>
+<div class="l def">  23 |       - db<span class="m">  ← d3</span></div>
+<div class="l">  24 |   mongo:</div>
+<div class="l gz">  25 |     image: mongo<span class="mg">  ◀ gray zone</span></div>
+</div><div class="srckey"><span class="k gz">▏</span> gray-zone span &nbsp; <span class="k def">▏</span> seeded defect line</div><h4>Gray zone</h4><div><code>services.mongo:25</code> — <i>The mongo image is unpinned (no version tag). A reviewer may flag it; not a seeded defect.</i></div><h4>Seeded defects — the gray zone must be a DIFFERENT issue</h4><table class="mini"><tr><td class="mono">d1 @ services.web.environment:7</td><td>The web proxy targets FLASK_SERVER_ADDR=backend:8080, but the backend serves on FLASK_SERVER_PORT=9091, so the proxy points at the wrong port.</td></tr><tr><td class="mono">d2 @ services.web.depends_on:12</td><td>web.depends_on names service `api`, but no such service is defined (the application service is named `backend`).</td></tr><tr><td class="mono">d3 @ services.backend.depends_on:23</td><td>backend.depends_on names service `db`, but the database service is named `mongo`; there is no service `db`.</td></tr></table><h4>Your three checks</h4><ol class="chk3"><li><b>Real, debatable?</b> — could a competent reviewer plausibly raise this note? &nbsp;<i>yes / no</i></li><li><b>Not a seeded defect?</b> — is it a different issue than every defect above? &nbsp;<i>yes / no</i></li><li><b>Exclusion correct?</b> — yes to both → excluding it from false-finding scoring is right; tick the row.</li></ol><div class="flagif"><b>Flag instead if:</b> the note is trivial/implausible (a finding there should count as a <i>false</i> finding), or it is actually one of the seeded defects in disguise (should count as <i>recall</i>).</div></div></details></td></tr>
+</table>
+</div>
+
+<!-- ============================ SIGN-OFF ============================ -->
+<div class="final">
+  <h2>Sign-off checklist</h2>
+  <div class="chk"><span class="box"></span><div><b>A.</b> Confirmed the 5 oracle refinements (code-0009 ×2, code-0019 ×1, spec-0015 ×2) — each NEW paraphrase faithfully restates its defect and no longer collides with its sibling. <i>(Reject any → tell Claude to revert + regenerate.)</i></div></div>
+  <div class="chk"><span class="box"></span><div><b>B.</b> Spot-checked the matcher fix — code-0003 and code-0015 genuinely raise all 3 defects, so recall 1.0 is real recovery, not inflation.</div></div>
+  <div class="chk"><span class="box"></span><div><b>D.</b> Scanned all 44 gray-zone exclusions — each is a real, non-seeded, debatable issue correctly excluded from false-finding scoring. <i>(Flag any "no" → tell Claude.)</i></div></div>
+  <div class="chk"><span class="box"></span><div><b>C.</b> Labeled the 250-pair κ worksheet and ran <code>compute_kappa.py</code>; recorded the κ value.</div></div>
+  <div class="chk"><span class="box"></span><div><b>Then:</b> tell Claude the audit is signed off → <b>Path&nbsp;B</b> (data intact; ~$60, ~overnight):
+    <ol style="margin:6px 0 0;padding-left:20px">
+      <li><b>Fix the matcher code-audit bugs first</b> (<code>docs/CODE_AUDIT_2026-07-09.md</code> #1–#8, each with a regression test). Measured impact is small — greedy vs optimal assignment deflates terminal recall on 12/720 runs, ~balanced across arms — but fix it for correctness before the definitive number.</li>
+      <li><b>Recompute</b> all four arms (<code>mem / nomem / ledger / structured-memory</code>) with the fixed matcher, reusing the warm V4-Pro cache → ~15.9K fresh judge calls (<b>~$6</b>).</li>
+      <li><b>Item-paired McNemar + sign test</b> for the real headline, then a <b>cross-judge robustness</b> pass (GPT-5.5/Opus on 50 mem/nomem traj) that clears the §84 same-family concern.</li>
+    </ol>
+    Gap holds → commit + <b>EMSE preprint</b>; gap collapses → escalate to a full non-DeepSeek recompute.</div></div>
+</div>
+
+<div class="foot">ReviewConverge · human-audit playbook · generated 2026-07-06 · recompiled 2026-07-09 (data confirmed intact — earlier data-loss alarm was a transient FS glitch; post-sign-off = fix matcher code-audit bugs → Path&nbsp;B recompute) · corpus / gold / κ unchanged since <code>corpus-freeze</code>.</div>
+
+</div>
+</body>
+</html>

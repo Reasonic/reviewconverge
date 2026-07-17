@@ -1,0 +1,50 @@
+{
+ "mem": {
+  "n": 180,
+  "settle_rate": 0.8,
+  "cc_rate": 0.7278,
+  "fc_rate": 0.0722,
+  "p_wrong_given_settled": 0.0903
+ },
+ "nomem": {
+  "n": 180,
+  "settle_rate": 0.6056,
+  "cc_rate": 0.5444,
+  "fc_rate": 0.0611,
+  "p_wrong_given_settled": 0.1009
+ },
+ "ledger": {
+  "n": 180,
+  "settle_rate": 0.8667,
+  "cc_rate": 0.7444,
+  "fc_rate": 0.1222,
+  "p_wrong_given_settled": 0.141
+ },
+ "structured": {
+  "n": 180,
+  "settle_rate": 0.8611,
+  "cc_rate": 0.7222,
+  "fc_rate": 0.1389,
+  "p_wrong_given_settled": 0.1613
+ },
+ "tests": {
+  "ledger_vs_mem_fc": {
+   "mean_fc_diff": 0.05,
+   "artifacts_more_fc": 11,
+   "artifacts_less_fc": 4,
+   "sign_test_p": 0.11847
+  },
+  "structured_vs_mem_fc": {
+   "mean_fc_diff": 0.0667,
+   "artifacts_more_fc": 11,
+   "artifacts_less_fc": 3,
+   "sign_test_p": 0.05737
+  },
+  "nomem_vs_mem_fc": {
+   "mean_fc_diff": -0.0111,
+   "artifacts_more_fc": 6,
+   "artifacts_less_fc": 9,
+   "sign_test_p": 0.60724
+  }
+ }
+}

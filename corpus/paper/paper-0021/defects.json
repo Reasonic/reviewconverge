@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0021",
+  "defects": [
+    {
+      "id": "paper-0021-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The rise from 2 million to over 450 million tonnes is called 'more than a 20-fold increase', but 450 divided by 2 is about 225 — more than a 200-fold increase.",
+      "location": {"unit": "A surge in production", "start": 4, "end": 5},
+      "anchor": "20-fold",
+      "paraphrases": [
+        "450 divided by 2 is about 225, so it is a 200-fold, not 20-fold, increase.",
+        "A 20-fold rise from 2 million would be 40 million, not 450 million.",
+        "The stated multiple is about ten times too small."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than a 200-fold' (450/2). Findable from the two tonnage figures, distinct."
+    },
+    {
+      "id": "paper-0021-d2",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "One-quarter of the 350 million tonnes of waste is given as 'roughly 250 million tonnes', but a quarter of 350 million is about 88 million, not 250 million.",
+      "location": {"unit": "Where it goes", "start": 8, "end": 9},
+      "anchor": "250 million",
+      "paraphrases": [
+        "A quarter of 350 million is roughly 88 million, not 250 million.",
+        "250 million would be more than two-thirds of 350 million, not a quarter.",
+        "The mismanaged tonnage does not match the stated one-quarter share."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 90 million' (350/4). Findable from the total and the share, distinct."
+    },
+    {
+      "id": "paper-0021-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "1-2 million tonnes reaching the ocean out of 350 million tonnes of waste is given as 'about 5%', but that ratio is about 0.5%.",
+      "location": {"unit": "Where it goes", "start": 9, "end": 11},
+      "anchor": "about 5%",
+      "paraphrases": [
+        "1.5 million out of 350 million is about 0.4%, not 5%.",
+        "The ocean share of plastic waste is overstated by roughly tenfold.",
+        "A couple of million tonnes is well under 1% of 350 million."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'about 0.5%' (1-2M / 350M). Findable from the ocean and total-waste figures, distinct."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0015",
+  "defects": [
+    {
+      "id": "paper-0015-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The ~36 million Great Leap Forward deaths are called 'more than two-thirds' of the century's ~100 million total, but 36 out of 100 is about a third, not more than two-thirds.",
+      "location": {"unit": "The scale of the toll", "start": 4, "end": 6},
+      "anchor": "more than two-thirds",
+      "paraphrases": [
+        "36 million out of 100 million is roughly one-third, not more than two-thirds.",
+        "The Great Leap Forward's share of the century's famine deaths is overstated.",
+        "More than two-thirds would be over 66 million, not 36 million."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than one-third' (36/100). Findable from the two figures, distinct."
+    },
+    {
+      "id": "paper-0015-d2",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The ~3 million Bengal deaths are called 'about one-third as many' as the ~36 million Great Leap Forward deaths, but 3 out of 36 is about one-twelfth, not one-third.",
+      "location": {"unit": "The scale of the toll", "start": 6, "end": 7},
+      "anchor": "one-third as many",
+      "paraphrases": [
+        "3 million is about one-twelfth of 36 million, not one-third.",
+        "One-third of 36 million would be 12 million, not 3 million.",
+        "The Bengal-to-Great-Leap ratio is overstated."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'about one-twelfth as many' (3/36). Findable from the two figures, distinct."
+    },
+    {
+      "id": "paper-0015-d3",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Children are said to account for 'between one half and one-quarter' of famine deaths, but one-quarter is less than one half, so the range is stated backwards (the upper bound is below the lower bound).",
+      "location": {"unit": "Who dies", "start": 10, "end": 11},
+      "anchor": "one-quarter",
+      "paraphrases": [
+        "A range from one half to one-quarter is inverted, since a quarter is smaller than a half.",
+        "The upper bound (one-quarter) is below the lower bound (one half).",
+        "'Between one half and one-quarter' cannot be a valid range."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'two-thirds' (one half to two-thirds). Findable within the sentence, distinct."
+    }
+  ]
+}

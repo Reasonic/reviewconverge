@@ -1,0 +1,62 @@
+{
+  "artifact_id": "spec-0002",
+  "defects": [
+    {
+      "id": "spec-0002-d1",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "backend.depends_on names `database`, but no service by that name is defined (the database service is named `db`).",
+      "location": {
+        "unit": "services.backend.depends_on",
+        "start": 30,
+        "end": 30
+      },
+      "anchor": "database",
+      "paraphrases": [
+        "The backend depends on `database`, which is not one of the defined services (backend, db, frontend).",
+        "depends_on points at a non-existent service `database`; it should reference `db`.",
+        "Dangling service dependency: `database` is never declared under `services`."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking depends_on against the service list; the db service (referenced elsewhere as DATABASE_HOST=db) is named `db`, not `database`."
+    },
+    {
+      "id": "spec-0002-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "frontend.networks references `frontend-net`, which is not declared under the top-level `networks` key (only `public` and `private` exist).",
+      "location": {
+        "unit": "services.frontend.networks",
+        "start": 57,
+        "end": 57
+      },
+      "anchor": "frontend-net",
+      "paraphrases": [
+        "The frontend joins network `frontend-net`, but that network is never defined at the top level.",
+        "Undefined network reference: `frontend-net` is missing from the top-level networks section.",
+        "frontend uses a network name that does not appear under `networks:` (only public/private are declared)."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking the service's networks against the top-level networks declaration."
+    },
+    {
+      "id": "spec-0002-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "critical",
+      "description": "frontend publishes host port 80 (`80:3000`), colliding with backend's host port 80 (`80:80`); two services cannot bind the same host port.",
+      "location": {
+        "unit": "services.frontend.ports",
+        "start": 52,
+        "end": 52
+      },
+      "anchor": "80:3000",
+      "paraphrases": [
+        "Host port 80 is mapped by both backend (80:80) and frontend (80:3000), which conflicts.",
+        "Port collision: the frontend's `80:3000` reuses host port 80 already taken by the backend.",
+        "Two services bind the same host port (80), so the stack cannot start."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the published host ports of backend (line 16) and frontend (line 52) within the file."
+    }
+  ]
+}

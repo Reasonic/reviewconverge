@@ -1,0 +1,17 @@
+{
+ "n_sampled": 150,
+ "judge": "deepseek:deepseek-v4-pro",
+ "self_consistency": {
+  "agree": 140,
+  "of": 150,
+  "rate": 0.9333
+ },
+ "order_swap": {
+  "agree": 137,
+  "of": 150,
+  "rate": 0.9133
+ },
+ "judge_calls": 450,
+ "undecided": 0,
+ "parse_err": 0
+}

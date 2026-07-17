@@ -1,0 +1,47 @@
+{
+  "id": "spec-0016",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Elasticsearch/Logstash/Kibana Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/elasticsearch-logstash-kibana/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) elasticsearch-logstash-kibana compose.yaml. Three dangling references injected (two service dependencies and one network), all findable within the file. The elasticsearch service and the top-level network are otherwise untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.logstash.networks",
+      "start": 34,
+      "end": 35,
+      "note": "logstash's network (elastic) is correct and declared"
+    },
+    {
+      "unit": "networks",
+      "start": 46,
+      "end": 48,
+      "note": "the top-level network declaration (elastic) is untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "services.elasticsearch",
+        "start": 3,
+        "end": 3
+      },
+      "note": "Images are pinned to an old version (7.16.1). A reviewer may flag the outdated images; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0006",
+  "defects": [
+    {
+      "id": "paper-0006-d1",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The fall from 33% (1970) to 12% (2015) is called 'a decline of 31 percentage points', but 33 - 12 = 21 percentage points.",
+      "location": {"unit": "A steep fall", "start": 6, "end": 6},
+      "anchor": "31 percentage points",
+      "paraphrases": [
+        "33 minus 12 is 21, not the stated 31 percentage points.",
+        "The percentage-point decline is miscalculated (should be 21).",
+        "The drop from 33% to 12% does not equal 31 points."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value '21 percentage points' (33 - 12). Findable from the two rates in the same passage, distinct."
+    },
+    {
+      "id": "paper-0006-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Hunger is described as having 'more than doubled' over the period, but the rate fell from 33% to 12% — it decreased, so it cannot have doubled.",
+      "location": {"unit": "A steep fall", "start": 7, "end": 7},
+      "anchor": "more than doubled",
+      "paraphrases": [
+        "The rate went down (33% to 12%), so 'more than doubled' is the wrong direction.",
+        "A decline from 33% to 12% is a fall, not a doubling.",
+        "'More than doubled' contradicts the reported decrease in the hunger rate."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than halved' (12 < 33/2). Findable from the 33%-to-12% fall stated in the same passage, distinct."
+    },
+    {
+      "id": "paper-0006-d3",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The 1970 rate is described as 'one-in-four ... about 33%', but one-in-four is 25%, not 33%.",
+      "location": {"unit": "A steep fall", "start": 4, "end": 5},
+      "anchor": "one-in-four people",
+      "paraphrases": [
+        "One-in-four is 25%, which does not match the stated 33%.",
+        "The fraction and the percentage disagree: one-in-four is not about 33%.",
+        "'One-in-four' should be 'one-in-three' to match the 33% figure."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'one-in-three' (~33%). Findable from the fraction and the 33% in the same sentence, distinct from the other defects."
+    }
+  ]
+}

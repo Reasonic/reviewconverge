@@ -1,0 +1,80 @@
+{
+ "defects": [
+  {
+   "id": "probe-0004-d1",
+   "category": "wrong-comparison-operator",
+   "severity": "major",
+   "description": "The half-open overlap test uses `<=` on both sides, so two intervals that merely touch at an endpoint (e.g. [0,5) and [5,9)) are reported as overlapping even though they share no interior point.",
+   "location": {
+    "unit": "src/interval_scheduler.py",
+    "start": 59,
+    "end": 59
+   },
+   "anchor": "return a[0] <= b[1] and b[0] <= a[1]",
+   "paraphrases": [
+    "Comparing endpoints with less-than-or-equal treats an interval's exclusive end as inclusive, so adjacent ranges meeting at a single boundary are wrongly judged to intersect.",
+    "The overlap predicate admits equality at the shared edge, causing back-to-back half-open intervals that only abut to be classified as overlapping.",
+    "Because the boundary is included on both comparisons, ranges that touch without any common point are counted as overlapping contrary to the half-open convention."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '    return a[0] < b[1] and b[0] < a[1]'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0004-d2",
+   "category": "wrong-min-max-selection",
+   "severity": "major",
+   "description": "The overlap's lower bound is taken as the smaller of the two starts instead of the larger, so `overlap_amount` computes an inflated width and even returns a positive amount for disjoint intervals.",
+   "location": {
+    "unit": "src/interval_scheduler.py",
+    "start": 66,
+    "end": 66
+   },
+   "anchor": "lo = a[0] if a[0] < b[0] else b[0]",
+   "paraphrases": [
+    "The intersection's left edge should be the later of the two starts, but the code picks the earlier one, overstating the shared length and yielding a nonzero result for ranges that do not meet.",
+    "Choosing the minimum start rather than the maximum makes the computed overlap span reach further left than the true intersection, breaking the disjoint-returns-zero contract.",
+    "Because `lo` binds to whichever start is smaller, the overlap measure is too large and can report coverage between intervals that actually have none in common."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '    lo = a[0] if a[0] > b[0] else b[0]'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0004-d3",
+   "category": "boundary-comparison-off-by-one",
+   "severity": "major",
+   "description": "Merging combines runs only when the next start is strictly less than the previous end, so intervals that touch (`start == last_end`) are left separate instead of fusing, contradicting the documented merge-on-touch behavior.",
+   "location": {
+    "unit": "src/interval_scheduler.py",
+    "start": 90,
+    "end": 90
+   },
+   "anchor": "if start < last_end:",
+   "paraphrases": [
+    "Using strict less-than as the coalesce test excludes the exact-adjacency case, so abutting intervals like [0,5) and [5,9) are not joined into one.",
+    "The merge condition drops equality, meaning a following interval that begins right where the current one ends is emitted as a distinct range rather than merged.",
+    "Because touching endpoints no longer satisfy the combine check, adjacent intervals that should collapse into a single span stay split apart."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        if start <= last_end:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0004-d4",
+   "category": "over-strict-acceptance-boundary",
+   "severity": "major",
+   "description": "Activity selection accepts an interval only when its start is strictly greater than the last chosen end, so a candidate beginning exactly at that end (which is non-overlapping under the half-open rule) is wrongly rejected, shrinking the selected set.",
+   "location": {
+    "unit": "src/interval_scheduler.py",
+    "start": 128,
+    "end": 128
+   },
+   "anchor": "if current_end is None or start > current_end:",
+   "paraphrases": [
+    "The greedy acceptance uses strict greater-than, excluding an interval that starts precisely where the previous selection finished even though the two do not overlap.",
+    "Because equality with the running end is disallowed, a valid non-conflicting activity whose start meets the last end is skipped, producing a smaller-than-maximal subset.",
+    "The selection gate demands the next start be past the current end rather than at-or-past it, so back-to-back half-open intervals cannot both be chosen."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        if current_end is None or start >= current_end:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  }
+ ]
+}

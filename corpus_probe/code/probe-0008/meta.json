@@ -1,0 +1,40 @@
+{
+ "id": "probe-0008",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "semver (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "wrong comparison",
+   "wrong operator",
+   "wrong variable"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/semver.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/semver.py",
+    "start": 265,
+    "end": 265
+   },
+   "note": "`_group_allows` enforces a 'no surprise prereleases' containment rule (a prerelease candidate is rejected unless some comparator's bound shares its exact core version), an opinionated and non-obvious departure from plain comparator-AND semantics that a reviewer might reasonably question."
+  }
+ ],
+ "defect_count": 4
+}

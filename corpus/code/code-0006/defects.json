@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0006",
+  "defects": [
+    {
+      "id": "code-0006-d1",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The divmod arguments are swapped: `divmod(arabic, number)` divides the table value by the running number, but it must divide the number by the value (`divmod(number, arabic)`).",
+      "location": {"unit": "src/to_roman.py", "start": 32, "end": 32},
+      "anchor": "divmod(arabic, number)",
+      "paraphrases": [
+        "`divmod(arabic, number)` has its operands reversed; conversion needs `divmod(number, arabic)`.",
+        "The quotient/remainder are computed from (value, number) instead of (number, value).",
+        "Argument-order bug: the number should be divided by each Roman value, not the reverse."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `divmod(number, arabic)`. Real (wrong factors and remainder), findable against the conversion logic and the docstring, distinct."
+    },
+    {
+      "id": "code-0006-d2",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "Each symbol is repeated `factor + 1` times instead of `factor`, appending one extra copy of every Roman symbol.",
+      "location": {"unit": "src/to_roman.py", "start": 33, "end": 33},
+      "anchor": "roman * (factor + 1)",
+      "paraphrases": [
+        "`roman * (factor + 1)` should be `roman * factor`; it adds an extra symbol each step.",
+        "The repetition count is off by one, so e.g. a factor of 3 emits four symbols.",
+        "One too many copies of each numeral are appended."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `roman * factor`. Real (extra symbols), findable against the docstring (int_to_roman(3) == 'III'), distinct."
+    },
+    {
+      "id": "code-0006-d3",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The loop breaks when the remaining number is non-zero (`if number != 0`), so it stops after the first iteration; it should break once the number has been fully converted (`if number == 0`).",
+      "location": {"unit": "src/to_roman.py", "start": 34, "end": 34},
+      "anchor": "if number != 0:",
+      "paraphrases": [
+        "`if number != 0` is inverted; the loop should terminate when `number == 0`.",
+        "The break condition stops the conversion prematurely, as soon as any remainder remains.",
+        "Termination logic is backwards: it exits while there is still work left to do."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `if number == 0:`. Real (premature termination), findable from the loop's intent and the docstring, distinct from the other defects."
+    }
+  ]
+}

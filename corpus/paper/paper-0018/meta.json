@@ -1,0 +1,54 @@
+{
+  "id": "paper-0018",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Alcohol consumption summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/alcohol-consumption",
+    "source_ref": "owid-alcohol-consumption-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Ritchie, Roser), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data figures (CC-BY): ~1% of people have an alcohol use disorder; in South Africa and Papua New Guinea more than half of traffic deaths are alcohol-attributable; France in the 1920s averaged 22.1 litres of pure alcohol per adult per year. Complements/derivations added and verified consistent (1% = one in a hundred; 22.1 L/yr ~ 60 mL/day) before injecting 3 defects."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "internal-contradiction",
+      "stat-inconsistency"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "A common disorder",
+      "start": 5,
+      "end": 5,
+      "note": "the 99% complement of the 1% figure is correct and untouched"
+    },
+    {
+      "unit": "Alcohol and road deaths",
+      "start": 8,
+      "end": 8,
+      "note": "the 'more than half of traffic deaths' figure is real and untouched"
+    },
+    {
+      "unit": "A historical peak",
+      "start": 12,
+      "end": 12,
+      "note": "the 22.1 litres/year France figure is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "A common disorder",
+        "start": 4,
+        "end": 4
+      },
+      "note": "Figures are estimates; the mL/day value is a derived conversion. A reviewer may want sources. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

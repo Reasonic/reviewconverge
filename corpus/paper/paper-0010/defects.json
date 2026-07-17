@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0010",
+  "defects": [
+    {
+      "id": "paper-0010-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The safe-water share is given as 'almost three-quarters — around 64%', but three-quarters is 75%, not 64%.",
+      "location": {"unit": "The global picture", "start": 4, "end": 4},
+      "anchor": "around 64%",
+      "paraphrases": [
+        "Three-quarters is 75%, so 'around 64%' does not match.",
+        "The word (three-quarters) and the figure (64%) disagree.",
+        "64% is well below three-quarters."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'around 74%' (~three-quarters). Findable from the fraction and the figure in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0010-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The share without safe water is given as 'one in four, roughly 46%', but one in four is 25%, not 46%.",
+      "location": {"unit": "The global picture", "start": 5, "end": 5},
+      "anchor": "roughly 46%",
+      "paraphrases": [
+        "One in four is 25%, so 'roughly 46%' is wrong.",
+        "The fraction (one in four) and the percentage (46%) disagree.",
+        "46% is far more than a quarter."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 25%' (one in four; complement of ~75%). Findable from the fraction, distinct."
+    },
+    {
+      "id": "paper-0010-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The gap between >50 and <0.05 per 100,000 is called 'more than a millionfold', but 50 / 0.05 is about 1,000 — a thousandfold, not a millionfold.",
+      "location": {"unit": "Stark inequalities", "start": 10, "end": 11},
+      "anchor": "millionfold",
+      "paraphrases": [
+        "50 divided by 0.05 is about 1,000, so it is a thousandfold, not a millionfold.",
+        "The stated fold-difference overstates the 50-vs-0.05 ratio by a thousand times.",
+        "A ratio of 50 to 0.05 is roughly 1,000-fold, not a million."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'thousandfold' (50/0.05 = 1000). Findable from the two death-rate figures, distinct."
+    }
+  ]
+}

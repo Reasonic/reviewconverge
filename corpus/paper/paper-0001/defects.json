@@ -1,0 +1,81 @@
+{
+  "artifact_id": "paper-0001",
+  "defects": [
+    {
+      "id": "paper-0001-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The Results section labels 180 of 200 as 75%, but 180/200 is 90%.",
+      "location": {
+        "unit": "Results",
+        "start": 16,
+        "end": 17
+      },
+      "anchor": "(75%)",
+      "paraphrases": [
+        "180 out of 200 is 90 percent, not the 75 percent stated for RAG-Sum.",
+        "The reported percentage for the primary-diagnosis result is arithmetically wrong (should be 90%).",
+        "RAG-Sum's 180/200 hit rate is mislabeled as 75% in the Results paragraph."
+      ],
+      "confirmed": true,
+      "rationale": "Real arithmetic error, findable from the numbers in the text, distinct from the baseline (132/200=66%, correct)."
+    },
+    {
+      "id": "paper-0001-d2",
+      "category": "citation-inversion",
+      "severity": "major",
+      "description": "The text says our results 'corroborate' Chen et al. (2024), but Chen reported retrieval *reduced* accuracy while RAG-Sum shows retrieval *improves* it - so the results contradict, not corroborate, that finding.",
+      "location": {
+        "unit": "Results",
+        "start": 17,
+        "end": 19
+      },
+      "anchor": "corroborate",
+      "paraphrases": [
+        "The claim of corroborating Chen et al. is inverted: our retrieval helps, whereas Chen found retrieval hurts.",
+        "Our result contradicts the cited Chen (2024) finding, so 'corroborate this finding' is the wrong relationship.",
+        "The paper misstates its relationship to prior work - it opposes Chen et al., it does not confirm them."
+      ],
+      "confirmed": true,
+      "rationale": "Both directions (Chen's and ours) are stated in the excerpt, so the contradiction is findable without external lookup."
+    },
+    {
+      "id": "paper-0001-d3",
+      "category": "overgeneralization",
+      "severity": "minor",
+      "description": "The Discussion claims RAG-Sum 'will generalize to any clinical documentation task' from a single 200-note test set - an unsupported over-generalization.",
+      "location": {
+        "unit": "Discussion",
+        "start": 22,
+        "end": 23
+      },
+      "anchor": "generalize to any",
+      "paraphrases": [
+        "The conclusion extends a 200-note result to 'any clinical documentation task,' which the evidence cannot support.",
+        "Over-claim: one small test set does not license a universal generalization.",
+        "The Discussion overreaches by asserting universal task generalization from a narrow evaluation."
+      ],
+      "confirmed": true,
+      "rationale": "The scope of the evidence (200 notes) and the scope of the claim ('any task') are both in the text."
+    },
+    {
+      "id": "paper-0001-d4",
+      "category": "methodology-flaw",
+      "severity": "critical",
+      "description": "Hyperparameters were tuned on the test set, a train/test leak that invalidates the reported test results.",
+      "location": {
+        "unit": "Dataset and Training",
+        "start": 12,
+        "end": 13
+      },
+      "anchor": "tuned directly on the test set",
+      "paraphrases": [
+        "Tuning hyperparameters on the test split leaks test information and inflates the reported ROUGE-L.",
+        "The evaluation is compromised: model selection used the same test set it reports results on.",
+        "Test-set tuning breaks the train/validation/test separation and biases the headline numbers."
+      ],
+      "confirmed": true,
+      "rationale": "Explicitly stated in the Training paragraph; a reviewer can flag it from the text alone."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0016",
+  "defects": [
+    {
+      "id": "paper-0016-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "If more than a third of US adults were obese, then a bit under two-thirds were not, but the text says 'fewer than one-quarter were not' obese.",
+      "location": {"unit": "A growing share", "start": 4, "end": 5},
+      "anchor": "fewer than one-quarter",
+      "paraphrases": [
+        "More than a third obese implies almost two-thirds not obese, not fewer than a quarter.",
+        "'Fewer than one-quarter not obese' would mean over three-quarters obese, contradicting 'more than a third'.",
+        "The obese and non-obese shares do not add up."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'fewer than two-thirds' (complement of more than a third). Findable from the obese share, distinct."
+    },
+    {
+      "id": "paper-0016-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "If over 60% of US adults were overweight or obese, then under 40% were at a healthy weight or below, but the text says 'over 40%'.",
+      "location": {"unit": "A growing share", "start": 5, "end": 6},
+      "anchor": "over 40%",
+      "paraphrases": [
+        "Over 60% overweight leaves under 40% healthy, not over 40%.",
+        "The two shares would exceed 100% (over 60% plus over 40%).",
+        "'Over 40% healthy' contradicts 'over 60% overweight or obese'."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'under 40%' (complement of over 60%). Findable from the overweight share, distinct."
+    },
+    {
+      "id": "paper-0016-d3",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "The global overweight/obese share is given as 'two-fifths — about 20%', but two-fifths is 40%, not 20%.",
+      "location": {"unit": "A global problem", "start": 9, "end": 9},
+      "anchor": "about 20%",
+      "paraphrases": [
+        "Two-fifths is 40%, so 'about 20%' does not match.",
+        "The fraction (two-fifths) and the percentage (20%) disagree.",
+        "20% is one-fifth, not two-fifths."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'about 40%' (two-fifths). Findable from the fraction and the figure in the same sentence, distinct."
+    }
+  ]
+}

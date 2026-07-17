@@ -1,0 +1,27 @@
+diff --git a/src/digits.py b/src/digits.py
+new file mode 100644
+index 0000000..9f3a2b1
+--- /dev/null
++++ b/src/digits.py
+@@ -0,0 +1,21 @@
++"""Sum the decimal digits of an integer."""
++
++
++def sum_of_digits(n):
++    """Return the sum of the (decimal) digits of n.
++
++        >>> sum_of_digits(12345)
++        15
++        >>> sum_of_digits(123)
++        6
++        >>> sum_of_digits(-123)
++        6
++        >>> sum_of_digits(0)
++        0
++    """
++    abs(n)
++    res = 0
++    while n > 1:
++        res += n // 10
++        n //= 10
++    return res

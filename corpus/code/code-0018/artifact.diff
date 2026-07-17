@@ -1,0 +1,26 @@
+diff --git a/src/findmax.py b/src/findmax.py
+new file mode 100644
+index 0000000..a2c8f5d
+--- /dev/null
++++ b/src/findmax.py
+@@ -0,0 +1,20 @@
++"""Return the largest value in a non-empty sequence."""
++
++
++def find_max(nums):
++    """Return the maximum value in nums.
++
++        >>> find_max([2, 4, 9, 7, 19, 94, 5])
++        94
++        >>> find_max([-3, -2, -1])
++        -1
++        >>> find_max([5])
++        5
++    """
++    if len(nums) == 1:
++        raise ValueError("find_max() arg is an empty sequence")
++    max_num = 0
++    for x in nums:
++        if x < max_num:
++            max_num = x
++    return max_num

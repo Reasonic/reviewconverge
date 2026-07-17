@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0007",
+  "defects": [
+    {
+      "id": "spec-0007-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "DB_HOST points at `postgres:5432`, but the database service is named `db` (its image is postgres, but there is no service or host `postgres`).",
+      "location": {"unit": "services.gitea.environment", "start": 6, "end": 6},
+      "anchor": "DB_HOST=postgres:5432",
+      "paraphrases": [
+        "Gitea connects to host `postgres`, which is not a defined service; the DB service is `db`.",
+        "DB_HOST should be `db:5432`; `postgres` is the image name, not the service name.",
+        "Dangling host reference: no service named `postgres` exists."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking DB_HOST against the service names; the DB service is `db`, not `postgres`."
+    },
+    {
+      "id": "spec-0007-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "DB_USER is `admin`, but the Postgres role created by the db service is `gitea` (POSTGRES_USER=gitea), so the login role does not exist.",
+      "location": {"unit": "services.gitea.environment", "start": 8, "end": 8},
+      "anchor": "DB_USER=admin",
+      "paraphrases": [
+        "DB_USER (admin) does not match POSTGRES_USER (gitea).",
+        "Gitea authenticates as `admin` but the database only creates the `gitea` role.",
+        "The database username is inconsistent between the app and the db service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing DB_USER to POSTGRES_USER in the same file; should be `gitea`."
+    },
+    {
+      "id": "spec-0007-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "DB_NAME is `giteadb`, but the database created by the db service is `gitea` (POSTGRES_DB=gitea), so Gitea targets a database that does not exist.",
+      "location": {"unit": "services.gitea.environment", "start": 7, "end": 7},
+      "anchor": "DB_NAME=giteadb",
+      "paraphrases": [
+        "DB_NAME (giteadb) does not match POSTGRES_DB (gitea).",
+        "Gitea looks for database `giteadb` but the server only creates `gitea`.",
+        "The database name is inconsistent between the app and the db service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing DB_NAME to POSTGRES_DB in the same file; should be `gitea`."
+    }
+  ]
+}

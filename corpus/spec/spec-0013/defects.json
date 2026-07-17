@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0013",
+  "defects": [
+    {
+      "id": "spec-0013-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The nc app sets POSTGRES_HOST=database, but the database service is named `db`; there is no service or host `database`.",
+      "location": {"unit": "services.nc.environment", "start": 5, "end": 5},
+      "anchor": "POSTGRES_HOST=database",
+      "paraphrases": [
+        "Nextcloud points at DB host `database`, but the DB service is `db`.",
+        "POSTGRES_HOST should be `db`; `database` is undefined.",
+        "Dangling host reference: no service named `database` exists."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking POSTGRES_HOST against the service names; the DB service is `db`."
+    },
+    {
+      "id": "spec-0013-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The nc app's POSTGRES_PASSWORD is `secret`, but the db service's POSTGRES_PASSWORD is `nextcloud`, so authentication will fail.",
+      "location": {"unit": "services.nc.environment", "start": 6, "end": 6},
+      "anchor": "POSTGRES_PASSWORD=secret",
+      "paraphrases": [
+        "The app password (secret) does not match the db password (nextcloud).",
+        "Nextcloud and the database are configured with different passwords.",
+        "POSTGRES_PASSWORD is inconsistent between the app and the db service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the nc POSTGRES_PASSWORD (line 6) to the db POSTGRES_PASSWORD (line 17); should be nextcloud."
+    },
+    {
+      "id": "spec-0013-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The nc app's POSTGRES_DB is `cloud`, but the db service creates database `nextcloud`, so the app targets a database that does not exist.",
+      "location": {"unit": "services.nc.environment", "start": 7, "end": 7},
+      "anchor": "POSTGRES_DB=cloud",
+      "paraphrases": [
+        "The app database name (cloud) does not match the db's (nextcloud).",
+        "Nextcloud looks for database `cloud` but the server only creates `nextcloud`.",
+        "POSTGRES_DB is inconsistent between the app and the db service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the nc POSTGRES_DB (line 7) to the db POSTGRES_DB (line 18); should be nextcloud."
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "artifact_id": "code-0001",
+  "defects": [
+    {
+      "id": "code-0001-d1",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The limit check in `allow` uses `>` instead of `>=`, so it admits one event beyond `max_events` per window.",
+      "location": {
+        "unit": "src/window.py",
+        "start": 16,
+        "end": 16
+      },
+      "anchor": "> self.max_events",
+      "paraphrases": [
+        "Off-by-one in `allow`: a client can send `max_events + 1` requests before being throttled.",
+        "The rate limiter permits one too many events because the comparison should be `>=`, not `>`.",
+        "`len(self._events) > self.max_events` under-counts by one; the guard lets an extra event through each window."
+      ],
+      "confirmed": true,
+      "rationale": "Real (admits max_events+1), findable from the diff alone, and distinct from the other seeded defects."
+    },
+    {
+      "id": "code-0001-d2",
+      "category": "missing-guard",
+      "severity": "minor",
+      "description": "`utilization` divides by `self.max_events` with no guard, raising ZeroDivisionError when `max_events == 0`.",
+      "location": {
+        "unit": "src/window.py",
+        "start": 23,
+        "end": 23
+      },
+      "anchor": "/ self.max_events",
+      "paraphrases": [
+        "A `RateLimiter` built with `max_events=0` crashes in `utilization()` due to division by zero.",
+        "Missing zero check before the division in `utilization`.",
+        "`len(self._events) / self.max_events` is unguarded against a zero denominator."
+      ],
+      "confirmed": true,
+      "rationale": "Real (ZeroDivisionError on a legal-looking config), findable, uniquely describable."
+    },
+    {
+      "id": "code-0001-d3",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "`cutoff` is computed with `+` instead of `-`, placing it in the future so every event is evicted and the limiter never throttles.",
+      "location": {
+        "unit": "src/window.py",
+        "start": 13,
+        "end": 13
+      },
+      "anchor": "now + self.window_seconds",
+      "paraphrases": [
+        "Sign error: `now + self.window_seconds` should subtract; as written the sliding window retains nothing.",
+        "The window cutoff moves forward in time, so `allow` always returns True regardless of load.",
+        "`cutoff = now + self.window_seconds` inverts the window boundary and disables rate limiting entirely."
+      ],
+      "confirmed": true,
+      "rationale": "Real (limiter is a no-op), findable from the arithmetic, distinct from the off-by-one defect."
+    },
+    {
+      "id": "code-0001-d4",
+      "category": "api-misuse",
+      "severity": "major",
+      "description": "`from_config` passes constructor arguments in the wrong order, swapping `max_events` and `window_seconds`.",
+      "location": {
+        "unit": "src/window.py",
+        "start": 27,
+        "end": 27
+      },
+      "anchor": "cls(cfg[\"window_seconds\"], cfg[\"max_events\"])",
+      "paraphrases": [
+        "The classmethod builds the limiter with `window_seconds` and `max_events` transposed versus `__init__`'s signature.",
+        "Argument-order mismatch between `from_config` and `RateLimiter.__init__`.",
+        "`cls(cfg[\"window_seconds\"], cfg[\"max_events\"])` maps the config values onto the wrong parameters."
+      ],
+      "confirmed": true,
+      "rationale": "Real (config is silently mis-applied), findable by comparing to the constructor signature in the same diff."
+    }
+  ]
+}

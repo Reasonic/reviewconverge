@@ -1,0 +1,162 @@
+{
+ "n_artifacts": 10,
+ "seeds": [
+  1,
+  2,
+  3
+ ],
+ "run_level": {
+  "mem_cc_rate": 0.4,
+  "n_mem_traj": 30,
+  "nomem_cc_rate": 0.1,
+  "n_nomem_traj": 30
+ },
+ "per_artifact_majority": {
+  "mem_cc_rate": 0.4,
+  "mem_cc_artifacts": [
+   "probe-0003",
+   "probe-0004",
+   "probe-0005",
+   "probe-0010"
+  ],
+  "nomem_cc_rate": 0.1,
+  "nomem_cc_artifacts": [
+   "probe-0004"
+  ],
+  "mcnemar": {
+   "b_mem_only_cc": 3,
+   "c_nomem_only_cc": 0,
+   "p_exact": 0.25
+  }
+ },
+ "recall": {
+  "mem": {
+   "traj_mean": 0.9367,
+   "traj_min": 0.6,
+   "artifacts_below_ceiling": 4,
+   "artifacts_at_ceiling": 6,
+   "per_artifact_mean_recall": {
+    "probe-0001": 1.0,
+    "probe-0002": 1.0,
+    "probe-0003": 1.0,
+    "probe-0004": 1.0,
+    "probe-0005": 0.733,
+    "probe-0006": 0.8,
+    "probe-0007": 0.917,
+    "probe-0008": 1.0,
+    "probe-0009": 0.917,
+    "probe-0010": 1.0
+   }
+  },
+  "nomem": {
+   "traj_mean": 0.88,
+   "traj_min": 0.6,
+   "artifacts_below_ceiling": 7,
+   "artifacts_at_ceiling": 3,
+   "per_artifact_mean_recall": {
+    "probe-0001": 0.917,
+    "probe-0002": 1.0,
+    "probe-0003": 0.917,
+    "probe-0004": 1.0,
+    "probe-0005": 0.733,
+    "probe-0006": 0.733,
+    "probe-0007": 0.833,
+    "probe-0008": 0.833,
+    "probe-0009": 1.0,
+    "probe-0010": 0.833
+   }
+  }
+ },
+ "per_artifact_table": [
+  {
+   "artifact": "probe-0001",
+   "mem_regime": "divergent",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 1.0,
+   "nomem_recall": 0.917,
+   "mem_conv": 0.0,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0002",
+   "mem_regime": "divergent",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 1.0,
+   "nomem_recall": 1.0,
+   "mem_conv": 0.33,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0003",
+   "mem_regime": "contractive-to-correct",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 1.0,
+   "nomem_recall": 0.917,
+   "mem_conv": 1.0,
+   "nomem_conv": 0.33
+  },
+  {
+   "artifact": "probe-0004",
+   "mem_regime": "contractive-to-correct",
+   "nomem_regime": "contractive-to-correct",
+   "mem_recall": 1.0,
+   "nomem_recall": 1.0,
+   "mem_conv": 0.67,
+   "nomem_conv": 0.67
+  },
+  {
+   "artifact": "probe-0005",
+   "mem_regime": "contractive-to-correct",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 0.733,
+   "nomem_recall": 0.733,
+   "mem_conv": 0.67,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0006",
+   "mem_regime": "divergent",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 0.8,
+   "nomem_recall": 0.733,
+   "mem_conv": 0.67,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0007",
+   "mem_regime": "oscillatory-churn",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 0.917,
+   "nomem_recall": 0.833,
+   "mem_conv": 0.33,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0008",
+   "mem_regime": "oscillatory-churn",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 1.0,
+   "nomem_recall": 0.833,
+   "mem_conv": 0.0,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0009",
+   "mem_regime": "divergent",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 0.917,
+   "nomem_recall": 1.0,
+   "mem_conv": 0.33,
+   "nomem_conv": 0.0
+  },
+  {
+   "artifact": "probe-0010",
+   "mem_regime": "contractive-to-correct",
+   "nomem_regime": "oscillatory-churn",
+   "mem_recall": 1.0,
+   "nomem_recall": 0.833,
+   "mem_conv": 1.0,
+   "nomem_conv": 0.33
+  }
+ ]
+}

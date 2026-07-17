@@ -1,0 +1,59 @@
+{
+  "module": "retry.py",
+  "defects": [
+    {
+      "category": "off-by-one-exponent",
+      "severity": "minor",
+      "anchor": "self.multiplier ** retry_index)",
+      "correct_form": "        delay = self.base_delay * (self.multiplier ** (retry_index - 1))",
+      "description": "The backoff exponent uses `retry_index` instead of `retry_index - 1`, so the first retry waits base_delay*multiplier rather than base_delay, shifting the whole geometric sequence one step too high.",
+      "paraphrases": [
+        "The exponent is not decremented before raising the multiplier, so the initial wait already includes one growth step instead of starting at the configured base.",
+        "Every scheduled backoff is computed one geometric term ahead, making the very first delay base_delay*multiplier and inflating each subsequent one.",
+        "Because the index is used raw as the power, the series skips its base term and all attempts sleep longer than the policy specifies."
+      ]
+    },
+    {
+      "category": "wrong-arithmetic-operator",
+      "severity": "major",
+      "anchor": "return half - rng.uniform(0.0, half)",
+      "correct_form": "        return half + rng.uniform(0.0, half)",
+      "description": "Equal jitter subtracts the random component from the half-delay instead of adding it, producing values in [0, delay/2] rather than the intended [delay/2, delay], so backoffs systematically under-wait.",
+      "paraphrases": [
+        "The 'equal' strategy should sit at half the delay and vary upward, but the minus sign pulls its results into the lower half of the range.",
+        "Jittered equal backoffs collapse toward zero because the random slice is deducted from the fixed half rather than stacked on top of it.",
+        "Instead of a guaranteed half plus some extra, the value becomes a half minus some amount, so an equal-jittered wait never exceeds 50% of the computed delay."
+      ]
+    },
+    {
+      "category": "inverted-condition",
+      "severity": "critical",
+      "anchor": "if elapsed <= policy.deadline:",
+      "correct_form": "            if elapsed >= policy.deadline:",
+      "description": "The deadline check direction is reversed (`<=` instead of `>=`), so a policy with a deadline aborts with a 'deadline' RetryError while budget still remains, and conversely fails to stop once the budget is genuinely exhausted.",
+      "paraphrases": [
+        "The comparison against the time budget runs backwards, tripping the timeout on the first retry whenever elapsed time is still comfortably within the allotment.",
+        "A deadline-bounded call bails out as soon as it has spent less than its budget, because the guard fires while elapsed remains below the deadline rather than beyond it.",
+        "The short-circuit treats 'time still left' as 'time is up', so the retry loop raises the deadline error prematurely and only skips the check once truly over budget."
+      ]
+    },
+    {
+      "category": "wrong-default-return",
+      "severity": "major",
+      "anchor": "            return True",
+      "correct_form": "            return False",
+      "description": "When no retryable exception types are configured, should_retry_exception returns True instead of False, so a policy built with retry_on=None retries every exception rather than letting it propagate immediately.",
+      "paraphrases": [
+        "An empty set of retryable exception classes is meant to mean 'retry nothing', yet the early-out reports retryable, causing all raised errors to be retried.",
+        "With no exception types registered the method wrongly classifies every exception as eligible for retry, contradicting the 'anything else propagates immediately' contract.",
+        "The no-configured-types branch yields the wrong boolean, effectively turning retry_on=None into retry-on-any-exception."
+      ]
+    }
+  ],
+  "gray_zones": [
+    {
+      "note": "_normalize_exc_types performs tuple(exc) for any iterable without checking that its elements are exception classes, so a malformed retry_on (e.g. a list containing non-types) is accepted silently at construction and only fails later as a TypeError inside isinstance(). A defensible robustness concern, but not one of the injected defects.",
+      "approx_line": 70
+    }
+  ]
+}

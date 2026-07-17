@@ -1,0 +1,58 @@
+{
+ "R4_1_cap_truncation": {
+  "mem_mean_chars": 1452.0,
+  "nomem_mean_chars": 1399.0,
+  "mem_median": 1360.0,
+  "nomem_median": 1333.0,
+  "observed_max_chars": 3611,
+  "approx_token_cap_lower_bound": 902,
+  "paired_wilcoxon_p": 0.0748,
+  "frac_rounds_near_max_mem": 0.0019,
+  "frac_rounds_near_max_nomem": 0.0009,
+  "verdict": "no differential truncation: per-round reviewer output is statistically indistinguishable across arms and far below a hard ceiling"
+ },
+ "R4_S1_confusion": {
+  "n": 360,
+  "regime_agreement": 0.9306,
+  "n_label_changed_under_swap": 25,
+  "frac_changed": 0.0694,
+  "confusion_v4pro_rows_gpt55_cols": {
+   "contractive-to-correct": {
+    "contractive-to-correct": 220,
+    "false-convergence": 1,
+    "oscillatory-churn": 8,
+    "divergent": 0
+   },
+   "false-convergence": {
+    "contractive-to-correct": 0,
+    "false-convergence": 22,
+    "oscillatory-churn": 2,
+    "divergent": 0
+   },
+   "oscillatory-churn": {
+    "contractive-to-correct": 10,
+    "false-convergence": 1,
+    "oscillatory-churn": 84,
+    "divergent": 0
+   },
+   "divergent": {
+    "contractive-to-correct": 2,
+    "false-convergence": 0,
+    "oscillatory-churn": 1,
+    "divergent": 9
+   }
+  }
+ },
+ "R4_2b_probe_f1_test": {
+  "n_modules": 10,
+  "mean_f1_mem": 0.76,
+  "mean_f1_nomem": 0.849,
+  "mean_paired_diff_mem_minus_nomem": -0.0892,
+  "bootstrap_ci95": [
+   -0.1516,
+   -0.0259
+  ],
+  "wilcoxon_p": 0.0273,
+  "excludes_zero": true
+ }
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0006",
+  "defects": [
+    {
+      "id": "spec-0006-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "WORDPRESS_DB_HOST is set to `database`, but the database service is named `db`; there is no service or host `database`.",
+      "location": {"unit": "services.wordpress.environment", "start": 25, "end": 25},
+      "anchor": "WORDPRESS_DB_HOST=database",
+      "paraphrases": [
+        "WordPress points at DB host `database`, which is not a defined service (the DB service is `db`).",
+        "The DB host should be `db`; `database` resolves to nothing.",
+        "Dangling host reference: no service named `database` exists in the file."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking WORDPRESS_DB_HOST against the service names; the DB service is `db`."
+    },
+    {
+      "id": "spec-0006-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "WORDPRESS_DB_NAME is `wp`, but the database created by the db service is `wordpress` (MYSQL_DATABASE=wordpress), so WordPress targets a database that does not exist.",
+      "location": {"unit": "services.wordpress.environment", "start": 28, "end": 28},
+      "anchor": "WORDPRESS_DB_NAME=wp",
+      "paraphrases": [
+        "WORDPRESS_DB_NAME (wp) does not match MYSQL_DATABASE (wordpress).",
+        "WordPress looks for database `wp` but the server only creates `wordpress`.",
+        "The configured database name is inconsistent between the app and the db service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing WORDPRESS_DB_NAME to MYSQL_DATABASE in the same file; should be `wordpress`."
+    },
+    {
+      "id": "spec-0006-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "WORDPRESS_DB_PASSWORD is `secret`, but the db user's password is `wordpress` (MYSQL_PASSWORD=wordpress), so authentication will fail.",
+      "location": {"unit": "services.wordpress.environment", "start": 27, "end": 27},
+      "anchor": "WORDPRESS_DB_PASSWORD=secret",
+      "paraphrases": [
+        "WORDPRESS_DB_PASSWORD (secret) does not match MYSQL_PASSWORD (wordpress).",
+        "The WordPress DB password differs from the password the MySQL user was created with.",
+        "App and database passwords are inconsistent, so the DB login will be rejected."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing WORDPRESS_DB_PASSWORD to MYSQL_PASSWORD in the same file; should be `wordpress`."
+    }
+  ]
+}

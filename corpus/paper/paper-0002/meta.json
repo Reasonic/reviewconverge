@@ -1,0 +1,44 @@
+{
+  "id": "paper-0002",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "CBO budget-review summary (real PD figures, internal-arithmetic defects)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "public-domain",
+    "url": "https://www.cbo.gov/publication/61307",
+    "source_ref": "cbo-publication-61307",
+    "retrieved": "2026-07-05",
+    "attribution": "Congressional Budget Office (U.S. Government work, public domain)",
+    "notes": "Figures are the real CBO Monthly Budget Review FY2025 values (deficit $1.8T, down $41B / 2%; revenues +$317B / 6%; outlays +$275B / 4%; deficit 5.9% vs 6.3% of GDP; debt held by the public 99.8% vs 97.4% of GDP). The report prose is composed around those figures because cbo.gov blocks automated verbatim retrieval (HTTP 403); the clean version's internal arithmetic was verified consistent before injecting defects. Defects are internal-arithmetic inconsistencies findable from the text's own numbers."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Overview",
+      "start": 4,
+      "end": 4,
+      "note": "the $1.8 trillion deficit total is the real, correct figure"
+    },
+    {
+      "unit": "Receipts and outlays",
+      "start": 9,
+      "end": 9,
+      "note": "revenues +6% / +$317 billion is internally consistent and untouched"
+    },
+    {
+      "unit": "Relative to the economy",
+      "start": 18,
+      "end": 18,
+      "note": "the 5.9% and 6.3% of GDP figures themselves are correct"
+    }
+  ],
+  "defect_count": 4
+}

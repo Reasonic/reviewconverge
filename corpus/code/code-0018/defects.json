@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0018",
+  "defects": [
+    {
+      "id": "code-0018-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The comparison `if x < max_num` keeps the smallest value seen, so the function returns the minimum instead of the maximum; it should be `>`.",
+      "location": {"unit": "src/findmax.py", "start": 18, "end": 18},
+      "anchor": "x < max_num",
+      "paraphrases": [
+        "`<` should be `>`; find_max must track the largest value.",
+        "Using `<` makes the function compute the minimum.",
+        "find_max([2,4,9,...]) would return the smallest element, not 94."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `if x > max_num`. Real (returns the min), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0018-d2",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "The running maximum is initialised to `0` instead of the first element, so for all-negative inputs the function wrongly returns 0.",
+      "location": {"unit": "src/findmax.py", "start": 16, "end": 16},
+      "anchor": "max_num = 0",
+      "paraphrases": [
+        "`max_num = 0` should be `max_num = nums[0]`; 0 is not a valid starting maximum.",
+        "For a list of negatives, starting at 0 returns 0, which is not in the list.",
+        "find_max([-3,-2,-1]) would return 0 instead of -1."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `max_num = nums[0]`. Real (wrong for all-negative inputs), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0018-d3",
+      "category": "missing-guard",
+      "severity": "minor",
+      "description": "The empty-input guard tests `len(nums) == 1`, so an empty list is not caught (it raises IndexError elsewhere) while a valid single-element list is wrongly rejected.",
+      "location": {"unit": "src/findmax.py", "start": 14, "end": 14},
+      "anchor": "len(nums) == 1",
+      "paraphrases": [
+        "`len(nums) == 1` should be `len(nums) == 0`; the guard is meant to catch empty input.",
+        "A one-element list is rejected while an empty list slips through.",
+        "find_max([5]) raises instead of returning 5."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `len(nums) == 0`. Real (wrong inputs guarded), findable via the docstring (find_max([5]) == 5), distinct."
+    }
+  ]
+}

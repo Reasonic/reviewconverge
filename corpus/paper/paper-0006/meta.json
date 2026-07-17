@@ -1,0 +1,48 @@
+{
+  "id": "paper-0006",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Global hunger decline summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/hunger-and-undernourishment",
+    "source_ref": "owid-hunger-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Roser, Ritchie), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data / UN FAO hunger figures (CC-BY): one-in-three (~33%) in developing countries hungry in 1970, falling to 12% by 2015 (a ~21 pp decline, more than halved); nearly one-in-ten globally today; North America/Europe below 2.5%. Clean version verified internally consistent before injecting 3 defects findable from the text's own numbers."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "A steep fall",
+      "start": 5,
+      "end": 5,
+      "note": "the 33% (1970) and 12% (2015) figures are the real, untouched values"
+    },
+    {
+      "unit": "Where we are now",
+      "start": 10,
+      "end": 11,
+      "note": "the current ~one-in-ten and below-2.5% figures are real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "A steep fall",
+        "start": 4,
+        "end": 4
+      },
+      "note": "'developing countries' is dated terminology the source itself notes; a reviewer may flag it. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

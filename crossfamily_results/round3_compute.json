@@ -1,0 +1,102 @@
+{
+ "B_defect_projection_ci": {
+  "majority_gap": 0.1667,
+  "discordant_b_mem_only": 12,
+  "c_nomem_only": 2,
+  "mcnemar_p_exact": 0.01294,
+  "cluster_bootstrap_ci95": [
+   0.05,
+   0.2833
+  ]
+ },
+ "C_per_round_curves": {
+  "mem": {
+   "recall": [
+    0.958,
+    0.968,
+    0.976,
+    0.969,
+    0.974,
+    0.967
+   ],
+   "precision": [
+    0.953,
+    0.929,
+    0.928,
+    0.912,
+    0.916,
+    0.915
+   ],
+   "f1": [
+    0.949,
+    0.94,
+    0.943,
+    0.927,
+    0.935,
+    0.929
+   ]
+  },
+  "nomem": {
+   "recall": [
+    0.942,
+    0.955,
+    0.934,
+    0.956,
+    0.927,
+    0.948
+   ],
+   "precision": [
+    0.939,
+    0.942,
+    0.944,
+    0.959,
+    0.944,
+    0.949
+   ],
+   "f1": [
+    0.932,
+    0.939,
+    0.928,
+    0.95,
+    0.927,
+    0.939
+   ]
+  }
+ },
+ "D_rejudge_agreement": {
+  "n_common": 360,
+  "per_trajectory_agreement": 0.9306,
+  "top_disagreements_v4pro_to_gpt55": [
+   {
+    "from": "oscillatory-churn",
+    "to": "contractive-to-correct",
+    "n": 10
+   },
+   {
+    "from": "contractive-to-correct",
+    "to": "oscillatory-churn",
+    "n": 8
+   },
+   {
+    "from": "false-convergence",
+    "to": "oscillatory-churn",
+    "n": 2
+   },
+   {
+    "from": "divergent",
+    "to": "contractive-to-correct",
+    "n": 2
+   },
+   {
+    "from": "oscillatory-churn",
+    "to": "false-convergence",
+    "n": 1
+   },
+   {
+    "from": "contractive-to-correct",
+    "to": "false-convergence",
+    "n": 1
+   }
+  ]
+ }
+}

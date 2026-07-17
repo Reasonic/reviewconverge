@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0009",
+  "defects": [
+    {
+      "id": "spec-0009-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The Pod's configMapKeyRef names ConfigMap `app-config`, but the ConfigMap defined in this manifest is named `special-config`; no `app-config` exists.",
+      "location": {"unit": "Pod.spec.containers.env.configMapKeyRef", "start": 24, "end": 24},
+      "anchor": "name: app-config",
+      "paraphrases": [
+        "configMapKeyRef points at `app-config`, but only `special-config` is defined.",
+        "The referenced ConfigMap name should be `special-config`, not `app-config`.",
+        "Dangling ConfigMap reference: `app-config` is never defined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the configMapKeyRef name (line 24) to the ConfigMap metadata.name (line 4); should be special-config."
+    },
+    {
+      "id": "spec-0009-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The configMapKeyRef requests key `SPECIAL_MODE`, but the ConfigMap only defines keys `SPECIAL_LEVEL` and `SPECIAL_TYPE`.",
+      "location": {"unit": "Pod.spec.containers.env.configMapKeyRef", "start": 25, "end": 25},
+      "anchor": "key: SPECIAL_MODE",
+      "paraphrases": [
+        "The key `SPECIAL_MODE` does not exist in the ConfigMap (which has SPECIAL_LEVEL and SPECIAL_TYPE).",
+        "configMapKeyRef.key should be one of the defined keys, not `SPECIAL_MODE`.",
+        "Dangling key reference: `SPECIAL_MODE` is not in the ConfigMap data."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the referenced key (line 25) to the ConfigMap data keys (lines 7-8)."
+    },
+    {
+      "id": "spec-0009-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The Pod is in namespace `production`, but the ConfigMap it references is in namespace `default`; ConfigMaps are namespace-scoped, so the reference cannot resolve across namespaces.",
+      "location": {"unit": "Pod.metadata.namespace", "start": 14, "end": 14},
+      "anchor": "namespace: production",
+      "paraphrases": [
+        "The Pod (namespace production) cannot reference a ConfigMap in namespace default.",
+        "Namespace mismatch: the ConfigMap is in `default` but the Pod is in `production`.",
+        "A namespaced ConfigMap reference only works within the same namespace."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the Pod namespace (line 14) to the ConfigMap namespace (line 5); should be default."
+    }
+  ]
+}

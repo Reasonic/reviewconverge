@@ -1,0 +1,41 @@
+{
+ "id": "probe-0009",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "token bucket (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "over-restrictive-validation-boundary",
+   "wrong-arithmetic-operator",
+   "wrong-comparison-operator",
+   "wrong-min-max-clamp"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/token_bucket.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/token_bucket.py",
+    "start": 136,
+    "end": 136
+   },
+   "note": "The 'impossible cost' short-circuit in allow() compares the requested cost against the limiter-wide self._burst, ignoring any per-key burst set through configure_key, so the retry_after=inf fast path can disagree with a key's actual ceiling. Arguably a pre-existing inconsistency a reviewer might flag, but it is not one of the injected defects."
+  }
+ ],
+ "defect_count": 4
+}

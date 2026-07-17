@@ -1,0 +1,53 @@
+{
+  "id": "spec-0010",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Kubernetes Secret + Pod env reference (real-derived from kubernetes/website)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://github.com/kubernetes/website/blob/0640ccf95db0469f884f37fb856951a1a182c9f1/content/en/examples/pods/inject/secret-envars-pod.yaml",
+    "source_ref": "0640ccf95db0469f884f37fb856951a1a182c9f1",
+    "retrieved": "2026-07-05",
+    "attribution": "The Kubernetes Authors (CC-BY-4.0)",
+    "notes": "Base = the upstream secret (test-secret) and secret-envars Pod, combined into one manifest. Three defects injected, each findable within the manifest: a dangling Secret name and two dangling keys. The Secret block is untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Secret.metadata",
+      "start": 4,
+      "end": 4,
+      "note": "the Secret name (test-secret) is the reference value, untouched"
+    },
+    {
+      "unit": "Secret.data",
+      "start": 6,
+      "end": 7,
+      "note": "the Secret keys (username, password) are the reference values, untouched"
+    },
+    {
+      "unit": "Pod...SECRET_PASSWORD.secretKeyRef",
+      "start": 26,
+      "end": 26,
+      "note": "the second reference's Secret name (test-secret) is correct"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Secret.data",
+        "start": 6,
+        "end": 7
+      },
+      "note": "Secret values are stored as base64 (not encrypted) in the manifest; a reviewer may flag committing secrets. Upstream example convention, not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

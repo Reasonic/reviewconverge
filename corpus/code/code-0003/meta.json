@@ -1,0 +1,54 @@
+{
+  "id": "code-0003",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "bisect_right(): rightmost insertion point (real-derived from CPython)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "PSF-2.0",
+    "url": "https://github.com/python/cpython/blob/1fd603fad20187496619930e5b74aa7690425926/Lib/bisect.py#L21",
+    "source_ref": "1fd603fad20187496619930e5b74aa7690425926",
+    "retrieved": "2026-07-05",
+    "attribution": "Python Software Foundation",
+    "notes": "Base = the upstream (correct) `bisect_right`, simplified to drop the `key`/accelerated branch and trimmed docstring, into src/search.py. Three independently-findable defects injected; upstream form of each mutated line is recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "off-by-one",
+      "inverted-condition"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/search.py",
+      "start": 16,
+      "end": 17,
+      "note": "the lo >= 0 guard is upstream-correct and untouched"
+    },
+    {
+      "unit": "src/search.py",
+      "start": 20,
+      "end": 21,
+      "note": "loop condition and midpoint computation are correct"
+    },
+    {
+      "unit": "src/search.py",
+      "start": 23,
+      "end": 23,
+      "note": "the hi = mid branch is correct"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "src/search.py",
+        "start": 4,
+        "end": 4
+      },
+      "note": "The function does not verify that `a` is sorted (a documented precondition of binary search, not checked). A reviewer may flag it; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

@@ -1,0 +1,59 @@
+{
+  "module": "cron.py",
+  "defects": [
+    {
+      "category": "wrong operator",
+      "severity": "critical",
+      "anchor": "return (moment.weekday() - 1) % 7",
+      "correct_form": "return (moment.weekday() + 1) % 7",
+      "description": "`_weekday_cron` subtracts 1 rather than adding 1 when converting `datetime.weekday()` (Mon=0) to cron's Sun=0 numbering, shifting every weekday by two so day-of-week matching is systematically wrong.",
+      "paraphrases": [
+        "The Mon=0 to Sun=0 remap is off: it uses `weekday() - 1`, so Monday maps to 6 and Friday to 3, corrupting which cron dow value each real weekday satisfies.",
+        "Cron numbers Sunday as 0, but this conversion decrements instead of incrementing the Python weekday, so a `mon-fri` schedule no longer lines up with actual Monday-through-Friday.",
+        "The sign of the weekday offset is inverted, giving every timestamp the wrong cron day-of-week index."
+      ]
+    },
+    {
+      "category": "wrong boolean operator",
+      "severity": "critical",
+      "anchor": "if self.dom_restricted or self.dow_restricted:",
+      "correct_form": "if self.dom_restricted and self.dow_restricted:",
+      "description": "`_day_matches` selects the OR (either-matches) branch with `or` instead of `and`, so whenever only one of day-of-month / day-of-week is restricted it wrongly uses either-matches semantics and the wildcard side (always true) makes the real restriction meaningless.",
+      "paraphrases": [
+        "The Vixie both-days rule should switch to 'either matches' only when both day fields are constrained, but the connector was changed so a single restricted day field also triggers it, letting the unrestricted field's blanket match swallow the constraint.",
+        "Because the branch predicate ORs the two 'restricted' flags, an expression like `0 0 1-5 * *` matches every day of the month instead of just days 1-5.",
+        "Day-of-month and day-of-week are combined with 'or-match' logic even when just one of them is set, effectively disabling that lone restriction."
+      ]
+    },
+    {
+      "category": "wrong comparison",
+      "severity": "major",
+      "anchor": "if dt.month == 11:",
+      "correct_form": "if dt.month == 12:",
+      "description": "`_advance_month` tests for month 11 instead of 12 as the year boundary, so November wrongly rolls straight to January (skipping December) and a December input falls through to a month-13 replace, so December schedules are never produced.",
+      "paraphrases": [
+        "The end-of-year check fires one month early: at November it jumps to the next January, so December is silently stepped over and never scheduled.",
+        "December (month 12) fails the year-rollover test because the constant is 11, leaving the fallback `replace(month=dt.month + 1)` to attempt an invalid month 13.",
+        "The wrap-to-next-year guard uses the wrong month number, causing the month advance to bypass December entirely."
+      ]
+    },
+    {
+      "category": "off-by-one",
+      "severity": "minor",
+      "anchor": "wrapped = list(range(start, high + 1)) + list(range(low, stop))",
+      "correct_form": "wrapped = list(range(start, high + 1)) + list(range(low, stop + 1))",
+      "description": "In the wrap-around branch of `_materialize_range` the lower segment uses `range(low, stop)` instead of `range(low, stop + 1)`, so a range that wraps past the field maximum (e.g. hours `22-2`) omits its final endpoint value.",
+      "paraphrases": [
+        "The second half of a wrapped range is built with an exclusive upper bound, dropping the `stop` value itself, so `22-2` yields hours 22,23,0,1 and loses hour 2.",
+        "When a range crosses the field's high/low seam, the tail segment is short by one because `stop + 1` was reduced to `stop`, excluding the wrap endpoint.",
+        "Overnight-style ranges silently lose their closing value since the low-side `range(...)` no longer includes `stop`."
+      ]
+    }
+  ],
+  "gray_zones": [
+    {
+      "note": "`_is_restricted` returns False for any `*/n` step wildcard, so a stepped-wildcard day field is treated as unrestricted; under the Vixie both-days rule this is a debatable interpretation (a field like `*/2` arguably restricts the days) that a reviewer might flag.",
+      "approx_line": 213
+    }
+  ]
+}

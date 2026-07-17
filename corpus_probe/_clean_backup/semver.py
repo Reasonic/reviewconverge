@@ -1,0 +1,383 @@
+"""Semantic version parsing, ordering and range satisfaction.
+
+Implements a pragmatic subset of the SemVer 2.0.0 grammar together with the
+range operators most commonly seen in ``package.json``-style dependency
+specifications:
+
+* exact match: ``1.2.3``
+* caret ranges: ``^1.2.3`` (compatible-with, keep left-most non-zero component)
+* tilde ranges: ``~1.2.3`` (allow patch-level drift)
+* wildcards: ``1.2.x`` / ``1.x`` / ``*``
+* bounded comparator sets: ``>=1.2.0 <2.0.0`` (space-joined AND terms)
+* ``||`` separated alternatives (OR of any of the above)
+
+Public surface::
+
+    Version.parse("1.2.3-rc.1+build.5")
+    Version(1, 2, 3) < Version(1, 2, 4)
+    satisfies("1.4.0", "^1.2.0")
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+from functools import total_ordering
+from typing import List, Optional, Sequence, Tuple, Union
+
+_CORE_RE = re.compile(
+    r"^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+    r"(?:-(?P<pre>[0-9A-Za-z.-]+))?"
+    r"(?:\+(?P<build>[0-9A-Za-z.-]+))?$"
+)
+
+_NUMERIC_RE = re.compile(r"^(0|[1-9]\d*)$")
+
+PreId = Union[int, str]
+
+
+class InvalidVersion(ValueError):
+    """Raised when a string cannot be parsed as a semantic version."""
+
+
+class InvalidRange(ValueError):
+    """Raised when a range expression cannot be understood."""
+
+
+@total_ordering
+@dataclass(frozen=True)
+class Version:
+    """An immutable, orderable semantic version.
+
+    Build metadata is retained for round-tripping but, per the spec, ignored
+    for all ordering and equality comparisons.
+    """
+
+    major: int
+    minor: int
+    patch: int
+    prerelease: Tuple[PreId, ...] = ()
+    build: Tuple[str, ...] = ()
+
+    @classmethod
+    def parse(cls, text: str) -> "Version":
+        match = _CORE_RE.match(text.strip())
+        if not match:
+            raise InvalidVersion(f"not a semantic version: {text!r}")
+        pre = _split_prerelease(match.group("pre"))
+        build_raw = match.group("build")
+        build = tuple(build_raw.split(".")) if build_raw else ()
+        return cls(
+            major=int(match.group("major")),
+            minor=int(match.group("minor")),
+            patch=int(match.group("patch")),
+            prerelease=pre,
+            build=build,
+        )
+
+    @property
+    def is_prerelease(self) -> bool:
+        return bool(self.prerelease)
+
+    @property
+    def core(self) -> Tuple[int, int, int]:
+        return (self.major, self.minor, self.patch)
+
+    def bump_major(self) -> "Version":
+        return Version(self.major + 1, 0, 0)
+
+    def bump_minor(self) -> "Version":
+        return Version(self.major, self.minor + 1, 0)
+
+    def bump_patch(self) -> "Version":
+        return Version(self.major, self.minor, self.patch + 1)
+
+    def without_prerelease(self) -> "Version":
+        return Version(self.major, self.minor, self.patch)
+
+    def __str__(self) -> str:
+        out = f"{self.major}.{self.minor}.{self.patch}"
+        if self.prerelease:
+            out += "-" + ".".join(str(p) for p in self.prerelease)
+        if self.build:
+            out += "+" + ".".join(self.build)
+        return out
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Version):
+            return NotImplemented
+        return self.core == other.core and self.prerelease == other.prerelease
+
+    def __hash__(self) -> int:
+        return hash((self.core, self.prerelease))
+
+    def __lt__(self, other: "Version") -> bool:
+        if not isinstance(other, Version):
+            return NotImplemented
+        if self.core != other.core:
+            return self.core < other.core
+        return _prerelease_lt(self.prerelease, other.prerelease)
+
+
+def _split_prerelease(raw: Optional[str]) -> Tuple[PreId, ...]:
+    if not raw:
+        return ()
+    ids: List[PreId] = []
+    for chunk in raw.split("."):
+        if chunk == "":
+            raise InvalidVersion("empty prerelease identifier")
+        if _NUMERIC_RE.match(chunk):
+            ids.append(int(chunk))
+        else:
+            if not re.match(r"^[0-9A-Za-z-]+$", chunk):
+                raise InvalidVersion(f"illegal prerelease identifier: {chunk!r}")
+            ids.append(chunk)
+    return tuple(ids)
+
+
+def _prerelease_lt(left: Sequence[PreId], right: Sequence[PreId]) -> bool:
+    """Ordering of prerelease tuples per SemVer 11.4.
+
+    An empty prerelease outranks any non-empty one (a release beats its
+    pre-releases). Numeric identifiers sort below alphanumeric ones.
+    """
+    if not left and not right:
+        return False
+    if not left:
+        return False
+    if not right:
+        return True
+
+    for a, b in zip(left, right):
+        if a == b:
+            continue
+        cmp = _compare_pre_ids(a, b)
+        return cmp < 0
+    return len(left) < len(right)
+
+
+def _compare_pre_ids(a: PreId, b: PreId) -> int:
+    a_num = isinstance(a, int)
+    b_num = isinstance(b, int)
+    if a_num and b_num:
+        return -1 if a < b else (1 if a > b else 0)
+    if a_num and not b_num:
+        return -1
+    if b_num and not a_num:
+        return 1
+    return -1 if a < b else (1 if a > b else 0)
+
+
+# --------------------------------------------------------------------------- #
+# Range handling
+# --------------------------------------------------------------------------- #
+
+_WILDCARD = {"x", "X", "*"}
+
+
+@dataclass(frozen=True)
+class _Comparator:
+    """A single ``<op> <version>`` bound used to build compound ranges."""
+
+    op: str
+    version: Version
+
+    def allows(self, candidate: Version) -> bool:
+        if self.op == ">=":
+            return candidate >= self.version
+        if self.op == ">":
+            return candidate > self.version
+        if self.op == "<=":
+            return candidate <= self.version
+        if self.op == "<":
+            return candidate < self.version
+        if self.op == "=":
+            return candidate == self.version
+        raise InvalidRange(f"unknown operator {self.op!r}")
+
+
+def _parse_partial(text: str) -> Tuple[Optional[int], Optional[int], Optional[int], Optional[str]]:
+    """Parse a possibly-wildcarded ``a.b.c`` core, returning None for wildcards."""
+    body = text
+    pre = None
+    if "-" in body:
+        body, _, pre = body.partition("-")
+    parts = body.split(".")
+    if len(parts) > 3:
+        raise InvalidRange(f"too many version components: {text!r}")
+    nums: List[Optional[int]] = []
+    for part in parts:
+        if part in _WILDCARD or part == "":
+            nums.append(None)
+        elif part.isdigit():
+            nums.append(int(part))
+        else:
+            raise InvalidRange(f"invalid version component {part!r} in {text!r}")
+    while len(nums) < 3:
+        nums.append(None)
+    return nums[0], nums[1], nums[2], pre
+
+
+def _bounds_from_partial(major, minor, patch, pre) -> List[_Comparator]:
+    """Translate a wildcard partial into a lower/upper comparator pair."""
+    if major is None:
+        return [_Comparator(">=", Version(0, 0, 0))]
+
+    if minor is None:
+        low = Version(major, 0, 0)
+        high = Version(major + 1, 0, 0)
+        return [_Comparator(">=", low), _Comparator("<", high)]
+
+    if patch is None:
+        low = Version(major, minor, 0)
+        high = Version(major, minor + 1, 0)
+        return [_Comparator(">=", low), _Comparator("<", high)]
+
+    exact = Version(major, minor, patch, _split_prerelease(pre) if pre else ())
+    return [_Comparator("=", exact)]
+
+
+def _caret_bounds(text: str) -> List[_Comparator]:
+    major, minor, patch, pre = _parse_partial(text)
+    lo_minor = minor or 0
+    lo_patch = patch or 0
+    low = Version(major or 0, lo_minor, lo_patch, _split_prerelease(pre) if pre else ())
+
+    if major and major > 0:
+        high = Version(major + 1, 0, 0)
+    elif major == 0 and minor and minor > 0:
+        high = Version(0, minor + 1, 0)
+    elif major == 0 and (minor == 0 or minor is None):
+        if patch is None:
+            high = Version(0, (minor or 0) + 1, 0)
+        else:
+            high = Version(0, 0, patch + 1)
+    else:
+        high = Version((major or 0) + 1, 0, 0)
+    return [_Comparator(">=", low), _Comparator("<", high)]
+
+
+def _tilde_bounds(text: str) -> List[_Comparator]:
+    major, minor, patch, pre = _parse_partial(text)
+    low = Version(
+        major or 0,
+        minor or 0,
+        patch or 0,
+        _split_prerelease(pre) if pre else (),
+    )
+    if minor is not None:
+        high = Version(major or 0, (minor or 0) + 1, 0)
+    else:
+        high = Version((major or 0) + 1, 0, 0)
+    return [_Comparator(">=", low), _Comparator("<", high)]
+
+
+def _parse_comparator_term(term: str) -> List[_Comparator]:
+    term = term.strip()
+    if not term:
+        return []
+    if term.startswith("^"):
+        return _caret_bounds(term[1:])
+    if term.startswith("~"):
+        return _tilde_bounds(term[1:])
+    for op in (">=", "<=", ">", "<", "="):
+        if term.startswith(op):
+            return [_Comparator(op, Version.parse(term[len(op):].strip()))]
+
+    major, minor, patch, pre = _parse_partial(term)
+    if None in (major, minor, patch):
+        return _bounds_from_partial(major, minor, patch, pre)
+    return _bounds_from_partial(major, minor, patch, pre)
+
+
+def _parse_and_group(group: str) -> List[_Comparator]:
+    comparators: List[_Comparator] = []
+    for term in group.split():
+        comparators.extend(_parse_comparator_term(term))
+    return comparators
+
+
+def _group_allows(comparators: Sequence[_Comparator], candidate: Version) -> bool:
+    """AND semantics with a prerelease-containment guard.
+
+    A prerelease candidate only satisfies a comparator group if some bound in
+    the group was itself written against the same core version, mirroring the
+    common "no surprise prereleases" rule.
+    """
+    if not comparators:
+        return False
+    if not all(c.allows(candidate) for c in comparators):
+        return False
+    if candidate.is_prerelease:
+        same_core = any(
+            c.version.is_prerelease and c.version.core == candidate.core
+            for c in comparators
+        )
+        if not same_core:
+            return False
+    return True
+
+
+def parse_range(range_str: str) -> List[List[_Comparator]]:
+    """Compile a range string into a list of AND-groups (OR'd together)."""
+    text = range_str.strip()
+    if text == "" or text == "*" or text in _WILDCARD:
+        return [[_Comparator(">=", Version(0, 0, 0))]]
+    groups: List[List[_Comparator]] = []
+    for alternative in text.split("||"):
+        comparators = _parse_and_group(alternative.strip())
+        if comparators:
+            groups.append(comparators)
+    if not groups:
+        raise InvalidRange(f"could not parse range: {range_str!r}")
+    return groups
+
+
+def satisfies(version: Union[str, Version], range_str: str) -> bool:
+    """Return True if ``version`` falls inside ``range_str``."""
+    candidate = version if isinstance(version, Version) else Version.parse(version)
+    for group in parse_range(range_str):
+        if _group_allows(group, candidate):
+            return True
+    return False
+
+
+def max_satisfying(versions: Sequence[Union[str, Version]], range_str: str) -> Optional[Version]:
+    """Return the highest version from ``versions`` that satisfies the range."""
+    best: Optional[Version] = None
+    for item in versions:
+        candidate = item if isinstance(item, Version) else Version.parse(item)
+        if satisfies(candidate, range_str) and (best is None or candidate > best):
+            best = candidate
+    return best
+
+
+def _demo() -> None:
+    a = Version.parse("1.2.3-rc.1+build.9")
+    b = Version.parse("1.2.3")
+    print(f"{a} < {b}: {a < b}")
+    print("sorted:", [str(v) for v in sorted(
+        Version.parse(s) for s in ["1.0.0", "1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-beta", "2.0.0"]
+    )])
+
+    checks = [
+        ("1.4.0", "^1.2.0"),
+        ("2.0.0", "^1.2.0"),
+        ("1.2.9", "~1.2.3"),
+        ("1.3.0", "~1.2.3"),
+        ("1.5.7", "1.5.x"),
+        ("1.6.0", "1.5.x"),
+        ("1.5.0", ">=1.2.0 <2.0.0"),
+        ("1.2.0", "^0.2.3 || >=1.0.0"),
+        ("0.2.5", "^0.2.3"),
+        ("0.3.0", "^0.2.3"),
+    ]
+    for ver, rng in checks:
+        print(f"satisfies({ver!r}, {rng!r}) = {satisfies(ver, rng)}")
+
+    pool = ["1.1.0", "1.2.5", "1.4.0", "2.0.0"]
+    print("max_satisfying:", max_satisfying(pool, "^1.2.0"))
+
+
+if __name__ == "__main__":
+    _demo()

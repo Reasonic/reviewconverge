@@ -1,0 +1,44 @@
+{
+  "id": "spec-0018",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Kubernetes StatefulSet + headless Service (real-derived from kubernetes/website)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://github.com/kubernetes/website/blob/0640ccf95db0469f884f37fb856951a1a182c9f1/content/en/examples/application/web/web.yaml",
+    "source_ref": "0640ccf95db0469f884f37fb856951a1a182c9f1",
+    "retrieved": "2026-07-05",
+    "attribution": "The Kubernetes Authors (CC-BY-4.0)",
+    "notes": "Base = the upstream (valid) web.yaml (headless Service + StatefulSet). Three defects injected, each findable within the manifest: a serviceName that does not match the Service, a StatefulSet selector/template label mismatch, and a volumeMount that does not match the volumeClaimTemplate. The Service block is untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference",
+      "cross-field-inconsistency"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Service.metadata",
+      "start": 4,
+      "end": 4,
+      "note": "the Service name (nginx) is the reference value, untouched"
+    },
+    {
+      "unit": "StatefulSet.spec.template.metadata.labels",
+      "start": 28,
+      "end": 28,
+      "note": "the pod template label (app: nginx) is the reference value, untouched"
+    },
+    {
+      "unit": "StatefulSet.spec.volumeClaimTemplates",
+      "start": 41,
+      "end": 41,
+      "note": "the volumeClaimTemplate name (www) is the reference value, untouched"
+    }
+  ],
+  "defect_count": 3
+}

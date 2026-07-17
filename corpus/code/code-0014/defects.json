@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0014",
+  "defects": [
+    {
+      "id": "code-0014-d1",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The digits are extracted with `divmod(decimal, 8)` instead of `divmod(decimal, 16)`, so it converts to base 8 rather than hexadecimal.",
+      "location": {"unit": "src/dec2hex.py", "start": 26, "end": 26},
+      "anchor": "divmod(decimal, 8)",
+      "paraphrases": [
+        "`divmod(decimal, 8)` should use 16; hexadecimal is base 16.",
+        "Dividing by 8 produces octal-style digits, not hex.",
+        "The radix is wrong (8 instead of 16), so decimal_to_hexadecimal(255) is not '0xff'."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `divmod(decimal, 16)`. Real (wrong base), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0014-d2",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "New digits are appended (`hexadecimal + values[remainder]`) instead of prepended (`values[remainder] + hexadecimal`), so the hex digits come out in reverse order.",
+      "location": {"unit": "src/dec2hex.py", "start": 27, "end": 27},
+      "anchor": "hexadecimal + values[remainder]",
+      "paraphrases": [
+        "The concatenation order is reversed; it should be `values[remainder] + hexadecimal`.",
+        "Digits are produced least-significant first, so appending reverses them.",
+        "decimal_to_hexadecimal(37) would give '0x52' instead of '0x25'."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `values[remainder] + hexadecimal`. Real (digits reversed), findable via the docstring, distinct from the base defect."
+    },
+    {
+      "id": "code-0014-d3",
+      "category": "wrong-operator",
+      "severity": "minor",
+      "description": "For negative inputs the value is multiplied by 1 (`decimal *= 1`) rather than -1, so it is never made positive and the while loop produces no digits.",
+      "location": {"unit": "src/dec2hex.py", "start": 24, "end": 24},
+      "anchor": "decimal *= 1",
+      "paraphrases": [
+        "`decimal *= 1` should be `decimal *= -1`; the sign is never flipped.",
+        "Negative inputs stay negative, so the loop emits nothing and the digits are lost.",
+        "decimal_to_hexadecimal(-256) would return '-0x' instead of '-0x100'."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `decimal *= -1`. Real (negatives lose their digits), findable via the -256 docstring example, distinct."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "paper-0014",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Renewable energy summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/renewable-energy",
+    "source_ref": "owid-renewable-energy-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Ritchie, Roser, Rosado), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data figures (CC-BY): ~one-seventh of primary energy from renewables; almost one-third of electricity renewable; ~three-quarters of greenhouse-gas emissions from fossil-fuel energy. Complements were added (six-sevenths non-renewable) to make the arithmetic self-contained and verified consistent (1/7 + 6/7 = 1; one-third ~ 33%) before injecting 3 defects."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "A small but growing share",
+      "start": 6,
+      "end": 6,
+      "note": "the 'almost one-third' electricity phrasing is real and untouched"
+    },
+    {
+      "unit": "Why it matters",
+      "start": 10,
+      "end": 10,
+      "note": "the ~three-quarters of emissions figure is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "A small but growing share",
+        "start": 5,
+        "end": 5
+      },
+      "note": "The non-renewable complement lumps nuclear with fossil fuels; a reviewer may note nuclear is not a fossil fuel. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

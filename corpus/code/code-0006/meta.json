@@ -1,0 +1,49 @@
+{
+  "id": "code-0006",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "int_to_roman(): integer to Roman numeral (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/conversions/roman_numerals.py#L44",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `int_to_roman` plus its module-level ROMAN table, into src/to_roman.py with a trimmed docstring. Three independently-findable defects injected in the loop body; upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "wrong-operator",
+      "off-by-one",
+      "inverted-condition"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/to_roman.py",
+      "start": 3,
+      "end": 17,
+      "note": "the ROMAN value/symbol table is correct and untouched"
+    },
+    {
+      "unit": "src/to_roman.py",
+      "start": 30,
+      "end": 31,
+      "note": "result initialization and loop header are correct"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "src/to_roman.py",
+        "start": 21,
+        "end": 21
+      },
+      "note": "No validation that the input is in 1-3999 (documented range). A reviewer may flag the missing bounds check; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

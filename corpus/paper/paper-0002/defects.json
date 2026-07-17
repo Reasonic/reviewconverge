@@ -1,0 +1,65 @@
+{
+  "artifact_id": "paper-0002",
+  "defects": [
+    {
+      "id": "paper-0002-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The deficit is said to have decreased by '$41 billion (or 6 percent)', but $41 billion is about 2 percent of the ~$1.8 trillion deficit, not 6 percent.",
+      "location": {"unit": "Overview", "start": 5, "end": 5},
+      "anchor": "or 6 percent",
+      "paraphrases": [
+        "$41 billion out of a $1.8 trillion deficit is roughly 2 percent, so the '6 percent' figure is wrong.",
+        "The dollar and percent forms of the deficit decrease disagree: $41B is ~2%, not 6%.",
+        "The parenthetical percentage for the $41 billion deficit reduction is miscalculated (should be about 2 percent)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value is '2 percent' (41/1800 ~= 2%). Findable from the text's own numbers ($41B vs the $1.8T deficit), distinct."
+    },
+    {
+      "id": "paper-0002-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Outlays are said to have grown by '$375 billion', which exceeds the '$317 billion' revenue increase, directly contradicting the following sentence ('the increase in outlays was smaller than the increase in revenues') and the stated deficit decrease.",
+      "location": {"unit": "Receipts and outlays", "start": 11, "end": 11},
+      "anchor": "$375 billion",
+      "paraphrases": [
+        "The $375B outlay increase is larger than the $317B revenue increase, so the claim that outlays rose less than revenues cannot hold.",
+        "If outlays grew $375B and revenues $317B, the deficit would rise, not fall as the text says.",
+        "The outlay-growth figure contradicts both the 'smaller than revenues' statement and the reported deficit decline (the real value is $275 billion)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value is '$275 billion'. Findable by comparing the outlay and revenue increases against the explanatory sentence in the same paragraph, distinct from d1."
+    },
+    {
+      "id": "paper-0002-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The deficit is said to fall from 6.3 percent to 5.9 percent of GDP, 'a decline of 0.7 percentage points', but 6.3 - 5.9 = 0.4 percentage points.",
+      "location": {"unit": "Relative to the economy", "start": 19, "end": 20},
+      "anchor": "0.7 percentage points",
+      "paraphrases": [
+        "6.3 minus 5.9 is 0.4, not the stated 0.7 percentage points.",
+        "The percentage-point change between 6.3% and 5.9% of GDP is misreported.",
+        "The GDP-share decline is arithmetically wrong: it should be 0.4 points."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value is '0.4 percentage points' (6.3 - 5.9). Findable from the two GDP percentages in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0002-d4",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Debt held by the public is said to have 'rose to 96.8 percent of GDP ... up from 97.4 percent', but 96.8 is lower than 97.4, so the debt did not rise.",
+      "location": {"unit": "Relative to the economy", "start": 20, "end": 21},
+      "anchor": "96.8 percent",
+      "paraphrases": [
+        "The text says debt rose but gives 96.8% versus a prior 97.4%, which is a decrease.",
+        "'Rose to 96.8 percent ... up from 97.4 percent' is self-contradictory (96.8 < 97.4).",
+        "The end-of-2025 debt share is stated below the 2024 figure yet described as an increase (the real value is 99.8 percent)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value is '99.8 percent'. Findable from the two debt percentages and the word 'rose/up' in the same sentence, distinct from d3."
+    }
+  ]
+}

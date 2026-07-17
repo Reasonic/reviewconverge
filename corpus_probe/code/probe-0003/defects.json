@@ -1,0 +1,80 @@
+{
+ "defects": [
+  {
+   "id": "probe-0003-d1",
+   "category": "binary-search-off-by-one",
+   "severity": "major",
+   "description": "The lower-bound search shrinks the upper bound to `mid - 1` instead of `mid`, breaking the invariant, so `_find_start` can return a resume index that is too small and the page re-emits an item the caller was already handed.",
+   "location": {
+    "unit": "src/cursor_pager.py",
+    "start": 150,
+    "end": 150
+   },
+   "anchor": "hi = mid - 1",
+   "paraphrases": [
+    "When the probe lands past the boundary the loop discards the midpoint by moving the high end below it, which can skip the true first-greater position and cause an already-seen row to reappear at the top of the next page.",
+    "The half-open search invariant requires keeping the midpoint as the new ceiling; dropping it by one collapses the window prematurely and yields a start offset that duplicates the previous page's last element.",
+    "Excluding `mid` from the still-viable range corrupts the resume-point computation, so paginating past a cursor can hand back a boundary record twice instead of continuing strictly after it."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '            hi = mid'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0003-d2",
+   "category": "slice-upper-bound-off-by-one",
+   "severity": "major",
+   "description": "The page window slice ends at `start + page_size + 1`, so every page returns one more item than the requested `page_size`, violating the page-size contract.",
+   "location": {
+    "unit": "src/cursor_pager.py",
+    "start": 205,
+    "end": 205
+   },
+   "anchor": "view[start : start + page_size + 1]",
+   "paraphrases": [
+    "Each fetched window grabs an extra trailing element beyond the caller's limit, inflating the returned batch by one row per page.",
+    "The upper index of the page slice overshoots by a single position, meaning a request for N results consistently yields N+1.",
+    "Because the window's end offset is one too large, the returned item count exceeds the configured page size on every call."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '    window = view[start : start + page_size]'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0003-d3",
+   "category": "inverted-boolean-return",
+   "severity": "minor",
+   "description": "`Page.is_last` returns `has_more` directly rather than its negation, so the method reports True precisely when more pages remain and False on the final page.",
+   "location": {
+    "unit": "src/cursor_pager.py",
+    "start": 45,
+    "end": 45
+   },
+   "anchor": "return self.has_more",
+   "paraphrases": [
+    "The final-page predicate is flipped: it claims there is a last page whenever further pages exist and denies it once the collection is actually exhausted.",
+    "Dropping the negation makes `is_last` a synonym for `has_more`, giving callers the opposite of the intended end-of-stream signal.",
+    "The helper answers whether iteration should continue instead of whether it has finished, inverting the terminal-page check."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        return not self.has_more'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0003-d4",
+   "category": "wrong-bitwise-operator",
+   "severity": "major",
+   "description": "The constant-time comparison AND-accumulates the per-character differences into a zero-initialized accumulator, so the result stays 0 for every input and the checksum is treated as matching even when it does not, disabling tamper detection.",
+   "location": {
+    "unit": "src/cursor_pager.py",
+    "start": 117,
+    "end": 117
+   },
+   "anchor": "mismatch &= ord(x) ^ ord(y)",
+   "paraphrases": [
+    "Because differences are folded together with `&=` starting from zero, the running total can never leave zero, so `_constant_time_equals` always reports equality and forged tokens sail through validation.",
+    "The digest comparison collapses to a constant success verdict: the bitwise-and reduction against an initial 0 masks any real byte divergence, letting an altered checksum pass as authentic.",
+    "Accumulating XOR diffs via and-assignment instead of or-assignment nullifies them all, meaning a tampered cursor whose body was edited is accepted rather than rejected."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        mismatch |= ord(x) ^ ord(y)'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  }
+ ]
+}

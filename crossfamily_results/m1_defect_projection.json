@@ -1,0 +1,42 @@
+{
+ "n_mem": 180,
+ "n_nomem": 180,
+ "original_full_set_settle": {
+  "run_level": {
+   "mem": 0.7278,
+   "nomem": 0.5444,
+   "gap": 0.1833
+  },
+  "majority": {
+   "mem": 0.8333,
+   "nomem": 0.55,
+   "gap": 0.2833,
+   "mcnemar": {
+    "b_mem_only": 19,
+    "c_nomem_only": 2,
+    "p_exact": 0.000221
+   }
+  }
+ },
+ "defect_projection_settle": {
+  "run_level": {
+   "mem": 0.8389,
+   "nomem": 0.6944,
+   "gap": 0.1444
+  },
+  "majority": {
+   "mem": 0.9167,
+   "nomem": 0.75,
+   "gap": 0.1667,
+   "mcnemar": {
+    "b_mem_only": 12,
+    "c_nomem_only": 2,
+    "p_exact": 0.012939
+   }
+  }
+ },
+ "nomem_reclassification": {
+  "nomem: churn/div -> false-conv (settled on defects but too many false)": 10,
+  "nomem: churn/div -> CC (defect-set was stable; false-wording churned)": 27
+ }
+}

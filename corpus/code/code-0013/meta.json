@@ -1,0 +1,38 @@
+{
+  "id": "code-0013",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "binary_exp(): exponentiation by squaring (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/maths/binary_exponentiation.py#L53",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `binary_exp_iterative`, into src/binexp.py (renamed binary_exp, type hints dropped, docstring trimmed). Three independently-findable defects injected in the loop (odd-bit test, square step, shift step); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "wrong-operator",
+      "off-by-one"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/binexp.py",
+      "start": 14,
+      "end": 16,
+      "note": "the negative guard and result initialization are correct"
+    },
+    {
+      "unit": "src/binexp.py",
+      "start": 22,
+      "end": 22,
+      "note": "the return statement is correct"
+    }
+  ],
+  "defect_count": 3
+}

@@ -1,0 +1,322 @@
+{
+ "R5_1_round1_vs_round6_f1": {
+  "mem": {
+   "mean_diff_r6_minus_r1": -0.0195,
+   "wilcoxon_p": 0.127,
+   "ci95": [
+    -0.0426,
+    0.0026
+   ],
+   "ci90": [
+    -0.0388,
+    -0.0009
+   ],
+   "tost_pm005_p": 0.005
+  },
+  "nomem": {
+   "mean_diff_r6_minus_r1": 0.0069,
+   "wilcoxon_p": 0.4045,
+   "ci95": [
+    -0.0075,
+    0.0216
+   ],
+   "ci90": [
+    -0.0051,
+    0.0193
+   ],
+   "tost_pm005_p": 0.0
+  }
+ },
+ "R5_2_terminal_set_sizes": {
+  "mem": {
+   "mean": 3.37,
+   "sd": 0.84,
+   "frac_in_3_4": 0.867,
+   "dist": {
+    "0": 1,
+    "2": 10,
+    "3": 109,
+    "4": 47,
+    "5": 9,
+    "6": 2,
+    "7": 2
+   }
+  },
+  "nomem": {
+   "mean": 3.15,
+   "sd": 0.75,
+   "frac_in_3_4": 0.811,
+   "dist": {
+    "2": 25,
+    "3": 114,
+    "4": 32,
+    "5": 8,
+    "7": 1
+   }
+  },
+  "ledger": {
+   "mean": 3.37,
+   "sd": 0.92,
+   "frac_in_3_4": 0.811,
+   "dist": {
+    "1": 1,
+    "2": 16,
+    "3": 105,
+    "4": 41,
+    "5": 9,
+    "6": 7,
+    "7": 1
+   }
+  },
+  "structured-memory": {
+   "mean": 3.32,
+   "sd": 0.96,
+   "frac_in_3_4": 0.794,
+   "dist": {
+    "1": 2,
+    "2": 19,
+    "3": 105,
+    "4": 38,
+    "5": 8,
+    "6": 6,
+    "7": 2
+   }
+  }
+ },
+ "R5_3_stop_at_first_stability": {
+  "mem": {
+   "early_stop_rate": 0.989,
+   "p_wrong_given_stop": 0.135,
+   "stopped": 178,
+   "wrong": 24,
+   "n": 180
+  },
+  "nomem": {
+   "early_stop_rate": 0.917,
+   "p_wrong_given_stop": 0.073,
+   "stopped": 165,
+   "wrong": 12,
+   "n": 180
+  },
+  "ledger": {
+   "early_stop_rate": 0.989,
+   "p_wrong_given_stop": 0.163,
+   "stopped": 178,
+   "wrong": 29,
+   "n": 180
+  },
+  "structured-memory": {
+   "early_stop_rate": 0.983,
+   "p_wrong_given_stop": 0.175,
+   "stopped": 177,
+   "wrong": 31,
+   "n": 180
+  },
+  "pooled_p_wrong_given_stop": 0.1375
+ },
+ "R5_4_memorization_exclusion": {
+  "n_excluded": 14,
+  "excluded": [
+   "code-0001",
+   "code-0003",
+   "code-0007",
+   "code-0008",
+   "code-0011",
+   "code-0013",
+   "code-0016",
+   "code-0017",
+   "code-0018",
+   "code-0019",
+   "spec-0009",
+   "spec-0010",
+   "spec-0012",
+   "spec-0018"
+  ],
+  "full": {
+   "n_artifacts": 60,
+   "mem_cc": 0.833,
+   "nomem_cc": 0.55,
+   "b": 19,
+   "c": 2,
+   "mcnemar_p": 0.00022
+  },
+  "excluded_result": {
+   "n_artifacts": 46,
+   "mem_cc": 0.891,
+   "nomem_cc": 0.565,
+   "b": 16,
+   "c": 1,
+   "mcnemar_p": 0.00027
+  }
+ },
+ "R5_5_gray_policy_full_dynamics": {
+  "positional": {
+   "per_arm": {
+    "nomem": {
+     "n": 180,
+     "cc": 0.5444,
+     "fc": 0.0611,
+     "mean_churn": 0.1434,
+     "mean_osc": 0.6167,
+     "mean_stab": 2.8889
+    },
+    "mem": {
+     "n": 180,
+     "cc": 0.7278,
+     "fc": 0.0722,
+     "mean_churn": 0.0569,
+     "mean_osc": 0.1722,
+     "mean_stab": 1.6944
+    },
+    "ledger": {
+     "n": 180,
+     "cc": 0.7444,
+     "fc": 0.1222,
+     "mean_churn": 0.0567,
+     "mean_osc": 0.15,
+     "mean_stab": 1.4722
+    },
+    "structured-memory": {
+     "n": 180,
+     "cc": 0.7222,
+     "fc": 0.1389,
+     "mean_churn": 0.0517,
+     "mean_osc": 0.1722,
+     "mean_stab": 1.3778
+    }
+   },
+   "mem_vs_nomem_sign": {
+    "mean_churn": {
+     "p": 0.0,
+     "pos": 4,
+     "neg": 46,
+     "n_arts": 60
+    },
+    "osc": {
+     "p": 0.0,
+     "pos": 4,
+     "neg": 35,
+     "n_arts": 60
+    },
+    "stab": {
+     "p": 9e-06,
+     "pos": 9,
+     "neg": 40,
+     "n_arts": 60
+    }
+   }
+  },
+  "semantic": {
+   "per_arm": {
+    "nomem": {
+     "n": 180,
+     "cc": 0.5444,
+     "fc": 0.0611,
+     "mean_churn": 0.1429,
+     "mean_osc": 0.6056,
+     "mean_stab": 2.8944
+    },
+    "mem": {
+     "n": 180,
+     "cc": 0.7222,
+     "fc": 0.0722,
+     "mean_churn": 0.0589,
+     "mean_osc": 0.1944,
+     "mean_stab": 1.7111
+    },
+    "ledger": {
+     "n": 180,
+     "cc": 0.75,
+     "fc": 0.1111,
+     "mean_churn": 0.0574,
+     "mean_osc": 0.1444,
+     "mean_stab": 1.4667
+    },
+    "structured-memory": {
+     "n": 180,
+     "cc": 0.7278,
+     "fc": 0.1389,
+     "mean_churn": 0.0522,
+     "mean_osc": 0.1667,
+     "mean_stab": 1.3667
+    }
+   },
+   "mem_vs_nomem_sign": {
+    "mean_churn": {
+     "p": 0.0,
+     "pos": 5,
+     "neg": 45,
+     "n_arts": 60
+    },
+    "osc": {
+     "p": 1.4e-05,
+     "pos": 6,
+     "neg": 33,
+     "n_arts": 60
+    },
+    "stab": {
+     "p": 3e-06,
+     "pos": 8,
+     "neg": 40,
+     "n_arts": 60
+    }
+   }
+  },
+  "none": {
+   "per_arm": {
+    "nomem": {
+     "n": 180,
+     "cc": 0.5333,
+     "fc": 0.0611,
+     "mean_churn": 0.1473,
+     "mean_osc": 0.6389,
+     "mean_stab": 2.9222
+    },
+    "mem": {
+     "n": 180,
+     "cc": 0.7333,
+     "fc": 0.0778,
+     "mean_churn": 0.057,
+     "mean_osc": 0.1722,
+     "mean_stab": 1.65
+    },
+    "ledger": {
+     "n": 180,
+     "cc": 0.7389,
+     "fc": 0.1167,
+     "mean_churn": 0.0588,
+     "mean_osc": 0.1556,
+     "mean_stab": 1.5167
+    },
+    "structured-memory": {
+     "n": 180,
+     "cc": 0.7111,
+     "fc": 0.1444,
+     "mean_churn": 0.0528,
+     "mean_osc": 0.1778,
+     "mean_stab": 1.3944
+    }
+   },
+   "mem_vs_nomem_sign": {
+    "mean_churn": {
+     "p": 0.0,
+     "pos": 3,
+     "neg": 47,
+     "n_arts": 60
+    },
+    "osc": {
+     "p": 0.0,
+     "pos": 3,
+     "neg": 36,
+     "n_arts": 60
+    },
+    "stab": {
+     "p": 2e-06,
+     "pos": 8,
+     "neg": 41,
+     "n_arts": 60
+    }
+   }
+  }
+ }
+}

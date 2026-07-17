@@ -1,0 +1,38 @@
+{
+  "id": "spec-0015",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "nginx/WSGI/Flask Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/nginx-wsgi-flask/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) nginx-wsgi-flask compose.yaml. Three defects injected, each findable within the file: a dangling service dependency, a proxy-target port that does not match the flask service, and a gunicorn bind port that does not match the published port. The flask-app ports and healthcheck are the untouched references."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference",
+      "cross-field-inconsistency"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.flask-app.ports",
+      "start": 23,
+      "end": 23,
+      "note": "the flask-app publishes port 8000 (reference value, untouched)"
+    },
+    {
+      "unit": "services.flask-app.healthcheck",
+      "start": 25,
+      "end": 25,
+      "note": "the flask-app healthcheck probes port 8000 (untouched)"
+    }
+  ],
+  "defect_count": 3
+}

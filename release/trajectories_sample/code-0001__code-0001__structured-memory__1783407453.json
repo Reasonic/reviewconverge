@@ -1,0 +1,484 @@
+{
+  "trajectory": {
+    "run_id": "code-0001__structured-memory__1783407453",
+    "artifact_id": "code-0001",
+    "config_id": "structured-memory",
+    "model_id": "deepseek-v4-flash",
+    "seed": null,
+    "rounds": [
+      {
+        "round_index": 0,
+        "findings": [
+          {
+            "id": "r0-f0",
+            "claim": "Incorrect cutoff calculation in allow method: `cutoff = now + self.window_seconds` should be `now - self.window_seconds`, causing the deque to be emptied on every call and the rate limiter to always return True.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 13,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "The while loop uses `self._events[0] <= cutoff` and cutoff is in future so all events are removed. Correct cutoff should be `now - self.window_seconds`.",
+            "raw": null
+          },
+          {
+            "id": "r0-f1",
+            "claim": "Off-by-one error in limit check: condition `if len(self._events) > self.max_events` should be `>=` because the new event is appended after the check, allowing one extra event.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 16,
+              "end": 16
+            },
+            "severity": "major",
+            "evidence": "Because the new event is appended after this check, a request that would bring the count to max_events + 1 is allowed. The condition should be >= self.max_events.",
+            "raw": null
+          },
+          {
+            "id": "r0-f2",
+            "claim": "Swapped arguments in from_config: calls cls(cfg['window_seconds'], cfg['max_events']) but __init__ expects (max_events, window_seconds), causing misconfiguration.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 27,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The classmethod from_config calls cls with swapped values.",
+            "raw": null
+          },
+          {
+            "id": "r0-f3",
+            "claim": "No validation for non-positive max_events; utilization method raises ZeroDivisionError and allow method may permit events despite limit of 0.",
+            "location": {
+              "unit": "src/window.py",
+              "start": null,
+              "end": null
+            },
+            "severity": "major",
+            "evidence": "If max_events is 0 or negative, utilization method (line 23) raises ZeroDivisionError, and allow method's logic may permit events despite a limit of 0 (e.g., with max_events=0, after removing old events the deque is empty, the check len>0 is false, so a new event is appended).",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 1,
+        "findings": [
+          {
+            "id": "r1-f0",
+            "claim": "Incorrect cutoff calculation in allow method: `cutoff = now + self.window_seconds` should be `now - self.window_seconds`, causing the deque to be emptied on every call and the rate limiter to always return True.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 13,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "The while loop uses `self._events[0] <= cutoff` and cutoff is in future so all events are removed. Correct cutoff should be `now - self.window_seconds`.",
+            "raw": null
+          },
+          {
+            "id": "r1-f1",
+            "claim": "Off-by-one error in limit check: condition `if len(self._events) > self.max_events` should be `>=` because the new event is appended after the check, allowing one extra event.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 16,
+              "end": 16
+            },
+            "severity": "major",
+            "evidence": "Because the new event is appended after this check, a request that would bring the count to max_events + 1 is allowed. The condition should be >= self.max_events.",
+            "raw": null
+          },
+          {
+            "id": "r1-f2",
+            "claim": "Swapped arguments in from_config: calls cls(cfg['window_seconds'], cfg['max_events']) but __init__ expects (max_events, window_seconds), causing misconfiguration.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 27,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The classmethod from_config calls cls with swapped values.",
+            "raw": null
+          },
+          {
+            "id": "r1-f3",
+            "claim": "No validation for non-positive max_events; utilization method raises ZeroDivisionError and allow method may permit events despite limit of 0.",
+            "location": {
+              "unit": "src/window.py",
+              "start": null,
+              "end": null
+            },
+            "severity": "major",
+            "evidence": "If max_events is 0 or negative, utilization method (line 23) raises ZeroDivisionError, and allow method's logic may permit events despite a limit of 0 (e.g., with max_events=0, after removing old events the deque is empty, the check len>0 is false, so a new event is appended).",
+            "raw": null
+          },
+          {
+            "id": "r1-f4",
+            "claim": "The while-loop condition uses <= instead of <, which incorrectly excludes events exactly at the window boundary.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 14,
+              "end": 14
+            },
+            "severity": "minor",
+            "evidence": "Even after correcting the cutoff to now - self.window_seconds, using \u2264 will remove events exactly at boundary; should be < cutoff.",
+            "raw": null
+          },
+          {
+            "id": "r1-f5",
+            "claim": "The from_config method does not validate that the cfg dictionary contains the required keys 'window_seconds' and 'max_events', causing a KeyError if missing.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 26,
+              "end": 27
+            },
+            "severity": "minor",
+            "evidence": "No validation that the provided cfg dictionary contains the keys 'window_seconds' and 'max_events'.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 2,
+        "findings": [
+          {
+            "id": "r2-f0",
+            "claim": "Incorrect cutoff calculation in allow method: `cutoff = now + self.window_seconds` should be `now - self.window_seconds`, causing the deque to be emptied on every call and the rate limiter to always return True.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 13,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "The while loop uses `self._events[0] <= cutoff` and cutoff is in future so all events are removed. Correct cutoff should be `now - self.window_seconds`.",
+            "raw": null
+          },
+          {
+            "id": "r2-f1",
+            "claim": "Off-by-one error in limit check: condition `if len(self._events) > self.max_events` should be `>=` because the new event is appended after the check, allowing one extra event.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 16,
+              "end": 16
+            },
+            "severity": "major",
+            "evidence": "Because the new event is appended after this check, a request that would bring the count to max_events + 1 is allowed. The condition should be >= self.max_events.",
+            "raw": null
+          },
+          {
+            "id": "r2-f2",
+            "claim": "Swapped arguments in from_config: calls cls(cfg['window_seconds'], cfg['max_events']) but __init__ expects (max_events, window_seconds), causing misconfiguration.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 27,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The classmethod from_config calls cls with swapped values.",
+            "raw": null
+          },
+          {
+            "id": "r2-f3",
+            "claim": "No validation for non-positive max_events; utilization method raises ZeroDivisionError and allow method may permit events despite limit of 0.",
+            "location": {
+              "unit": "src/window.py",
+              "start": null,
+              "end": null
+            },
+            "severity": "major",
+            "evidence": "If max_events is 0 or negative, utilization method (line 23) raises ZeroDivisionError, and allow method's logic may permit events despite a limit of 0 (e.g., with max_events=0, after removing old events the deque is empty, the check len>0 is false, so a new event is appended).",
+            "raw": null
+          },
+          {
+            "id": "r2-f4",
+            "claim": "Non-positive window_seconds is not validated, leading to incorrect rate-limiting behavior.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 6,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "when `window_seconds <= 0`, the cutoff `now + self.window_seconds` lies at or before `now`, causing all events to be removed on every call (`window_seconds=0`) or effectively inverting the window direction (negative values). This leads to rate\u2011limiting logic that is either always permissive or semantically wrong, violating the intended behaviour of a positive time window.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 3,
+        "findings": [
+          {
+            "id": "r3-f0",
+            "claim": "Incorrect cutoff calculation in allow method: `cutoff = now + self.window_seconds` should be `now - self.window_seconds`, causing the deque to be emptied on every call and the rate limiter to always return True.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 13,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "The while loop uses `self._events[0] <= cutoff` and cutoff is in future so all events are removed. Correct cutoff should be `now - self.window_seconds`.",
+            "raw": null
+          },
+          {
+            "id": "r3-f1",
+            "claim": "Off-by-one error in limit check: condition `if len(self._events) > self.max_events` should be `>=` because the new event is appended after the check, allowing one extra event.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 16,
+              "end": 16
+            },
+            "severity": "major",
+            "evidence": "Because the new event is appended after this check, a request that would bring the count to max_events + 1 is allowed. The condition should be >= self.max_events.",
+            "raw": null
+          },
+          {
+            "id": "r3-f2",
+            "claim": "Swapped arguments in from_config: calls cls(cfg['window_seconds'], cfg['max_events']) but __init__ expects (max_events, window_seconds), causing misconfiguration.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 27,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The classmethod from_config calls cls with swapped values.",
+            "raw": null
+          },
+          {
+            "id": "r3-f3",
+            "claim": "No validation for non-positive max_events; utilization method raises ZeroDivisionError and allow method may permit events despite limit of 0.",
+            "location": {
+              "unit": "src/window.py",
+              "start": null,
+              "end": null
+            },
+            "severity": "major",
+            "evidence": "If max_events is 0 or negative, utilization method (line 23) raises ZeroDivisionError, and allow method's logic may permit events despite a limit of 0 (e.g., with max_events=0, after removing old events the deque is empty, the check len>0 is false, so a new event is appended).",
+            "raw": null
+          },
+          {
+            "id": "r3-f4",
+            "claim": "Non-positive window_seconds is not validated, leading to incorrect rate-limiting behavior.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 6,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "when `window_seconds <= 0`, the cutoff `now + self.window_seconds` lies at or before `now`, causing all events to be removed on every call (`window_seconds=0`) or effectively inverting the window direction (negative values). This leads to rate\u2011limiting logic that is either always permissive or semantically wrong, violating the intended behaviour of a positive time window.",
+            "raw": null
+          },
+          {
+            "id": "r3-f5",
+            "claim": "The utilization method does not accept a now parameter and never removes expired events, so it may return a stale fraction of the limit that includes events outside the current sliding window.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 21,
+              "end": 23
+            },
+            "severity": "minor",
+            "evidence": "The method only returns len(self._events) / self.max_events without any cleanup; expired events remain in the deque until the next allow call, causing utilization to overcount.",
+            "raw": null
+          },
+          {
+            "id": "r3-f6",
+            "claim": "The from_config class method does not validate that the config dict contains the required keys \"window_seconds\" and \"max_events\"; if either is missing, a KeyError will be raised at runtime.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 26,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The method directly accesses cfg[\"window_seconds\"] and cfg[\"max_events\"] without a .get() or a check, making the code brittle against incomplete configuration.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 4,
+        "findings": [
+          {
+            "id": "r4-f0",
+            "claim": "Incorrect cutoff calculation in allow method: `cutoff = now + self.window_seconds` should be `now - self.window_seconds`, causing the deque to be emptied on every call and the rate limiter to always return True.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 13,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "The while loop uses `self._events[0] <= cutoff` and cutoff is in future so all events are removed. Correct cutoff should be `now - self.window_seconds`.",
+            "raw": null
+          },
+          {
+            "id": "r4-f1",
+            "claim": "Off-by-one error in limit check: condition `if len(self._events) > self.max_events` should be `>=` because the new event is appended after the check, allowing one extra event.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 16,
+              "end": 16
+            },
+            "severity": "major",
+            "evidence": "Because the new event is appended after this check, a request that would bring the count to max_events + 1 is allowed. The condition should be >= self.max_events.",
+            "raw": null
+          },
+          {
+            "id": "r4-f2",
+            "claim": "Swapped arguments in from_config: calls cls(cfg['window_seconds'], cfg['max_events']) but __init__ expects (max_events, window_seconds), causing misconfiguration.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 27,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The classmethod from_config calls cls with swapped values.",
+            "raw": null
+          },
+          {
+            "id": "r4-f3",
+            "claim": "No validation for non-positive max_events; utilization method raises ZeroDivisionError and allow method may permit events despite limit of 0.",
+            "location": {
+              "unit": "src/window.py",
+              "start": null,
+              "end": null
+            },
+            "severity": "major",
+            "evidence": "If max_events is 0 or negative, utilization method (line 23) raises ZeroDivisionError, and allow method's logic may permit events despite a limit of 0 (e.g., with max_events=0, after removing old events the deque is empty, the check len>0 is false, so a new event is appended).",
+            "raw": null
+          },
+          {
+            "id": "r4-f4",
+            "claim": "Non-positive window_seconds is not validated, leading to incorrect rate-limiting behavior.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 6,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "when `window_seconds <= 0`, the cutoff `now + self.window_seconds` lies at or before `now`, causing all events to be removed on every call (`window_seconds=0`) or effectively inverting the window direction (negative values). This leads to rate\u2011limiting logic that is either always permissive or semantically wrong, violating the intended behaviour of a positive time window.",
+            "raw": null
+          },
+          {
+            "id": "r4-f5",
+            "claim": "The utilization method does not accept a now parameter and never removes expired events, so it may return a stale fraction of the limit that includes events outside the current sliding window.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 21,
+              "end": 23
+            },
+            "severity": "minor",
+            "evidence": "The method only returns len(self._events) / self.max_events without any cleanup; expired events remain in the deque until the next allow call, causing utilization to overcount.",
+            "raw": null
+          }
+        ]
+      },
+      {
+        "round_index": 5,
+        "findings": [
+          {
+            "id": "r5-f0",
+            "claim": "Incorrect cutoff calculation in allow method: `cutoff = now + self.window_seconds` should be `now - self.window_seconds`, causing the deque to be emptied on every call and the rate limiter to always return True.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 13,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "The while loop uses `self._events[0] <= cutoff` and cutoff is in future so all events are removed. Correct cutoff should be `now - self.window_seconds`.",
+            "raw": null
+          },
+          {
+            "id": "r5-f1",
+            "claim": "Off-by-one error in limit check: condition `if len(self._events) > self.max_events` should be `>=` because the new event is appended after the check, allowing one extra event.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 16,
+              "end": 16
+            },
+            "severity": "major",
+            "evidence": "Because the new event is appended after this check, a request that would bring the count to max_events + 1 is allowed. The condition should be >= self.max_events.",
+            "raw": null
+          },
+          {
+            "id": "r5-f2",
+            "claim": "Swapped arguments in from_config: calls cls(cfg['window_seconds'], cfg['max_events']) but __init__ expects (max_events, window_seconds), causing misconfiguration.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 27,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": "The classmethod from_config calls cls with swapped values.",
+            "raw": null
+          },
+          {
+            "id": "r5-f3",
+            "claim": "No validation for non-positive max_events; utilization method raises ZeroDivisionError and allow method may permit events despite limit of 0.",
+            "location": {
+              "unit": "src/window.py",
+              "start": null,
+              "end": null
+            },
+            "severity": "major",
+            "evidence": "If max_events is 0 or negative, utilization method (line 23) raises ZeroDivisionError, and allow method's logic may permit events despite a limit of 0 (e.g., with max_events=0, after removing old events the deque is empty, the check len>0 is false, so a new event is appended).",
+            "raw": null
+          },
+          {
+            "id": "r5-f4",
+            "claim": "Non-positive window_seconds is not validated, leading to incorrect rate-limiting behavior.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 6,
+              "end": 13
+            },
+            "severity": "major",
+            "evidence": "when `window_seconds <= 0`, the cutoff `now + self.window_seconds` lies at or before `now`, causing all events to be removed on every call (`window_seconds=0`) or effectively inverting the window direction (negative values). This leads to rate\u2011limiting logic that is either always permissive or semantically wrong, violating the intended behaviour of a positive time window.",
+            "raw": null
+          },
+          {
+            "id": "r5-f5",
+            "claim": "The utilization method does not accept a now parameter and never removes expired events, so it may return a stale fraction of the limit that includes events outside the current sliding window.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 21,
+              "end": 23
+            },
+            "severity": "minor",
+            "evidence": "The method only returns len(self._events) / self.max_events without any cleanup; expired events remain in the deque until the next allow call, causing utilization to overcount.",
+            "raw": null
+          },
+          {
+            "id": "r5-f6",
+            "claim": "from_config method does not validate that cfg contains required keys; accessing cfg[\"window_seconds\"] and cfg[\"max_events\"] can raise KeyError if the config is incomplete, leading to a runtime crash.",
+            "location": {
+              "unit": "src/window.py",
+              "start": 26,
+              "end": 27
+            },
+            "severity": "major",
+            "evidence": null,
+            "raw": null
+          }
+        ]
+      }
+    ]
+  },
+  "transcripts": [
+    [
+      "**Issue 1 \u2013 Incorrect cutoff calculation in `allow` (line 13)**  \nThe expression `cutoff = now + self.window_seconds` sets the cutoff to a time in the future, so the while loop `while self._events and self._events[0] <= cutoff` removes *all* events (since every event timestamp is \u2264 a future time). This effectively empties the deque on every call, causing the rate limiter to never see any events and always return `True`. The correct cutoff should be `now - self.window_seconds` to remove events that are older than the sliding window.\n\n**Issue 2 \u2013 Off\u2011by\u2011one error in the limit check (line 16)**  \nThe condition `if len(self._events) > self.max_events` only rejects a request when the number of events strictly exceeds `max_events`. Because the new event is appended *after* this check, a request that would bring the count to `max_events + 1` is allowed (e.g., if `max_events = 5` and the deque already contains 5 events, the condition `len > 5` is false, so the 6th event is appended and the method returns `True`). The condition should be `>= self.max_events` to enforce the limit correctly.\n\n**Issue 3 \u2013 Swapped arguments in `from_config` (line 27)**  \nThe classmethod `from_config` calls `cls(cfg[\"window_seconds\"], cfg[\"max_events\"])`, but the `__init__` signature is `__init__(self, max_events, window_seconds)`. Therefore the `window_seconds` value is assigned to `max_events` and vice versa, producing a misconfigured rate limiter. The call should be `cls(cfg[\"max_events\"], cfg[\"window_seconds\"])`.\n\n**Issue 4 \u2013 No handling of `max_events \u2264 0`**  \nIf `max_events` is set to 0 or a negative number, the `utilization` method (line 23) will raise a `ZeroDivisionError`, and the `allow` method\u2019s logic may permit events despite a limit of 0 (e.g., with `max_events=0`, after removing old events the deque is empty, the check `len > 0` is false, so a new event is appended). The code should validate that `max_events` is positive, or at least guard against division by zero."
+    ],
+    [
+      "RETIRE:\nnone\n\nNEW ISSUES:\n5. [src/window.py:14] The while-loop condition uses `<=` to remove old events. Even after correcting the cutoff to `now - self.window_seconds`, this strictness (\u2264) will remove events whose timestamp exactly equals the window boundary, causing them to be incorrectly excluded from the count. The condition should be `< cutoff` (or equivalently `< now - self.window_seconds`) to keep events at the boundary inside the sliding window.\n6. [src/window.py:26-27] The `from_config` method performs no validation that the provided `cfg` dictionary contains the keys `\"window_seconds\"` and `\"max_events\"`. If either key is missing, a `KeyError` will be raised at runtime, making the class fragile when used with incomplete configuration data."
+    ],
+    [
+      "RETIRE:\n- item 5: The boundary condition (<= vs <) is undetermined by the artifact; using <= to drop events exactly at the cutoff is a common implementation choice. Since the cutoff itself is miscomputed (item 1), the inequality choice has no practical impact and is not demonstrably incorrect.\n- item 6: The `from_config` method is a factory that expects a valid configuration dictionary; raising `KeyError` when keys are missing is the natural Python behaviour for such a contract and is not a bug or misconfiguration of the code itself.\n\nNEW ISSUES:\n- 7. [src/window.py:6\u20138,13] No validation for non-positive `window_seconds`; when `window_seconds <= 0`, the cutoff `now + self.window_seconds` lies at or before `now`, causing all events to be removed on every call (`window_seconds=0`) or effectively inverting the window direction (negative values). This leads to rate\u2011limiting logic that is either always permissive or semantically wrong, violating the intended behaviour of a positive time window."
+    ],
+    [
+      "RETIRE:\n  none\n\nNEW ISSUES:\n  6. [src/window.py:21-23] The `utilization` method does not accept a `now` parameter and never removes expired events, so it may return a stale fraction of the limit that includes events outside the current sliding window.  \n     Evidence: The method only returns `len(self._events) / self.max_events` without any cleanup; expired events remain in the deque until the next `allow` call, causing `utilization` to overcount.\n\n  7. [src/window.py:26-27] The `from_config` class method does not validate that the config dict contains the required keys `\"window_seconds\"` and `\"max_events\"`; if either is missing, a `KeyError` will be raised at runtime.  \n     Evidence: The method directly accesses `cfg[\"window_seconds\"]` and `cfg[\"max_events\"]` without a `.get()` or a check, making the code brittle against incomplete configuration."
+    ],
+    [
+      "RETIRE:\n  item 7: The method `from_config` accesses dictionary keys without validation; if keys are missing, Python raises a `KeyError`, which is the standard behavior for missing keys. The artifact does not define a contract requiring explicit validation, so this is not a concrete bug, logical error, or misconfiguration.\n\nNEW ISSUES:\n  none"
+    ],
+    [
+      "RETIRE:\nnone\n\nNEW ISSUES:\n7. [src/window.py:26-27] from_config method does not validate that cfg contains required keys; accessing cfg[\"window_seconds\"] and cfg[\"max_events\"] can raise KeyError if the config is incomplete, leading to a runtime crash."
+    ]
+  ],
+  "reviewer_calls": 6,
+  "extractor_calls": 6,
+  "prompt_version": "1.1.0"
+}

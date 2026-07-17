@@ -1,0 +1,40 @@
+{
+ "id": "probe-0002",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "csv reader (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "inverted condition",
+   "off-by-one",
+   "wrong operator"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/csv_reader.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/csv_reader.py",
+    "start": 97,
+    "end": 97
+   },
+   "note": "In `_try_number`, when `looks_floaty` is true the `float(token)` conversion is attempted inside the `try` and then attempted a second, identical time in the `except ValueError` fallback; that second attempt is redundant/dead for float-shaped tokens and a reviewer might flag it."
+  }
+ ],
+ "defect_count": 3
+}

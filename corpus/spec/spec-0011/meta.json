@@ -1,0 +1,48 @@
+{
+  "id": "spec-0011",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Spring + Postgres Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/spring-postgres/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) spring-postgres compose.yaml. Three defects injected, each findable within the file: a database-name mismatch, a dangling network, and a dangling secret. The db service's own POSTGRES_DB and network are untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "cross-field-inconsistency",
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.db.networks",
+      "start": 18,
+      "end": 18,
+      "note": "the db's network (spring-postgres) is the reference value, untouched"
+    },
+    {
+      "unit": "services.db.environment",
+      "start": 20,
+      "end": 20,
+      "note": "the db POSTGRES_DB=example is the reference value, untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "secrets",
+        "start": 27,
+        "end": 27
+      },
+      "note": "The top-level secret `db-password` is left unused once d3 renames the db's secret; declared-but-unused, not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

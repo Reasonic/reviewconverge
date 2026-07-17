@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0008",
+  "defects": [
+    {
+      "id": "code-0008-d1",
+      "category": "api-misuse",
+      "severity": "minor",
+      "description": "`abs(n)` is computed but its result is discarded (not assigned back to `n`), so negative inputs are never made positive and the loop returns 0 for them.",
+      "location": {"unit": "src/digits.py", "start": 16, "end": 16},
+      "anchor": "abs(n)",
+      "paraphrases": [
+        "The line should be `n = abs(n)`; as written the absolute value is thrown away.",
+        "Negative numbers are not normalized because the `abs(n)` result is not stored.",
+        "`sum_of_digits(-123)` returns 0 instead of 6 since `n` stays negative."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `n = abs(n)`. Real (negatives handled wrong), findable via the docstring example for -123, distinct."
+    },
+    {
+      "id": "code-0008-d2",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "The digit is extracted with integer division (`n // 10`) instead of the remainder (`n % 10`), so it adds the truncated quotient rather than the last digit.",
+      "location": {"unit": "src/digits.py", "start": 19, "end": 19},
+      "anchor": "res += n // 10",
+      "paraphrases": [
+        "`res += n // 10` should be `res += n % 10`; it accumulates the wrong quantity.",
+        "The last digit is obtained with `% 10`, not `// 10`.",
+        "Using `//` sums quotients instead of digits, so `sum_of_digits(123)` is not 6."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `res += n % 10`. Real (wrong sum), findable via the docstring examples, distinct from the shift on the next line."
+    },
+    {
+      "id": "code-0008-d3",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The loop condition is `while n > 1`, which stops before processing the final (most significant) digit; it should be `while n > 0`.",
+      "location": {"unit": "src/digits.py", "start": 18, "end": 18},
+      "anchor": "while n > 1:",
+      "paraphrases": [
+        "`while n > 1` drops the last digit; the loop should run `while n > 0`.",
+        "The leading digit is never added because the loop exits one iteration early.",
+        "Off-by-one loop bound: it terminates at n == 1 instead of n == 0."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `while n > 0:`. Real (drops the most significant digit), findable via the docstring examples, distinct."
+    }
+  ]
+}

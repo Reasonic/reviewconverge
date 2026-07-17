@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0009",
+  "defects": [
+    {
+      "id": "paper-0009-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The rise from 6 to more than 20 billion tonnes is called 'almost doubled', but 20 is more than three times 6, not roughly double.",
+      "location": {"unit": "A steep climb", "start": 4, "end": 5},
+      "anchor": "almost doubled",
+      "paraphrases": [
+        "6 to over 20 billion tonnes is more than a tripling, not a doubling.",
+        "'Almost doubled' understates the 6-to-20 increase (which is over 3x).",
+        "Going from 6 to more than 20 cannot be described as almost doubling."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'almost quadrupled' (20/6 ~= 3.3). Findable from the 6 and 20 figures in the same passage, distinct."
+    },
+    {
+      "id": "paper-0009-d2",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The US ~400 billion tonnes is called 'almost one-half' of the ~1,600 billion tonne historical total, but 400 / 1,600 is one-quarter, not one-half.",
+      "location": {"unit": "Who is responsible", "start": 8, "end": 9},
+      "anchor": "almost one-half",
+      "paraphrases": [
+        "400 out of 1,600 is a quarter, not a half.",
+        "The US share of the historical total is miscalculated (should be about one-quarter).",
+        "400 billion is one-quarter of 1,600 billion, not one-half."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'almost one-quarter' (400/1600). Findable from the US and total figures, distinct."
+    },
+    {
+      "id": "paper-0009-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The US total (~400 billion) is said to be 'more than 3 times' China's ~270 billion tonnes, but 400 / 270 is about 1.5.",
+      "location": {"unit": "Who is responsible", "start": 9, "end": 10},
+      "anchor": "more than 3 times",
+      "paraphrases": [
+        "400 divided by 270 is about 1.5, not more than 3.",
+        "The US-to-China ratio is overstated (it is roughly 1.5 times).",
+        "400 billion is only about 1.5 times 270 billion, not three times."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than 1.5 times' (400/270). Findable from the US and China figures in the same sentence, distinct from the share defect."
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+"""Hand-rolled delimited-text reader with light value coercion.
+
+This module implements a small CSV/DSV parser without relying on the standard
+library ``csv`` module. It supports quoted fields, doubled-quote escaping,
+embedded delimiters and newlines inside quotes, a configurable delimiter and
+quote character, an optional header row, and opt-in coercion of scalar values
+to ``int`` / ``float`` / ``bool`` / ``None``.
+
+The public surface is intentionally tiny:
+
+    parse(text, ...)        -> list[list[Any]]
+    parse_dicts(text, ...)  -> list[dict[str, Any]]
+
+Both accept a :class:`Dialect` (or keyword overrides) describing how the text
+is shaped.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any, Iterator, List, Optional, Sequence
+
+
+class CSVFormatError(ValueError):
+    """Raised when the input cannot be interpreted under the active dialect."""
+
+    def __init__(self, message: str, line: int, column: int) -> None:
+        super().__init__(f"{message} (line {line}, column {column})")
+        self.line = line
+        self.column = column
+
+
+@dataclass
+class Dialect:
+    """Bundle of knobs controlling how raw text is split into fields."""
+
+    delimiter: str = ","
+    quote: str = '"'
+    trim_unquoted: bool = True
+    skip_blank_lines: bool = True
+    coerce: bool = True
+    true_tokens: Sequence[str] = field(default_factory=lambda: ("true", "yes", "on"))
+    false_tokens: Sequence[str] = field(default_factory=lambda: ("false", "no", "off"))
+    null_tokens: Sequence[str] = field(default_factory=lambda: ("", "null", "na", "nan"))
+
+    def __post_init__(self) -> None:
+        if len(self.delimiter) != 1:
+            raise ValueError("delimiter must be exactly one character")
+        if len(self.quote) != 1:
+            raise ValueError("quote must be exactly one character")
+        if self.delimiter == self.quote:
+            raise ValueError("delimiter and quote must differ")
+
+
+def _coerce_scalar(raw: str, quoted: bool, dialect: Dialect) -> Any:
+    """Turn a single already-unescaped field into a Python scalar.
+
+    Quoted fields are always kept as text; the whole point of quoting is to
+    say "this is literal". Unquoted fields are probed against the token tables
+    and then against numeric syntax.
+    """
+    if quoted or not dialect.coerce:
+        return raw
+
+    probe = raw.strip()
+    folded = probe.lower()
+    if folded in dialect.null_tokens:
+        return None
+    if folded in dialect.true_tokens:
+        return True
+    if folded in dialect.false_tokens:
+        return False
+
+    parsed = _try_number(probe)
+    if parsed is not None:
+        return parsed
+    return raw
+
+
+def _try_number(token: str) -> Optional[Any]:
+    """Best-effort numeric parse that refuses things ``int``/``float`` accept
+    but a spreadsheet user would not consider numbers (whitespace-only,
+    underscores, embedded spaces)."""
+    if not token:
+        return None
+    if any(ch.isspace() or ch == "_" for ch in token):
+        return None
+    body = token[1:] if token[0] in "+-" else token
+    if not body:
+        return None
+    looks_floaty = any(c in token for c in ".eE") and not _is_hexish(token)
+    try:
+        if not looks_floaty:
+            return int(token)
+        return float(token)
+    except ValueError:
+        try:
+            return float(token)
+        except ValueError:
+            return None
+
+
+def _is_hexish(token: str) -> bool:
+    lowered = token.lower()
+    return lowered.startswith("0x") or lowered.startswith("+0x") or lowered.startswith("-0x")
+
+
+class _Cursor:
+    """A tiny position-tracking wrapper so error messages can point at the
+    offending line/column."""
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+        self.pos = 0
+        self.line = 1
+        self.col = 1
+        self.length = len(text)
+
+    def at_end(self) -> bool:
+        return self.pos >= self.length
+
+    def peek(self) -> str:
+        return self.text[self.pos]
+
+    def advance(self) -> str:
+        ch = self.text[self.pos]
+        self.pos += 1
+        if ch == "\n":
+            self.line += 1
+            self.col = 1
+        else:
+            self.col += 1
+        return ch
+
+
+def _iter_records(cursor: _Cursor, dialect: Dialect) -> Iterator[List[Any]]:
+    """Yield one parsed record (list of coerced fields) at a time."""
+    delim = dialect.delimiter
+    quote = dialect.quote
+
+    while not cursor.at_end():
+        fields: List[Any] = []
+        buf: List[str] = []
+        field_quoted = False
+        saw_any = False
+
+        while True:
+            if cursor.at_end():
+                fields.append(_finish_field(buf, field_quoted, dialect))
+                yield fields
+                return
+
+            ch = cursor.peek()
+
+            if ch == quote and not buf and not field_quoted:
+                field_quoted = True
+                saw_any = True
+                cursor.advance()
+                _consume_quoted(cursor, dialect, buf)
+                continue
+
+            if ch == delim:
+                cursor.advance()
+                fields.append(_finish_field(buf, field_quoted, dialect))
+                buf = []
+                field_quoted = False
+                saw_any = True
+                continue
+
+            if ch == "\n" or ch == "\r":
+                _consume_newline(cursor)
+                fields.append(_finish_field(buf, field_quoted, dialect))
+                if dialect.skip_blank_lines and not saw_any and len(fields) == 1 and fields[0] in ("", None):
+                    fields = []
+                    buf = []
+                    field_quoted = False
+                    saw_any = False
+                    break
+                yield fields
+                break
+
+            buf.append(cursor.advance())
+            saw_any = True
+
+
+def _consume_quoted(cursor: _Cursor, dialect: Dialect, buf: List[str]) -> None:
+    """Read characters until the closing quote, honoring doubled-quote escapes."""
+    quote = dialect.quote
+    start_line, start_col = cursor.line, cursor.col
+    while True:
+        if cursor.at_end():
+            raise CSVFormatError("unterminated quoted field", start_line, start_col)
+        ch = cursor.advance()
+        if ch == quote:
+            if not cursor.at_end() and cursor.peek() == quote:
+                cursor.advance()
+                buf.append(quote)
+                continue
+            return
+        buf.append(ch)
+
+
+def _consume_newline(cursor: _Cursor) -> None:
+    ch = cursor.advance()
+    if ch == "\r" and not cursor.at_end() and cursor.peek() == "\n":
+        cursor.advance()
+
+
+def _finish_field(buf: List[str], quoted: bool, dialect: Dialect) -> Any:
+    raw = "".join(buf)
+    if not quoted and dialect.trim_unquoted:
+        raw = raw.strip()
+    return _coerce_scalar(raw, quoted, dialect)
+
+
+def _resolve_dialect(dialect: Optional[Dialect], overrides: dict) -> Dialect:
+    if dialect is None:
+        base = Dialect()
+    else:
+        base = dialect
+    if not overrides:
+        return base
+    merged = {
+        "delimiter": base.delimiter,
+        "quote": base.quote,
+        "trim_unquoted": base.trim_unquoted,
+        "skip_blank_lines": base.skip_blank_lines,
+        "coerce": base.coerce,
+        "true_tokens": base.true_tokens,
+        "false_tokens": base.false_tokens,
+        "null_tokens": base.null_tokens,
+    }
+    merged.update(overrides)
+    return Dialect(**merged)
+
+
+def parse(
+    text: str,
+    dialect: Optional[Dialect] = None,
+    *,
+    delimiter: Optional[str] = None,
+    quote: Optional[str] = None,
+    coerce: Optional[bool] = None,
+) -> List[List[Any]]:
+    """Parse ``text`` into a list of rows, each a list of coerced field values."""
+    overrides = {}
+    if delimiter is not None:
+        overrides["delimiter"] = delimiter
+    if quote is not None:
+        overrides["quote"] = quote
+    if coerce is not None:
+        overrides["coerce"] = coerce
+    active = _resolve_dialect(dialect, overrides)
+    cursor = _Cursor(text)
+    return list(_iter_records(cursor, active))
+
+
+def parse_dicts(
+    text: str,
+    dialect: Optional[Dialect] = None,
+    *,
+    delimiter: Optional[str] = None,
+    quote: Optional[str] = None,
+    coerce: Optional[bool] = None,
+    fieldnames: Optional[Sequence[str]] = None,
+    restkey: str = "_extra",
+    fillvalue: Any = None,
+) -> List[dict]:
+    """Parse ``text`` into dicts keyed by the header row (or ``fieldnames``).
+
+    Rows longer than the header land their overflow under ``restkey`` as a list;
+    rows shorter than the header are padded with ``fillvalue``.
+    """
+    rows = parse(text, dialect, delimiter=delimiter, quote=quote, coerce=coerce)
+    if not rows:
+        return []
+
+    if fieldnames is None:
+        header = [str(cell) if cell is not None else "" for cell in rows[0]]
+        body = rows[1:]
+    else:
+        header = list(fieldnames)
+        body = rows
+
+    width = len(header)
+    out: List[dict] = []
+    for row in body:
+        record: dict = {}
+        for idx, name in enumerate(header):
+            record[name] = row[idx] if idx < len(row) else fillvalue
+        if len(row) > width:
+            record[restkey] = list(row[width:])
+        out.append(record)
+    return out
+
+
+def _demo() -> None:
+    sample = (
+        'name,age,active,note\r\n'
+        'Ada,36,yes,"Loves ""lace"", commas, and\nnewlines"\r\n'
+        'Grace,,no,plain\r\n'
+        '\r\n'
+        'Linus,54,true,'
+    )
+    print("rows:")
+    for row in parse(sample):
+        print("  ", row)
+    print("dicts:")
+    for record in parse_dicts(sample):
+        print("  ", record)
+
+    tsv = "a\tb\tc\n1\t2\t3"
+    print("tsv:", parse(tsv, delimiter="\t"))
+
+
+if __name__ == "__main__":
+    _demo()

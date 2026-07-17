@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0003",
+  "defects": [
+    {
+      "id": "code-0003-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The midpoint comparison uses `x <= a[mid]`; a rightmost insertion point (per the docstring) requires `x < a[mid]`, so equal keys are routed into the left subrange rather than the right (bisect_left instead of bisect_right).",
+      "location": {"unit": "src/search.py", "start": 22, "end": 22},
+      "anchor": "x <= a[mid]",
+      "paraphrases": [
+        "`x <= a[mid]` should be `x < a[mid]`: with `<=` the routine follows bisect_left semantics, not the documented rightmost insertion.",
+        "Using `<=` sends equal elements into the left half, contradicting the docstring's 'just after the rightmost x'.",
+        "The midpoint comparison operator is `<=` where rightmost-insertion logic requires `<`."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `x < a[mid]`. Real (wrong side for duplicate keys), findable against the docstring's rightmost-insertion semantics, distinct from the other defects. Described statically since the co-present non-termination defect (d3) masks any runtime observation."
+    },
+    {
+      "id": "code-0003-d2",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The initial upper bound is `len(a) - 1`, so the last element (index len(a)-1) is excluded from the searched range; the default should be `len(a)`.",
+      "location": {"unit": "src/search.py", "start": 19, "end": 19},
+      "anchor": "len(a) - 1",
+      "paraphrases": [
+        "The default `hi` should be `len(a)`, not `len(a) - 1`; the final element is left outside the search interval.",
+        "Off-by-one in the upper bound: `len(a) - 1` drops the last index, so an insertion point of len(a) is unreachable.",
+        "`hi` starts one too low, excluding the last element from consideration."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `hi = len(a)`. Real (last element excluded from the range), findable because the docstring's `bisect_right([1,3,3,5],5)` must reach index 4, distinct."
+    },
+    {
+      "id": "code-0003-d3",
+      "category": "off-by-one",
+      "severity": "critical",
+      "description": "The else branch sets `lo = mid` instead of `lo = mid + 1`, so when `x` belongs to the right half the loop cannot make progress and never terminates.",
+      "location": {"unit": "src/search.py", "start": 25, "end": 25},
+      "anchor": "lo = mid",
+      "paraphrases": [
+        "`lo = mid` should be `lo = mid + 1`; without the increment the search interval never shrinks and the loop hangs.",
+        "Non-termination: on the right-half branch `lo` is not advanced past `mid`.",
+        "The binary search can loop forever because `lo` is reassigned to `mid` rather than `mid + 1`."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `lo = mid + 1`. Real (infinite loop), findable by checking loop progress, distinct from the bound and comparison defects."
+    }
+  ]
+}

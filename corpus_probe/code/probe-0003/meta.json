@@ -1,0 +1,41 @@
+{
+ "id": "probe-0003",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "cursor pager (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "binary-search-off-by-one",
+   "inverted-boolean-return",
+   "slice-upper-bound-off-by-one",
+   "wrong-bitwise-operator"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/cursor_pager.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/cursor_pager.py",
+    "start": 166,
+    "end": 166
+   },
+   "note": "`_scalar_lt` falls back to comparing `repr(a) < repr(b)` when values are not directly orderable; this makes the sort total but the resulting order is lexicographic-on-repr and can be surprising (e.g. mixed types or numbers rendered as strings), which a reviewer might flag. It is not one of the injected defects."
+  }
+ ],
+ "defect_count": 4
+}

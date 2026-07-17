@@ -1,0 +1,41 @@
+{
+ "id": "probe-0004",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "interval scheduler (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "boundary-comparison-off-by-one",
+   "over-strict-acceptance-boundary",
+   "wrong-comparison-operator",
+   "wrong-min-max-selection"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/interval_scheduler.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/interval_scheduler.py",
+    "start": 33,
+    "end": 33
+   },
+   "note": "`_validate` accepts a 2-element list as an interval (`isinstance(interval, (tuple, list))`) and coerces it to a tuple, even though the public Interval type is documented as a 2-tuple; a reviewer might flag silently accepting lists as loose input handling. It is not one of the injected defects."
+  }
+ ],
+ "defect_count": 4
+}

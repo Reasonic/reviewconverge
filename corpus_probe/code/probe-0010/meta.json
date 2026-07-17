@@ -1,0 +1,41 @@
+{
+ "id": "probe-0010",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "topo (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "missing-increment",
+   "range-bound-off-by-one",
+   "wrong-comparison-operator",
+   "wrong-sentinel-constant"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/topo.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/topo.py",
+    "start": 49,
+    "end": 49
+   },
+   "note": "`_sort_key` orders nodes by the repr of `(type(node).__name__, str(node))`, so heterogeneous or numeric nodes are compared as strings and sort lexicographically (e.g. '10' before '9'); a reviewer might flag this as a surprising, non-numeric tie-break. It is not one of the injected defects."
+  }
+ ],
+ "defect_count": 4
+}

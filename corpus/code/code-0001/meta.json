@@ -1,0 +1,53 @@
+{
+  "id": "code-0001",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "Sliding-window rate limiter (new file)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "synthetic",
+    "license": "CC-BY-4.0",
+    "url": null,
+    "notes": "Hand-authored clean base, then bug-introducing edits per docs/corpus-construction.md."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "off-by-one",
+      "missing-guard",
+      "wrong-operator",
+      "api-misuse"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/window.py",
+      "start": 6,
+      "end": 9,
+      "note": "__init__ stores config correctly"
+    },
+    {
+      "unit": "src/window.py",
+      "start": 14,
+      "end": 15,
+      "note": "eviction pop loop is correct given a correct cutoff"
+    },
+    {
+      "unit": "src/window.py",
+      "start": 17,
+      "end": 19,
+      "note": "append + return-True path is correct"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "src/window.py",
+        "start": 11,
+        "end": 19
+      },
+      "note": "No thread-safety: concurrent allow() calls race on the deque. Not claimed or seeded; a reviewer may plausibly flag it, so exclude from false-finding scoring."
+    }
+  ],
+  "defect_count": 4
+}

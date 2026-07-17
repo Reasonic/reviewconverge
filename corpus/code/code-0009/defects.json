@@ -1,0 +1,62 @@
+{
+  "artifact_id": "code-0009",
+  "defects": [
+    {
+      "id": "code-0009-d1",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The loop `for i in range(1, number)` stops at `number - 1`, so the factor `number` itself is never multiplied in; it should be `range(1, number + 1)`.",
+      "location": {
+        "unit": "src/factorial.py",
+        "start": 15,
+        "end": 15
+      },
+      "anchor": "range(1, number)",
+      "paraphrases": [
+        "`range(1, number)` should be `range(1, number + 1)`; the last factor is dropped.",
+        "The product omits `number` itself because the range upper bound is short by one.",
+        "The largest factor, `number` itself, is never multiplied in because the loop's upper bound stops one short."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `range(1, number + 1)`. Real (omits the largest factor), findable via the docstring (factorial(6) == 720), distinct."
+    },
+    {
+      "id": "code-0009-d2",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The accumulator uses `value += i` (addition) instead of `value *= i` (multiplication), so it sums the factors rather than multiplying them.",
+      "location": {
+        "unit": "src/factorial.py",
+        "start": 16,
+        "end": 16
+      },
+      "anchor": "value += i",
+      "paraphrases": [
+        "`value += i` should be `value *= i`; a factorial multiplies, it does not sum.",
+        "The running product is being added to instead of multiplied.",
+        "The routine adds the factors together instead of multiplying them, returning a sum rather than a product."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `value *= i`. Real (computes a sum, not a product), findable via the docstring, distinct from the range defect."
+    },
+    {
+      "id": "code-0009-d3",
+      "category": "missing-guard",
+      "severity": "minor",
+      "description": "The negative guard is `number < -1`, so `-1` is accepted even though factorial is undefined for negative values; it should be `number < 0`.",
+      "location": {
+        "unit": "src/factorial.py",
+        "start": 12,
+        "end": 12
+      },
+      "anchor": "number < -1",
+      "paraphrases": [
+        "`number < -1` should be `number < 0`; -1 slips past the guard.",
+        "The guard fails to reject -1, though factorial is not defined for negatives.",
+        "factorial(-1) returns a value instead of raising."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `number < 0`. Real (accepts -1), findable via the stated 'non-negative' precondition, distinct."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0005",
+  "defects": [
+    {
+      "id": "spec-0005-d1",
+      "category": "cross-field-inconsistency",
+      "severity": "critical",
+      "description": "grafana publishes host port 9090 (`9090:3000`), colliding with prometheus's host port 9090 (`9090:9090`); two services cannot bind the same host port.",
+      "location": {"unit": "services.grafana.ports", "start": 17, "end": 17},
+      "anchor": "9090:3000",
+      "paraphrases": [
+        "Host port 9090 is mapped by both prometheus (9090:9090) and grafana (9090:3000), which conflicts.",
+        "Port collision: grafana's `9090:3000` reuses host port 9090 already taken by prometheus.",
+        "Two services bind the same host port (9090), so the stack cannot start."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the published host ports of prometheus (line 8) and grafana (line 17) within the file."
+    },
+    {
+      "id": "spec-0005-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The prometheus config directory is mounted at `/config`, but the command loads the config from `/etc/prometheus/prometheus.yml`, so the config file will not be found at the path the command expects.",
+      "location": {"unit": "services.prometheus.volumes", "start": 11, "end": 11},
+      "anchor": "/config",
+      "paraphrases": [
+        "The volume mounts the config at /config while the command points at /etc/prometheus/prometheus.yml; the paths do not match.",
+        "prometheus.yml is mounted under /config but read from /etc/prometheus, so the container cannot find its config.",
+        "Mount target (/config) and the --config.file path (/etc/prometheus) are inconsistent."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the volume mount target (line 11) with the --config.file argument (line 6) in the same service; the mount should target /etc/prometheus."
+    },
+    {
+      "id": "spec-0005-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "prometheus mounts the named volume `metrics_data`, which is not declared under the top-level `volumes` key (only `prom_data` exists there).",
+      "location": {"unit": "services.prometheus.volumes", "start": 12, "end": 12},
+      "anchor": "metrics_data",
+      "paraphrases": [
+        "The named volume `metrics_data` is referenced but never defined at the top level (only `prom_data` is).",
+        "Undefined named volume: `metrics_data` should be `prom_data`.",
+        "Dangling volume reference in the prometheus service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking the prometheus named-volume mount against the top-level volumes declaration (only prom_data is defined)."
+    }
+  ]
+}

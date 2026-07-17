@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0022",
+  "defects": [
+    {
+      "id": "paper-0022-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "Russia's over 800 million hectares is called 'about two-fifths of the global total', but 800 million is one-fifth of the world's roughly 4 billion hectares, not two-fifths.",
+      "location": {"unit": "Where the forests are", "start": 9, "end": 10},
+      "anchor": "two-fifths",
+      "paraphrases": [
+        "800 million is one-fifth of 4 billion, not two-fifths.",
+        "Two-fifths of 4 billion would be 1.6 billion hectares, not 800 million.",
+        "The stated share is double what the hectare figures imply."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'about one-fifth' (800M / 4B). Findable from the 4 billion total and Russia's 800 million, distinct."
+    },
+    {
+      "id": "paper-0022-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Forest is said to be a little over one-third of habitable land and 'around one-half of all land', but habitable land is a subset of all land, so one-third of habitable land must be less than one-third of all land, not one-half of it.",
+      "location": {"unit": "How much forest remains", "start": 4, "end": 6},
+      "anchor": "one-half of all land",
+      "paraphrases": [
+        "One-third of habitable land cannot be half of the larger total land.",
+        "Since habitable land is only part of all land, the forest share of all land must be smaller than its share of habitable land.",
+        "The share of total land is overstated relative to the habitable-land share."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'around one-quarter' (one-third of habitable land is about a quarter of all land). Findable from the subset relationship in the text, distinct."
+    },
+    {
+      "id": "paper-0022-d3",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Russia is stated to hold the largest share at over 800 million hectares, yet Brazil (the only OTHER country above 10%) is also given 'over 800 million hectares', which would tie or exceed the country said to be largest.",
+      "location": {"unit": "Where the forests are", "start": 11, "end": 12},
+      "anchor": "over 800 million",
+      "paraphrases": [
+        "Brazil cannot have over 800 million hectares if Russia is the largest at 800 million.",
+        "The second-ranked country is given as much forest as the first-ranked one.",
+        "Brazil's hectare figure contradicts its being smaller than Russia."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'over 400 million hectares' (more than 10% of 4 billion, and below Russia's 800M). Findable from Russia being the largest and Brazil being second, distinct."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "paper-0013",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "World population growth summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/world-population-growth",
+    "source_ref": "owid-world-population-growth-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Ritchie, Rodes-Guirao, Roser), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data figures (CC-BY): ~1 billion in 1800 to >8 billion today (eightfold); growth peaked >2%/yr in the 1960s, since more than halved to <1%; ~108 billion people have ever lived, of whom today's 8 billion are ~7%. Clean version verified internally consistent (8/1 = 8x; 2% halved -> ~1%; 8/108 ~= 7%) before injecting 3 defects findable from the text's own numbers."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "From one billion to eight",
+      "start": 4,
+      "end": 4,
+      "note": "the 1 billion (1800) and >8 billion (today) figures are real and untouched"
+    },
+    {
+      "unit": "Slowing growth",
+      "start": 8,
+      "end": 8,
+      "note": "the >2%/yr 1960s peak is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Slowing growth",
+        "start": 9,
+        "end": 9
+      },
+      "note": "The '108 billion ever lived' figure is a modelled estimate; a reviewer may want a source. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

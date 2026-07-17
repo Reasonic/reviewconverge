@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0012",
+  "defects": [
+    {
+      "id": "spec-0012-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The Pod volume's persistentVolumeClaim.claimName is `pv-claim`, but the PVC defined in this manifest is named `task-pv-claim`.",
+      "location": {"unit": "Pod.spec.volumes.persistentVolumeClaim", "start": 23, "end": 23},
+      "anchor": "claimName: pv-claim",
+      "paraphrases": [
+        "claimName points at `pv-claim`, but the PVC is `task-pv-claim`.",
+        "The referenced PVC name should be `task-pv-claim`, not `pv-claim`.",
+        "Dangling PVC reference: `pv-claim` is never defined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the claimName (line 23) to the PVC metadata.name (line 4); should be task-pv-claim."
+    },
+    {
+      "id": "spec-0012-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The container's volumeMount references volume `pv-storage`, but the Pod defines the volume as `task-pv-storage`.",
+      "location": {"unit": "Pod.spec.containers.volumeMounts", "start": 32, "end": 32},
+      "anchor": "name: pv-storage",
+      "paraphrases": [
+        "The volumeMount name `pv-storage` does not match the Pod volume `task-pv-storage`.",
+        "volumeMounts.name should be `task-pv-storage`, not `pv-storage`.",
+        "Dangling volume reference: the mount names a volume the Pod does not define."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the volumeMount name (line 32) to the Pod volume name (line 21); should be task-pv-storage."
+    },
+    {
+      "id": "spec-0012-d3",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The Pod is in namespace `production`, but the PVC it claims is in namespace `default`; PVCs are namespace-scoped, so a Pod can only bind a PVC in its own namespace.",
+      "location": {"unit": "Pod.metadata.namespace", "start": 18, "end": 18},
+      "anchor": "namespace: production",
+      "paraphrases": [
+        "The Pod (namespace production) cannot bind a PVC in namespace default.",
+        "Namespace mismatch: the PVC is in `default` but the Pod is in `production`.",
+        "A PersistentVolumeClaim reference only resolves within the same namespace."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the Pod namespace (line 18) to the PVC namespace (line 5); should be default."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0003",
+  "defects": [
+    {
+      "id": "paper-0003-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The decline is stated as 'more than 2.5 billion fewer', but the excerpt's own figures give 2.3 billion (1990) minus about 800 million (2025), i.e. roughly 1.5 billion fewer.",
+      "location": {"unit": "The long-run decline", "start": 8, "end": 8},
+      "anchor": "2.5 billion",
+      "paraphrases": [
+        "2.3 billion in 1990 minus ~800 million in 2025 is about 1.5 billion, not 2.5 billion.",
+        "The stated size of the decline in extreme poverty contradicts the two counts given in the same passage.",
+        "The '2.5 billion fewer' figure is arithmetically wrong; it should be about 1.5 billion."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value ~1.5 billion (2.3B - 0.8B), stated in OWID as 'more than 1.5 billion'. Findable from the two counts in the same passage, distinct."
+    },
+    {
+      "id": "paper-0003-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The text says two-thirds (66%) live on less than $5 a day while only half (52%) live on less than $10 a day, which is impossible: everyone below $5 is also below $10, so the $10 share cannot be smaller than the $5 share.",
+      "location": {"unit": "Higher poverty lines", "start": 12, "end": 12},
+      "anchor": "66%",
+      "paraphrases": [
+        "The share under $5/day (66%) exceeds the share under $10/day (52%), but a lower threshold must capture no more people than a higher one.",
+        "It is contradictory for more of the world to live under $5 than under $10, since the under-$5 group is a subset of the under-$10 group.",
+        "The $5-a-day percentage is larger than the $10-a-day percentage, which cannot hold for nested poverty lines (the real value is 24%)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 24% (< 52%). Findable from the nesting of the two thresholds stated in the same paragraph, distinct."
+    },
+    {
+      "id": "paper-0003-d3",
+      "category": "internal-contradiction",
+      "severity": "minor",
+      "description": "The extreme-poverty threshold is given inconsistently: 'less than $2 a day' in one sentence but the 'International Poverty Line of $3 per day' in the next.",
+      "location": {"unit": "The long-run decline", "start": 7, "end": 7},
+      "anchor": "$2 a day",
+      "paraphrases": [
+        "The passage names the poverty line as both $2 a day and $3 per day.",
+        "Two different dollar figures ($2 vs $3) are used for the same extreme-poverty line within a few lines.",
+        "The '$2 a day' threshold contradicts the '$3 per day' International Poverty Line stated just after it."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value '$3 a day' (matching the International Poverty Line stated on the next line). Findable within the passage, distinct from the other defects."
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "summary": {
+    "model": "deepseek-v4-flash",
+    "n_items": 10,
+    "overall": {
+      "n": 10,
+      "mem_ratio": 0.104,
+      "verbatim_frac": 0.144
+    },
+    "by_domain": {
+      "code": {
+        "n": 10,
+        "mem_ratio": 0.104,
+        "verbatim_frac": 0.144
+      },
+      "paper": null,
+      "spec": null
+    },
+    "by_origin": {
+      "derived": null,
+      "synthetic": {
+        "n": 10,
+        "mem_ratio": 0.104,
+        "verbatim_frac": 0.144
+      }
+    }
+  },
+  "items": [
+    {
+      "id": "probe-0004",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 190,
+      "suffix_lines": 86,
+      "mem_ratio": 0.2157,
+      "verbatim_frac": 0.0625,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0006",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 319,
+      "suffix_lines": 144,
+      "mem_ratio": 0.1911,
+      "verbatim_frac": 0.3241,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0007",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 239,
+      "suffix_lines": 108,
+      "mem_ratio": 0.1817,
+      "verbatim_frac": 0.1047,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0005",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 312,
+      "suffix_lines": 141,
+      "mem_ratio": 0.1815,
+      "verbatim_frac": 0.3874,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0010",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 238,
+      "suffix_lines": 108,
+      "mem_ratio": 0.1738,
+      "verbatim_frac": 0.1176,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0008",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 325,
+      "suffix_lines": 147,
+      "mem_ratio": 0.04,
+      "verbatim_frac": 0.0696,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0003",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 264,
+      "suffix_lines": 119,
+      "mem_ratio": 0.0263,
+      "verbatim_frac": 0.1023,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0009",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 295,
+      "suffix_lines": 133,
+      "mem_ratio": 0.0202,
+      "verbatim_frac": 0.2286,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0001",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 280,
+      "suffix_lines": 126,
+      "mem_ratio": 0.0101,
+      "verbatim_frac": 0.0106,
+      "mean_terminal_recall": NaN
+    },
+    {
+      "id": "probe-0002",
+      "type": "code",
+      "origin": "synthetic",
+      "n_lines": 317,
+      "suffix_lines": 143,
+      "mem_ratio": 0.0029,
+      "verbatim_frac": 0.0364,
+      "mean_terminal_recall": NaN
+    }
+  ]
+}

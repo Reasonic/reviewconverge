@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0012",
+  "defects": [
+    {
+      "id": "code-0012-d1",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The Horner accumulation multiplies by 3 (`3 * decimal_number`) instead of 2, so it interprets the string in base 3 rather than binary.",
+      "location": {"unit": "src/bin2dec.py", "start": 24, "end": 24},
+      "anchor": "3 * decimal_number",
+      "paraphrases": [
+        "`3 * decimal_number` should be `2 * decimal_number`; binary uses base 2.",
+        "Using a factor of 3 evaluates the digits in base 3, not base 2.",
+        "bin_to_decimal('101') is not 5 because each step multiplies by 3."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `2 * decimal_number + int(char)`. Real (wrong base), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0012-d2",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The final sign is inverted: it returns `decimal_number` for negative inputs and `-decimal_number` otherwise, so positive binary strings come back negative.",
+      "location": {"unit": "src/bin2dec.py", "start": 25, "end": 25},
+      "anchor": "decimal_number if is_negative else -decimal_number",
+      "paraphrases": [
+        "The ternary is backwards; it should be `-decimal_number if is_negative else decimal_number`.",
+        "Positive inputs are negated and negative inputs are left positive.",
+        "The sign applied on return is the opposite of what is_negative indicates."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `-decimal_number if is_negative else decimal_number`. Real (wrong sign), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0012-d3",
+      "category": "off-by-one",
+      "severity": "minor",
+      "description": "When stripping the leading '-', the slice `bin_string[2:]` removes two characters instead of one, dropping the first binary digit of negative inputs.",
+      "location": {"unit": "src/bin2dec.py", "start": 19, "end": 19},
+      "anchor": "bin_string[2:]",
+      "paraphrases": [
+        "`bin_string[2:]` should be `bin_string[1:]`; only the sign character should be removed.",
+        "Removing two characters drops the first digit after the minus sign.",
+        "The sign strip is off by one, discarding a binary digit for negative values."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `bin_string[1:]`. Real (drops a digit for negatives), findable via the -11101 docstring example, distinct."
+    }
+  ]
+}

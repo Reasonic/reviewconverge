@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0018",
+  "defects": [
+    {
+      "id": "paper-0018-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The 1% with an alcohol use disorder is described as 'about one in ten', but 1% is one in a hundred, not one in ten.",
+      "location": {"unit": "A common disorder", "start": 4, "end": 4},
+      "anchor": "one in ten",
+      "paraphrases": [
+        "1% is one in a hundred, so 'one in ten' is wrong.",
+        "One in ten would be 10%, not 1%.",
+        "The percentage (1%) and the fraction (one in ten) disagree."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'one in a hundred' (1%). Findable from the percentage and fraction in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0018-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "If more than half of traffic deaths are attributable to alcohol, then fewer than half come from other causes, but the text says 'more than half from all other causes'.",
+      "location": {"unit": "Alcohol and road deaths", "start": 8, "end": 9},
+      "anchor": "more than half from all other",
+      "paraphrases": [
+        "More than half from alcohol leaves fewer than half from other causes, not more than half.",
+        "Two 'more than half' shares would exceed the whole.",
+        "The alcohol and non-alcohol shares of traffic deaths cannot both exceed half."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'fewer than half' (complement of more than half). Findable within the sentence, distinct."
+    },
+    {
+      "id": "paper-0018-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "22.1 litres per year is said to work out to 'roughly 600 millilitres a day', but 22.1 litres over 365 days is about 60 millilitres a day.",
+      "location": {"unit": "A historical peak", "start": 12, "end": 13},
+      "anchor": "600 millilitres",
+      "paraphrases": [
+        "22.1 litres / 365 days is about 60 mL/day, not 600.",
+        "The daily figure is roughly ten times too high.",
+        "22,100 mL over a year is around 60 mL per day."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 60 millilitres' (22.1 L / 365). Findable from the annual figure, distinct."
+    }
+  ]
+}

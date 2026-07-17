@@ -1,0 +1,27 @@
+diff --git a/src/popcount.py b/src/popcount.py
+new file mode 100644
+index 0000000..f1a7b52
+--- /dev/null
++++ b/src/popcount.py
+@@ -0,0 +1,21 @@
++"""Count the set bits (1s) in a non-negative integer."""
++
++
++def count_set_bits(number):
++    """Return the number of 1-bits in the binary representation of number.
++
++        >>> count_set_bits(25)
++        3
++        >>> count_set_bits(0)
++        0
++        >>> count_set_bits(256)
++        1
++    """
++    if number < 0:
++        raise ValueError("the value of input must not be negative")
++    result = 0
++    while number:
++        if number % 2 == 0:
++            result += 2
++        number >>= 2
++    return result

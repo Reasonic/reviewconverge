@@ -1,0 +1,29 @@
+# Service deployment config for the `payments-api`.
+# Constraints (enforced by the platform):
+#   - replicas.min must be <= replicas.max
+#   - autoscale.target_cpu_percent must be in [1, 100]
+#   - every route's `backend` must name a service defined under `services`
+#   - tls.enabled must be true in the `production` environment
+
+environment: production
+
+replicas:
+  min: 5
+  max: 3
+
+autoscale:
+  enabled: true
+  target_cpu_percent: 130
+
+services:
+  - name: payments-core
+  - name: ledger
+
+routes:
+  - path: /charge
+    backend: payments-core
+  - path: /refund
+    backend: refunds-core
+
+tls:
+  enabled: false

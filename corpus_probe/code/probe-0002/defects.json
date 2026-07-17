@@ -1,0 +1,61 @@
+{
+ "defects": [
+  {
+   "id": "probe-0002-d1",
+   "category": "inverted condition",
+   "severity": "major",
+   "description": "The trim guard in `_finish_field` lost its `not`, so quoted fields get whitespace-stripped (breaking the 'quoted stays literal' contract) while unquoted fields are no longer trimmed.",
+   "location": {
+    "unit": "src/csv_reader.py",
+    "start": 211,
+    "end": 211
+   },
+   "anchor": "if quoted and dialect.trim_unquoted:",
+   "paraphrases": [
+    "`_finish_field` applies `.strip()` to the wrong branch: it now trims quoted values and leaves unquoted ones untouched, the opposite of what `trim_unquoted` promises.",
+    "Because the whitespace-stripping test fires on quoted rather than unquoted fields, a value like `\"  hi  \"` loses its surrounding spaces even though quoting is supposed to preserve them.",
+    "The condition deciding when to strip surrounding whitespace is negated, so trimming is applied to literal (quoted) text and skipped for bare fields."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'if not quoted and dialect.trim_unquoted:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0002-d2",
+   "category": "wrong operator",
+   "severity": "minor",
+   "description": "In `_try_number` the reject guard joins its two tests with `and` instead of `or`, so no character can satisfy both, the guard never triggers, and tokens with underscores (e.g. `1_000`) are coerced to numbers the module documents that it refuses.",
+   "location": {
+    "unit": "src/csv_reader.py",
+    "start": 86,
+    "end": 86
+   },
+   "anchor": "if any(ch.isspace() and ch == \"_\" for ch in token):",
+   "paraphrases": [
+    "The numeric-refusal predicate requires a single character to be simultaneously whitespace and an underscore (impossible), so the early bail-out is dead and Python-style underscore separators slip through as integers.",
+    "`_try_number` should reject a token if it contains whitespace or an underscore, but the boolean connector was swapped so the check is always false and `1_000` becomes the int 1000.",
+    "The guard meant to filter out underscore- and space-bearing tokens can never be true as written, letting spreadsheet-illegal numerics be parsed anyway."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'if any(ch.isspace() or ch == \"_\" for ch in token):'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0002-d3",
+   "category": "off-by-one",
+   "severity": "major",
+   "description": "The bounds test in `parse_dicts` uses `<=` instead of `<`, so when a row is shorter than the header the index equal to the row length is treated as valid and `row[len(row)]` raises IndexError instead of padding with `fillvalue`.",
+   "location": {
+    "unit": "src/csv_reader.py",
+    "start": 290,
+    "end": 290
+   },
+   "anchor": "record[name] = row[idx] if idx <= len(row) else fillvalue",
+   "paraphrases": [
+    "`parse_dicts` is documented to pad short rows, but the guarding comparison admits one index past the end, so a ragged (too-short) row crashes with an out-of-range access.",
+    "Reading a header column from a row uses an off-by-one boundary (`idx <= len(row)`), which lets the code index one element beyond the row and blow up instead of substituting the fill value.",
+    "The fallback-to-fillvalue branch is never reached for the first missing column because the length check is inclusive, causing an IndexError on any under-width row."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'record[name] = row[idx] if idx < len(row) else fillvalue'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  }
+ ]
+}

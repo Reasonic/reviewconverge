@@ -1,0 +1,48 @@
+{
+  "id": "paper-0008",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Vaccination impact summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/vaccination",
+    "source_ref": "owid-vaccination-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Roser, Ritchie, Dattani), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data / Shattock et al. vaccination figures (CC-BY): over 80% infant coverage (one in five uncovered); ~154 million deaths prevented over fifty years. Clean version verified internally consistent (100 - 80 = 20; 154M/50 ~= 3M/yr; 3M/365 ~= 8,000/day) before injecting 3 defects findable from the text's own numbers."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Coverage today",
+      "start": 4,
+      "end": 4,
+      "note": "the over-80% coverage figure is real and untouched"
+    },
+    {
+      "unit": "The lives saved",
+      "start": 9,
+      "end": 9,
+      "note": "the ~154 million deaths-prevented total is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "The lives saved",
+        "start": 9,
+        "end": 9
+      },
+      "note": "The 154 million figure is a modelled estimate (Shattock et al.); a reviewer may want a citation or uncertainty range. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

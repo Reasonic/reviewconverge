@@ -1,0 +1,181 @@
+{
+ "S8_wilcoxon_hodges_lehmann": {
+  "mem_vs_nomem:churn": {
+   "wilcoxon_p": 0.0,
+   "hodges_lehmann": -0.1,
+   "hl_ci95": [
+    -0.1255,
+    -0.075
+   ],
+   "mean_diff": -0.0865
+  },
+  "mem_vs_nomem:oscillation": {
+   "wilcoxon_p": 0.0,
+   "hodges_lehmann": -0.6667,
+   "hl_ci95": [
+    -0.8333,
+    -0.5
+   ],
+   "mean_diff": -0.4444
+  },
+  "mem_vs_nomem:stabilized_round": {
+   "wilcoxon_p": 0.0,
+   "hodges_lehmann": -1.5,
+   "hl_ci95": [
+    -2.0,
+    -1.0
+   ],
+   "mean_diff": -1.1944
+  },
+  "mem_vs_nomem:precision": {
+   "wilcoxon_p": 0.00527,
+   "hodges_lehmann": -0.0833,
+   "hl_ci95": [
+    -0.125,
+    -0.025
+   ],
+   "mean_diff": -0.0336
+  },
+  "mem_vs_nomem:recall": {
+   "wilcoxon_p": 0.08259,
+   "hodges_lehmann": 0.1111,
+   "hl_ci95": [
+    0.0,
+    0.1666
+   ],
+   "mean_diff": 0.0194
+  },
+  "ledger_vs_mem:churn": {
+   "wilcoxon_p": 0.59374,
+   "hodges_lehmann": -0.0056,
+   "hl_ci95": [
+    -0.03,
+    0.0211
+   ],
+   "mean_diff": -0.0002
+  },
+  "ledger_vs_mem:oscillation": {
+   "wilcoxon_p": 0.95373,
+   "hodges_lehmann": 0.0,
+   "hl_ci95": [
+    -0.3333,
+    0.1667
+   ],
+   "mean_diff": -0.0222
+  },
+  "ledger_vs_mem:stabilized_round": {
+   "wilcoxon_p": 0.1716,
+   "hodges_lehmann": -0.3333,
+   "hl_ci95": [
+    -0.8333,
+    0.1667
+   ],
+   "mean_diff": -0.2222
+  },
+  "ledger_vs_mem:precision": {
+   "wilcoxon_p": 0.50748,
+   "hodges_lehmann": -0.0139,
+   "hl_ci95": [
+    -0.05,
+    0.0417
+   ],
+   "mean_diff": -0.0076
+  },
+  "ledger_vs_mem:recall": {
+   "wilcoxon_p": 0.22868,
+   "hodges_lehmann": -0.0556,
+   "hl_ci95": [
+    -0.1667,
+    0.0556
+   ],
+   "mean_diff": -0.0097
+  },
+  "structured_vs_mem:churn": {
+   "wilcoxon_p": 0.30955,
+   "hodges_lehmann": -0.0106,
+   "hl_ci95": [
+    -0.0306,
+    0.0122
+   ],
+   "mean_diff": -0.0052
+  },
+  "structured_vs_mem:oscillation": {
+   "wilcoxon_p": 0.64532,
+   "hodges_lehmann": 0.0,
+   "hl_ci95": [
+    -0.3333,
+    0.1667
+   ],
+   "mean_diff": 0.0
+  },
+  "structured_vs_mem:stabilized_round": {
+   "wilcoxon_p": 0.05391,
+   "hodges_lehmann": -0.6667,
+   "hl_ci95": [
+    -1.1667,
+    0.0
+   ],
+   "mean_diff": -0.3167
+  },
+  "structured_vs_mem:precision": {
+   "wilcoxon_p": 0.5673,
+   "hodges_lehmann": 0.0,
+   "hl_ci95": [
+    -0.0222,
+    0.0667
+   ],
+   "mean_diff": 0.0051
+  },
+  "structured_vs_mem:recall": {
+   "wilcoxon_p": 0.09968,
+   "hodges_lehmann": -0.0556,
+   "hl_ci95": [
+    -0.1111,
+    0.0
+   ],
+   "mean_diff": -0.0153
+  }
+ },
+ "S9_cluster_bootstrap_runlevel": {
+  "run_level_cc_diff_mem_minus_nomem": 0.1833,
+  "cluster_bootstrap_ci95": [
+   0.0889,
+   0.2833
+  ],
+  "cluster_bootstrap_p": 0.0002,
+  "B": 20000
+ },
+ "S10_tost": {
+  "ledger_vs_mem": {
+   "obs_diff": -0.0333,
+   "ci90": [
+    -0.1167,
+    0.05
+   ],
+   "tost_p_margin_0.15": 0.0183,
+   "equivalent_at_0.15": true,
+   "tost_p_margin_0.1": 0.0843,
+   "equivalent_at_0.1": false
+  },
+  "structured_vs_mem": {
+   "obs_diff": -0.0667,
+   "ci90": [
+    -0.15,
+    0.0167
+   ],
+   "tost_p_margin_0.15": 0.0724,
+   "equivalent_at_0.15": false,
+   "tost_p_margin_0.1": 0.237,
+   "equivalent_at_0.1": false
+  },
+  "recall_mem_vs_nomem": {
+   "obs_diff": 0.0194,
+   "ci90": [
+    -0.0,
+    0.0389
+   ],
+   "tost_p_margin_0.05": 0.0056,
+   "equivalent_at_0.05": true
+  }
+ }
+}

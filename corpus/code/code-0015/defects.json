@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0015",
+  "defects": [
+    {
+      "id": "code-0015-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The shift condition uses `insert_value > collection[insert_index - 1]`, which shifts while the value is larger and yields a descending order; ascending insertion sort needs `<`.",
+      "location": {"unit": "src/insort.py", "start": 14, "end": 14},
+      "anchor": "insert_value > collection[insert_index - 1]",
+      "paraphrases": [
+        "The comparison should be `<`, not `>`; as written it sorts descending.",
+        "Shifting while the value is greater reverses the sort order.",
+        "insertion_sort([0,5,3,2,2]) would not come out ascending with `>`."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `insert_value < collection[insert_index - 1]`. Real (wrong order), findable via the ascending docstring, distinct."
+    },
+    {
+      "id": "code-0015-d2",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The outer loop `range(1, len(collection) - 1)` stops before the last element, so the final element is never inserted and the list is left partially unsorted.",
+      "location": {"unit": "src/insort.py", "start": 12, "end": 12},
+      "anchor": "range(1, len(collection) - 1)",
+      "paraphrases": [
+        "`range(1, len(collection) - 1)` should be `range(1, len(collection))`; the last element is skipped.",
+        "The loop stops one short, leaving the final item unsorted.",
+        "Off-by-one in the outer range drops the last insertion."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `range(1, len(collection))`. Real (last element not sorted), findable via the docstring examples, distinct."
+    },
+    {
+      "id": "code-0015-d3",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The shift `collection[insert_index] = collection[insert_index]` assigns the element to itself instead of copying the previous element down (`collection[insert_index - 1]`), so nothing is shifted and values are overwritten.",
+      "location": {"unit": "src/insort.py", "start": 15, "end": 15},
+      "anchor": "collection[insert_index] = collection[insert_index]",
+      "paraphrases": [
+        "The right-hand side should be `collection[insert_index - 1]`; the shift is a no-op.",
+        "Assigning the slot to itself copies nothing down, so the insert overwrites data.",
+        "The element to the left is never moved into place."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `collection[insert_index] = collection[insert_index - 1]`. Real (shift does nothing / data loss), findable by reading the assignment, distinct."
+    }
+  ]
+}

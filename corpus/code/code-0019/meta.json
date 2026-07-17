@@ -1,0 +1,38 @@
+{
+  "id": "code-0019",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "gnome_sort(): gnome sort (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/sorts/gnome_sort.py#L16",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `gnome_sort`, into src/gnome.py (docstring trimmed). Three independently-findable defects injected (index init, order comparison, swap); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "wrong-operator",
+      "inverted-condition"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/gnome.py",
+      "start": 12,
+      "end": 13,
+      "note": "the short-list guard is correct"
+    },
+    {
+      "unit": "src/gnome.py",
+      "start": 21,
+      "end": 23,
+      "note": "the index reset and return are correct"
+    }
+  ],
+  "defect_count": 3
+}

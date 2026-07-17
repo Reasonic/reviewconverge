@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0017",
+  "defects": [
+    {
+      "id": "spec-0017-d1",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The web proxy targets FLASK_SERVER_ADDR=backend:8080, but the backend serves on FLASK_SERVER_PORT=9091, so the proxy points at the wrong port.",
+      "location": {"unit": "services.web.environment", "start": 7, "end": 7},
+      "anchor": "backend:8080",
+      "paraphrases": [
+        "The proxy sends traffic to backend:8080, but the backend listens on 9091.",
+        "FLASK_SERVER_ADDR should use port 9091 to match the backend.",
+        "Proxy target port (8080) does not match the backend port (9091)."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing FLASK_SERVER_ADDR (line 7) with FLASK_SERVER_PORT (line 19); should be 9091."
+    },
+    {
+      "id": "spec-0017-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "web.depends_on names service `api`, but no such service is defined (the application service is named `backend`).",
+      "location": {"unit": "services.web.depends_on", "start": 12, "end": 12},
+      "anchor": "- api",
+      "paraphrases": [
+        "The web service depends on `api`, but the service is `backend`.",
+        "depends_on should reference `backend`, not `api`.",
+        "Dangling service dependency: `api` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking web.depends_on against the service list; the app service is `backend`."
+    },
+    {
+      "id": "spec-0017-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "backend.depends_on names service `db`, but the database service is named `mongo`; there is no service `db`.",
+      "location": {"unit": "services.backend.depends_on", "start": 23, "end": 23},
+      "anchor": "- db",
+      "paraphrases": [
+        "The backend depends on `db`, but the database service is `mongo`.",
+        "depends_on should reference `mongo`, not `db`.",
+        "Dangling service dependency: `db` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking backend.depends_on against the service list; the DB service is `mongo`."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "spec-0004",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "nginx/Flask/MySQL Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/nginx-flask-mysql/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) nginx-flask-mysql compose.yaml. Three defects injected, each findable within the file: a dangling network, a dangling secret, and a host-port collision. The db service (healthcheck, secrets, volumes) and the top-level secrets section are untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference",
+      "cross-field-inconsistency"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.db.healthcheck",
+      "start": 9,
+      "end": 13,
+      "note": "db healthcheck block is upstream and valid"
+    },
+    {
+      "unit": "secrets",
+      "start": 52,
+      "end": 54,
+      "note": "top-level secrets definition is untouched and valid"
+    }
+  ],
+  "defect_count": 3
+}

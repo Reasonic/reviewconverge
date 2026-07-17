@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0014",
+  "defects": [
+    {
+      "id": "spec-0014-d1",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "frontend.depends_on names service `api`, but no such service is defined (the application service is named `backend`).",
+      "location": {"unit": "services.frontend.depends_on", "start": 16, "end": 16},
+      "anchor": "- api",
+      "paraphrases": [
+        "The frontend depends on `api`, which is not a defined service (frontend, backend, mongo).",
+        "depends_on should reference `backend`, not `api`.",
+        "Dangling service dependency: `api` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking frontend.depends_on against the service list; the app service is `backend`."
+    },
+    {
+      "id": "spec-0014-d2",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "backend.depends_on names service `db`, but the database service is named `mongo`; there is no service `db`.",
+      "location": {"unit": "services.backend.depends_on", "start": 26, "end": 26},
+      "anchor": "- db",
+      "paraphrases": [
+        "The backend depends on `db`, but the database service is `mongo`.",
+        "depends_on should reference `mongo`, not `db`.",
+        "Dangling service dependency: `db` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking backend.depends_on against the service list; the DB service is `mongo`."
+    },
+    {
+      "id": "spec-0014-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "backend.networks references `mongo-net`, which is not declared under the top-level `networks` key (only `react-express` and `express-mongo` exist).",
+      "location": {"unit": "services.backend.networks", "start": 28, "end": 28},
+      "anchor": "- mongo-net",
+      "paraphrases": [
+        "backend joins network `mongo-net`, but only `react-express` and `express-mongo` are defined.",
+        "The network should be `express-mongo`, not `mongo-net`.",
+        "Dangling network reference in the backend service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking backend.networks against the top-level networks; mongo-net is undefined (should be express-mongo)."
+    }
+  ]
+}

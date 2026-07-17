@@ -1,0 +1,49 @@
+{
+  "id": "code-0009",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "factorial(): iterative factorial (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/maths/factorial.py#L6",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) iterative `factorial`, into src/factorial.py (the non-int type check was trimmed for a self-contained excerpt). Three independently-findable defects injected (guard, loop range, accumulate); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "missing-guard",
+      "off-by-one",
+      "wrong-operator"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/factorial.py",
+      "start": 13,
+      "end": 14,
+      "note": "the raise message and value initialization are correct"
+    },
+    {
+      "unit": "src/factorial.py",
+      "start": 17,
+      "end": 17,
+      "note": "the return statement is correct"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "src/factorial.py",
+        "start": 4,
+        "end": 4
+      },
+      "note": "No type check on the input: a non-integer (e.g. a float or string) is not rejected before the factorial loop. A reviewer may flag the missing isinstance/type guard; not a seeded defect. (Distinct from d3, which is the negative-value guard being off-by-one.)"
+    }
+  ],
+  "defect_count": 3
+}

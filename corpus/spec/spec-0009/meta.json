@@ -1,0 +1,48 @@
+{
+  "id": "spec-0009",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Kubernetes ConfigMap + Pod env reference (real-derived from kubernetes/website)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://github.com/kubernetes/website/blob/0640ccf95db0469f884f37fb856951a1a182c9f1/content/en/examples/pods/pod-single-configmap-env-variable.yaml",
+    "source_ref": "0640ccf95db0469f884f37fb856951a1a182c9f1",
+    "retrieved": "2026-07-05",
+    "attribution": "The Kubernetes Authors (CC-BY-4.0)",
+    "notes": "Base = the upstream configmap-multikeys ConfigMap and the pod-single-configmap-env-variable Pod, combined into one manifest with the Pod's configMapKeyRef pointing at a real key. Three defects injected, each findable within the manifest: a dangling ConfigMap name, a dangling key, and a cross-namespace reference. The ConfigMap block is untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "dangling-reference",
+      "cross-field-inconsistency"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "ConfigMap.metadata",
+      "start": 4,
+      "end": 5,
+      "note": "the ConfigMap name (special-config) and namespace (default) are the reference values, untouched"
+    },
+    {
+      "unit": "ConfigMap.data",
+      "start": 7,
+      "end": 8,
+      "note": "the ConfigMap keys (SPECIAL_LEVEL, SPECIAL_TYPE) are untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Pod.spec.containers",
+        "start": 18,
+        "end": 18
+      },
+      "note": "The image is pinned to an old busybox tag (1.27.2). A reviewer may flag the outdated image; not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

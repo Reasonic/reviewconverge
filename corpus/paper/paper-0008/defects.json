@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0008",
+  "defects": [
+    {
+      "id": "paper-0008-d1",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The uncovered share is given as 'nearly one in five — around 40%', but one in five is 20%, not 40% (and 80% coverage leaves 20% uncovered).",
+      "location": {"unit": "Coverage today", "start": 5, "end": 5},
+      "anchor": "around 40%",
+      "paraphrases": [
+        "One in five is 20%, so 'around 40%' is wrong.",
+        "If 80% are covered, 20% are not — one in five, not 40%.",
+        "The fraction (one in five) and the percentage (40%) disagree."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'around 20%' (one in five; complement of 80%). Findable from the fraction and the 80% figure, distinct."
+    },
+    {
+      "id": "paper-0008-d2",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "154 million deaths prevented over fifty years is called 'an average of roughly 8 million lives saved every year', but 154 / 50 is about 3 million per year.",
+      "location": {"unit": "The lives saved", "start": 9, "end": 10},
+      "anchor": "roughly 8 million",
+      "paraphrases": [
+        "154 million over 50 years is about 3 million a year, not 8 million.",
+        "The annual average is miscalculated from the 154-million-over-fifty-years total.",
+        "Dividing 154 million by 50 gives roughly 3 million, not 8 million, per year."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'roughly 3 million' (154/50). Findable from the total and the period in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0008-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The daily figure 'more than 80,000 every single day' is inconsistent with 154 million over fifty years, which is about 8,000 per day.",
+      "location": {"unit": "The lives saved", "start": 10, "end": 11},
+      "anchor": "more than 80,000",
+      "paraphrases": [
+        "154 million over 50 years is roughly 8,000 a day, not 80,000.",
+        "The per-day figure is about ten times too high given the stated total and period.",
+        "154,000,000 / (50 x 365) is around 8,400 per day, not 80,000."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'more than 8,000' (154M / (50*365)). Findable from the total and the period, distinct from the per-year defect."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0019",
+  "defects": [
+    {
+      "id": "paper-0019-d1",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "The rise from ~80 to >350 million tonnes is called 'more than a tenfold increase', but 350 divided by 80 is about 4.4 — more than fourfold, not tenfold.",
+      "location": {"unit": "A steep climb", "start": 4, "end": 6},
+      "anchor": "tenfold",
+      "paraphrases": [
+        "350 divided by 80 is about 4.4, so it is a fourfold, not tenfold, increase.",
+        "A tenfold rise from 80 million would be 800 million, not 350 million.",
+        "The stated growth multiple is far too high for 80-to-350."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'more than a fourfold' (350/80). Findable from the two tonnage figures, distinct."
+    },
+    {
+      "id": "paper-0019-d2",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "Poultry is said to be 'more than a third' of the 350 million tonne total but 'about 40 million' tonnes; 40 million is only about a ninth of 350 million, not a third.",
+      "location": {"unit": "What and where", "start": 9, "end": 10},
+      "anchor": "about 40 million",
+      "paraphrases": [
+        "40 million out of 350 million is roughly a ninth, not more than a third.",
+        "More than a third of 350 million would be over 115 million, not 40 million.",
+        "The poultry tonnage and its stated share disagree."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'about 120 million' (more than a third of 350). Findable from the total, distinct."
+    },
+    {
+      "id": "paper-0019-d3",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "With Asia up about 15-fold and Europe roughly doubled, Asia grew about seven times as fast as Europe, but the text says 'about three times as fast'.",
+      "location": {"unit": "What and where", "start": 11, "end": 12},
+      "anchor": "three times as fast",
+      "paraphrases": [
+        "15-fold versus twofold is about seven times, not three.",
+        "The Asia-to-Europe growth ratio is understated.",
+        "Dividing a 15-fold rise by a twofold rise gives about 7.5, not 3."
+      ],
+      "confirmed": true,
+      "rationale": "Correct phrasing 'about seven times as fast' (15/2). Findable from the two regional multiples, distinct."
+    }
+  ]
+}

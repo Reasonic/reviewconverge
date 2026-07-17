@@ -1,0 +1,80 @@
+{
+ "defects": [
+  {
+   "id": "probe-0007-d1",
+   "category": "inverted-condition",
+   "severity": "critical",
+   "description": "The out-of-order branch is entered when the new timestamp is greater than the latest instead of less, so normal in-order arrivals take the insert path that never advances `_latest_ts`; the window horizon freezes, nothing is ever evicted, and the sample set grows without bound.",
+   "location": {
+    "unit": "src/rolling_stats.py",
+    "start": 65,
+    "end": 65
+   },
+   "anchor": "and ts > self._latest_ts:",
+   "paraphrases": [
+    "The comparison meant to catch late (older) arrivals is reversed, so fresh newer samples are routed through the ordered-insert path that leaves the newest-timestamp watermark stuck at its first value and the trailing window stops sliding.",
+    "Because newer readings satisfy the `>` test, they bypass the branch that updates the high-water timestamp, so eviction's horizon never moves forward and stale points are retained indefinitely.",
+    "Detecting backfill should compare against `<`; flipping it to `>` means every in-sequence update is treated as a reorder, the latest-time marker is frozen, and the count keeps climbing past the window size."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        if self._latest_ts is not None and ts < self._latest_ts:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0007-d2",
+   "category": "percentile-rank-off-by-one",
+   "severity": "major",
+   "description": "The interpolated rank is scaled by `n` instead of `n - 1`, so interior percentiles land between the wrong pair of order statistics and return values shifted toward the upper end of the distribution.",
+   "location": {
+    "unit": "src/rolling_stats.py",
+    "start": 158,
+    "end": 158
+   },
+   "anchor": "rank = (p / 100.0) * n",
+   "paraphrases": [
+    "Multiplying the fraction by the sample count rather than one less than it misplaces the fractional index, skewing every non-extreme percentile upward.",
+    "The linear-rank formula uses the wrong span: with `n` in place of `n-1`, the median and other quantiles interpolate at an offset position and come out too high.",
+    "Because the rank spans `n` intervals instead of the `n-1` gaps between ordered samples, the computed percentile picks a point further along the sorted values than intended."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        rank = (p / 100.0) * (n - 1)'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0007-d3",
+   "category": "swapped-operands",
+   "severity": "minor",
+   "description": "`range_span` subtracts the maximum from the minimum, returning the negative of the true span rather than the documented `max - min`.",
+   "location": {
+    "unit": "src/rolling_stats.py",
+    "start": 173,
+    "end": 173
+   },
+   "anchor": "return min(values) - max(values)",
+   "paraphrases": [
+    "The two extremes are subtracted in the wrong order, so the reported spread is negated instead of being a non-negative width.",
+    "Computing smallest-minus-largest yields a negative magnitude for the window's range whenever the values are not all equal.",
+    "The span comes back with a flipped sign because the minuend and subtrahend are reversed."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        return max(values) - min(values)'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0007-d4",
+   "category": "wrong-divisor",
+   "severity": "minor",
+   "description": "Variance divides the sum of squared deviations by `n - 1`, producing the sample (Bessel-corrected) variance even though the method is documented to return the population variance (divide by `n`).",
+   "location": {
+    "unit": "src/rolling_stats.py",
+    "start": 184,
+    "end": 184
+   },
+   "anchor": "for v in values) / (n - 1)",
+   "paraphrases": [
+    "The estimator applies Bessel's correction, dividing by one fewer than the sample size, which contradicts the promised population-variance definition.",
+    "Using `n - 1` in the denominator overstates the spread relative to the population variance the docstring specifies.",
+    "The squared-deviation average is taken over `n - 1` rather than `n`, so the result is the unbiased sample variance instead of the intended population figure."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: '        return sum((v - mu) ** 2 for v in values) / n'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  }
+ ]
+}

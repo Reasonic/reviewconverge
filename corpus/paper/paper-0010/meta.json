@@ -1,0 +1,42 @@
+{
+  "id": "paper-0010",
+  "type": "paper",
+  "artifact_file": "artifact.md",
+  "title": "Safe drinking water summary (real CC-BY prose from Our World in Data)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC-BY-4.0",
+    "url": "https://ourworldindata.org/water-access",
+    "source_ref": "owid-water-access-2026-07-05",
+    "retrieved": "2026-07-05",
+    "attribution": "Our World in Data (Ritchie, Roser), CC-BY-4.0",
+    "notes": "Composed from real Our World in Data figures (CC-BY): almost three-quarters use safely managed water, one in four do not; unsafe-water death rates >50 per 100,000 in low-income vs far lower in high-income countries. Clean version verified internally consistent (three-quarters ~ 75%, complement 25%; 50/0.05 = 1000) before injecting 3 defects findable from the text's own numbers."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "stat-inconsistency",
+      "internal-contradiction"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "Stark inequalities",
+      "start": 10,
+      "end": 10,
+      "note": "the >50 per 100,000 low-income death-rate figure is real and untouched"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "Stark inequalities",
+        "start": 10,
+        "end": 11
+      },
+      "note": "The death-rate thresholds are rounded/approximate; a reviewer may want exact figures or sources. Not a seeded defect."
+    }
+  ],
+  "defect_count": 3
+}

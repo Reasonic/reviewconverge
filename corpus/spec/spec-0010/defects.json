@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0010",
+  "defects": [
+    {
+      "id": "spec-0010-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The SECRET_USERNAME env var's secretKeyRef names Secret `app-secret`, but the Secret defined in this manifest is named `test-secret`.",
+      "location": {"unit": "Pod...SECRET_USERNAME.secretKeyRef", "start": 21, "end": 21},
+      "anchor": "name: app-secret",
+      "paraphrases": [
+        "secretKeyRef points at `app-secret`, but only `test-secret` is defined.",
+        "The referenced Secret name should be `test-secret`, not `app-secret`.",
+        "Dangling Secret reference: `app-secret` is never defined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the secretKeyRef name (line 21) to the Secret metadata.name (line 4); should be test-secret."
+    },
+    {
+      "id": "spec-0010-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The SECRET_USERNAME env var requests key `user`, but the Secret defines keys `username` and `password` — there is no `user` key.",
+      "location": {"unit": "Pod...SECRET_USERNAME.secretKeyRef", "start": 22, "end": 22},
+      "anchor": "key: user",
+      "paraphrases": [
+        "The key `user` does not exist in the Secret (which has username and password).",
+        "secretKeyRef.key should be `username`, not `user`.",
+        "Dangling key reference: `user` is not a key of the Secret."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the referenced key (line 22) to the Secret data keys (lines 6-7); should be username."
+    },
+    {
+      "id": "spec-0010-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The SECRET_PASSWORD env var requests key `passwd`, but the Secret defines the key as `password`.",
+      "location": {"unit": "Pod...SECRET_PASSWORD.secretKeyRef", "start": 27, "end": 27},
+      "anchor": "key: passwd",
+      "paraphrases": [
+        "The key `passwd` does not exist in the Secret (the key is `password`).",
+        "secretKeyRef.key should be `password`, not `passwd`.",
+        "Dangling key reference: `passwd` is not a key of the Secret."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the referenced key (line 27) to the Secret data keys (lines 6-7); should be password."
+    }
+  ]
+}

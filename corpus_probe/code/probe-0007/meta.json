@@ -1,0 +1,41 @@
+{
+ "id": "probe-0007",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "rolling stats (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "inverted-condition",
+   "percentile-rank-off-by-one",
+   "swapped-operands",
+   "wrong-divisor"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/rolling_stats.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [
+  {
+   "location": {
+    "unit": "src/rolling_stats.py",
+    "start": 98,
+    "end": 98
+   },
+   "note": "Eviction drops samples whose timestamp is exactly at the horizon (`_samples[0][0] <= horizon`, i.e. now - t == window_seconds), yet the class docstring says a sample is retained while `now - t <= window`; code and docstring disagree at the exact window boundary. A reviewer could reasonably flag this inconsistency, but it is pre-existing and not one of the injected defects."
+  }
+ ],
+ "defect_count": 4
+}

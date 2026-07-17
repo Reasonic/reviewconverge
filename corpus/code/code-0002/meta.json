@@ -1,0 +1,40 @@
+{
+  "id": "code-0002",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "divide(): split a sequence into n parts (real-derived from more-itertools)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/more-itertools/more-itertools/blob/ed86a1528aa015f219f8d3385ea2ebd3f63a5212/more_itertools/more.py#L2049",
+    "source_ref": "ed86a1528aa015f219f8d3385ea2ebd3f63a5212",
+    "retrieved": "2026-07-04",
+    "attribution": "Erik Rose and the more-itertools contributors",
+    "notes": "Base = the upstream (correct) `more_itertools.divide`, extracted into src/partition.py with a trimmed docstring. Four defects were then injected per docs/corpus-construction.md; the upstream form of every mutated line is recorded in each defect's rationale."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "missing-guard",
+      "api-misuse",
+      "off-by-one",
+      "inverted-condition"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/partition.py",
+      "start": 19,
+      "end": 24,
+      "note": "sequence-vs-iterable coercion (try/except) is upstream-correct and untouched"
+    },
+    {
+      "unit": "src/partition.py",
+      "start": 28,
+      "end": 29,
+      "note": "result-list initialization is correct"
+    }
+  ],
+  "defect_count": 4
+}

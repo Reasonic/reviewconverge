@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0005",
+  "defects": [
+    {
+      "id": "paper-0005-d1",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "French 15-year-olds' life expectancy is said to rise from 58 to 83, 'an increase of 35 years', but 83 - 58 = 25 years.",
+      "location": {"unit": "Not only about infants", "start": 11, "end": 12},
+      "anchor": "increase of 35 years",
+      "paraphrases": [
+        "83 minus 58 is 25, not the stated 35-year increase.",
+        "The rise from 58 to 83 years is miscalculated as 35.",
+        "The stated increase does not match the two figures given (it should be 25)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value '25 years' (83 - 58). Findable from the two figures in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0005-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Life expectancy is said to have 'more than doubled' from 32 to 61 years, but 32 doubled is 64, so 61 is less than double, not more.",
+      "location": {"unit": "Longer lives", "start": 4, "end": 5},
+      "anchor": "doubled to 61 years",
+      "paraphrases": [
+        "32 more than doubled would exceed 64, but 61 is below that, so it did not more than double.",
+        "'More than doubled to 61' contradicts the starting value of 32 (2 x 32 = 64 > 61).",
+        "The claim of more-than-doubling is inconsistent with the 32-to-61 change."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value '71 years' (> 2 x 32). Findable from the 32 figure and the doubling claim in the same passage, distinct."
+    },
+    {
+      "id": "paper-0005-d3",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "Global 2021 life expectancy (just over 70) is said to be 'more than twice' the value two centuries earlier, given as 'less than 45'; but twice 45 is 90, which exceeds 70, so 70 is not more than twice 45.",
+      "location": {"unit": "Longer lives", "start": 6, "end": 7},
+      "anchor": "less than 45 years",
+      "paraphrases": [
+        "If the earlier value was under 45, more than twice it would exceed 90, but 2021 is only about 70.",
+        "'More than twice ... less than 45' is inconsistent with a 2021 value of just over 70.",
+        "70 cannot be more than double a figure as high as 45 (that would require over 90)."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'less than 35 years' (half of ~70). Findable from the ~70 figure and the 'more than twice' claim in the same sentence, distinct."
+    }
+  ]
+}

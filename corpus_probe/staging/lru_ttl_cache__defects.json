@@ -1,0 +1,59 @@
+{
+  "module": "lru_ttl_cache.py",
+  "defects": [
+    {
+      "category": "off-by-one-loop-bound",
+      "severity": "major",
+      "anchor": "while len(self._store) >= self._capacity:",
+      "correct_form": "        while len(self._store) > self._capacity:",
+      "description": "Capacity enforcement evicts while the size is `>=` capacity instead of strictly greater, so the cache tops out at capacity-1 live entries and discards a valid entry one insertion too early.",
+      "paraphrases": [
+        "The eviction loop fires the moment the store reaches its limit rather than after surpassing it, permanently costing the cache one slot of its advertised size.",
+        "Filling the cache to exactly N entries immediately triggers a removal, so a cache configured for N never actually retains N items.",
+        "Because the condition includes equality, the least-recently-used entry is thrown out prematurely whenever the count merely equals the bound."
+      ]
+    },
+    {
+      "category": "wrong-comparison-boundary",
+      "severity": "minor",
+      "anchor": "and now > self.expires_at",
+      "correct_form": "        return self.expires_at is not None and now >= self.expires_at",
+      "description": "Expiry uses strict `>` against the deadline instead of `>=`, so an entry read at exactly its expiration instant is still reported as live rather than expired.",
+      "paraphrases": [
+        "At the precise clock value where an entry's deadline lands it should count as stale, but the strict comparison keeps it valid for that tick.",
+        "A lookup arriving exactly on `expires_at` returns the cached value instead of a miss, so entries survive one instant past their intended lifetime.",
+        "The deadline is treated as still-fresh because expiry requires the clock to advance strictly beyond it rather than reach it."
+      ]
+    },
+    {
+      "category": "wrong-variable",
+      "severity": "major",
+      "anchor": "return (self.misses / total) if total else 0.0",
+      "correct_form": "        return (self.hits / total) if total else 0.0",
+      "description": "The hit_rate property divides misses by total lookups instead of hits, so it reports the miss fraction under the name hit_rate and propagates the wrong value into as_dict() and __repr__.",
+      "paraphrases": [
+        "The success ratio is derived from the miss counter, so a cache serving mostly hits advertises a deceptively low figure.",
+        "What the property returns is really the fraction of lookups that failed, making every stats snapshot show the complement of the true value.",
+        "The numerator names the wrong tally — misses where hits belong — inverting the meaning of the reported effectiveness metric."
+      ]
+    },
+    {
+      "category": "inverted-return-predicate",
+      "severity": "major",
+      "anchor": "return self._store.pop(key, None) is None",
+      "correct_form": "            return self._store.pop(key, None) is not None",
+      "description": "delete() returns the negation of what it should: checking `is None` makes it report True when the key was absent (nothing removed) and False when an entry was actually deleted.",
+      "paraphrases": [
+        "The boolean result of the removal is flipped, so callers are told a deletion succeeded exactly when nothing was there to delete.",
+        "Deleting a present key yields False while deleting a missing key yields True, because the presence test is written against None instead of not-None.",
+        "The return value contradicts the documented 'whether anything was deleted' — a real removal signals false and a no-op signals true."
+      ]
+    }
+  ],
+  "gray_zones": [
+    {
+      "note": "__contains__ delegates to peek(), which lazily removes an expired entry and increments the _expirations counter; consequently a plain membership test (`key in cache`) can mutate the observability statistics as a side effect. A debatable design smell a reviewer might raise, but not one of the injected defects.",
+      "approx_line": 262
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0018",
+  "defects": [
+    {
+      "id": "spec-0018-d1",
+      "category": "dangling-reference",
+      "severity": "critical",
+      "description": "The StatefulSet's serviceName is `web-svc`, but the headless Service that governs it is named `nginx`; there is no Service `web-svc`.",
+      "location": {"unit": "StatefulSet.spec.serviceName", "start": 20, "end": 20},
+      "anchor": "serviceName: \"web-svc\"",
+      "paraphrases": [
+        "serviceName points at `web-svc`, but the Service is named `nginx`.",
+        "The governing Service name should be `nginx`, not `web-svc`.",
+        "Dangling reference: no Service `web-svc` is defined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the StatefulSet serviceName (line 20) with the Service metadata.name (line 4); should be nginx."
+    },
+    {
+      "id": "spec-0018-d2",
+      "category": "cross-field-inconsistency",
+      "severity": "major",
+      "description": "The StatefulSet selector matchLabels is `app: web`, but its pod template labels are `app: nginx`; a StatefulSet's selector must match its template labels.",
+      "location": {"unit": "StatefulSet.spec.selector.matchLabels", "start": 24, "end": 24},
+      "anchor": "app: web",
+      "paraphrases": [
+        "matchLabels (app: web) does not match the template labels (app: nginx).",
+        "The StatefulSet selects `app: web` but labels its pods `app: nginx`.",
+        "Selector/template label mismatch inside the StatefulSet."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the StatefulSet selector (line 24) with the pod template labels (line 28); should be app: nginx."
+    },
+    {
+      "id": "spec-0018-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "The container's volumeMount references volume `data`, but the StatefulSet's volumeClaimTemplate is named `www`; there is no volume `data`.",
+      "location": {"unit": "StatefulSet...containers.volumeMounts", "start": 37, "end": 37},
+      "anchor": "name: data",
+      "paraphrases": [
+        "The volumeMount name `data` does not match the volumeClaimTemplate `www`.",
+        "volumeMounts.name should be `www`, not `data`.",
+        "Dangling volume reference: the mount names a volume the StatefulSet does not provide."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by comparing the volumeMount name (line 37) with the volumeClaimTemplate name (line 41); should be www."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+diff --git a/src/roman.py b/src/roman.py
+new file mode 100644
+index 0000000..5e7a1b2
+--- /dev/null
++++ b/src/roman.py
+@@ -0,0 +1,26 @@
++"""Convert a Roman numeral string to an integer."""
++
++
++def roman_to_int(roman):
++    """Convert a roman numeral to an integer (input assumed valid, 1-3999).
++
++        >>> roman_to_int("III")
++        3
++        >>> roman_to_int("CLIV")
++        154
++        >>> roman_to_int("MIX")
++        1009
++        >>> roman_to_int("MMMCMXCIX")
++        3999
++    """
++    vals = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
++    total = 0
++    place = 0
++    while place < len(roman):
++        if (place + 1 < len(roman)) and (vals[roman[place]] > vals[roman[place + 1]]):
++            total += vals[roman[place + 1]] - vals[roman[place]]
++            place += 3
++        else:
++            total -= vals[roman[place]]
++            place += 1
++    return total

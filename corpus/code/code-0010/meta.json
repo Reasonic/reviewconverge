@@ -1,0 +1,45 @@
+{
+  "id": "code-0010",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "bubble_sort(): iterative bubble sort (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/sorts/bubble_sort.py#L4",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) `bubble_sort_iterative`, into src/bubble.py (type hints dropped, docstring trimmed). Three independently-findable defects injected in the inner loop (range, comparison, swap); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "off-by-one",
+      "inverted-condition",
+      "wrong-operator"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/bubble.py",
+      "start": 13,
+      "end": 14,
+      "note": "the outer loop and swapped-flag reset are correct"
+    },
+    {
+      "unit": "src/bubble.py",
+      "start": 17,
+      "end": 17,
+      "note": "setting swapped = True is correct"
+    },
+    {
+      "unit": "src/bubble.py",
+      "start": 19,
+      "end": 21,
+      "note": "the early-exit and return are correct"
+    }
+  ],
+  "defect_count": 3
+}

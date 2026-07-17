@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0013",
+  "defects": [
+    {
+      "id": "code-0013-d1",
+      "category": "wrong-operator",
+      "severity": "major",
+      "description": "The odd-bit test uses `exponent & 2` instead of `exponent & 1`, so it inspects the wrong bit and multiplies in the base at the wrong steps.",
+      "location": {"unit": "src/binexp.py", "start": 18, "end": 18},
+      "anchor": "exponent & 2",
+      "paraphrases": [
+        "`exponent & 2` should be `exponent & 1`; it must test the least-significant bit.",
+        "Masking with 2 checks the wrong bit of the exponent.",
+        "The condition inspects bit 1 rather than bit 0, so binary_exp(3,5) is not 243."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `exponent & 1`. Real (wrong bit tested), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0013-d2",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The base is doubled (`base += base`) instead of squared (`base *= base`), so the repeated-squaring step is wrong.",
+      "location": {"unit": "src/binexp.py", "start": 20, "end": 20},
+      "anchor": "base += base",
+      "paraphrases": [
+        "`base += base` should be `base *= base`; each step must square the base.",
+        "Adding the base to itself doubles it rather than squaring it.",
+        "The squaring step uses addition, so the exponentiation is wrong."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `base *= base`. Real (no longer computes a power), findable via the docstring, distinct from the bit test."
+    },
+    {
+      "id": "code-0013-d3",
+      "category": "off-by-one",
+      "severity": "major",
+      "description": "The exponent is shifted right by 2 (`exponent >>= 2`) instead of 1, so it consumes two bits per iteration and skips half of them.",
+      "location": {"unit": "src/binexp.py", "start": 21, "end": 21},
+      "anchor": "exponent >>= 2",
+      "paraphrases": [
+        "`exponent >>= 2` should be `exponent >>= 1`; only one bit is processed per step.",
+        "Shifting by two skips a bit of the exponent each iteration.",
+        "The exponent is halved too aggressively (divided by 4, not 2)."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `exponent >>= 1`. Real (skips exponent bits), findable via the docstring, distinct from the squaring step."
+    }
+  ]
+}

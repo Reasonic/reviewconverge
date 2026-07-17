@@ -1,0 +1,56 @@
+{
+  "id": "spec-0005",
+  "type": "spec",
+  "artifact_file": "artifact.yaml",
+  "title": "Prometheus + Grafana Compose stack (real-derived from docker/awesome-compose)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "CC0-1.0",
+    "url": "https://github.com/docker/awesome-compose/blob/30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562/prometheus-grafana/compose.yaml",
+    "source_ref": "30f4b7f6a6c3b0c0ecf4d4efb0de203c48d11562",
+    "retrieved": "2026-07-05",
+    "attribution": "docker/awesome-compose contributors (CC0-1.0, public domain)",
+    "notes": "Base = the upstream (valid) prometheus-grafana compose.yaml. Three defects injected: a host-port collision, a config-path/mount mismatch, and a dangling named volume. Image and container_name lines are untouched."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "cross-field-inconsistency",
+      "dangling-reference"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "services.prometheus",
+      "start": 3,
+      "end": 4,
+      "note": "prometheus image and container_name are upstream and valid"
+    },
+    {
+      "unit": "services.grafana",
+      "start": 14,
+      "end": 15,
+      "note": "grafana image and container_name are upstream and valid"
+    }
+  ],
+  "known_gray_zone": [
+    {
+      "location": {
+        "unit": "volumes",
+        "start": 25,
+        "end": 25
+      },
+      "note": "The top-level volume `prom_data` is left unused once d3 renames the mount; declared-but-unused, not a seeded defect."
+    },
+    {
+      "location": {
+        "unit": "services.grafana.environment",
+        "start": 21,
+        "end": 21
+      },
+      "note": "GF_SECURITY_ADMIN_PASSWORD is a hardcoded weak password (upstream, untouched). A reviewer may flag it as a security smell; not a seeded defect, so exclude from false-finding scoring."
+    }
+  ],
+  "defect_count": 3
+}

@@ -1,0 +1,50 @@
+{
+  "artifact_id": "paper-0004",
+  "defects": [
+    {
+      "id": "paper-0004-d1",
+      "category": "stat-inconsistency",
+      "severity": "minor",
+      "description": "The rise from 10% to 90% is called 'a gain of 70 percentage points', but 90 - 10 = 80 percentage points.",
+      "location": {"unit": "The long reversal", "start": 7, "end": 8},
+      "anchor": "70 percentage",
+      "paraphrases": [
+        "Going from 10% to 90% is an 80-point gain, not the stated 70.",
+        "The percentage-point gain is miscalculated; 90 minus 10 is 80.",
+        "The literacy improvement is reported as 70 points when the two figures imply 80."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value '80 percentage points' (90 - 10). Findable from the two rates in the same sentence, distinct."
+    },
+    {
+      "id": "paper-0004-d2",
+      "category": "internal-contradiction",
+      "severity": "major",
+      "description": "The text says ~90% of adults are literate yet 'one in five' (20%) remain illiterate; 90% + 20% exceeds 100%, so the literate and illiterate shares are inconsistent.",
+      "location": {"unit": "The long reversal", "start": 6, "end": 6},
+      "anchor": "one in five remain illiterate",
+      "paraphrases": [
+        "90% literate and 20% illiterate cannot both be true (they sum to 110%).",
+        "If 90% are literate, only 10% (one in ten) can be illiterate, not one in five.",
+        "The literate and illiterate percentages overlap impossibly."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'one in ten remain illiterate' (10%, complement of 90%). Findable from the two shares in the same paragraph, distinct."
+    },
+    {
+      "id": "paper-0004-d3",
+      "category": "stat-inconsistency",
+      "severity": "major",
+      "description": "It says more than 95% of youth have basic literacy, 'meaning fewer than 15% cannot read', but the complement of 95% is 5%, not 15%.",
+      "location": {"unit": "Recent progress", "start": 12, "end": 12},
+      "anchor": "fewer than 15%",
+      "paraphrases": [
+        "If over 95% are literate, then under 5% cannot read, not under 15%.",
+        "95% and 'fewer than 15%' do not sum to 100%.",
+        "The illiterate share for youth is inconsistent with the stated 95% literacy."
+      ],
+      "confirmed": true,
+      "rationale": "Correct value 'fewer than 5%' (100 - 95). Findable from the 95% figure in the same sentence, distinct."
+    }
+  ]
+}

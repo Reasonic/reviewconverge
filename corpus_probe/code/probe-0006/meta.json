@@ -1,0 +1,33 @@
+{
+ "id": "probe-0006",
+ "type": "code",
+ "artifact_file": "artifact.diff",
+ "title": "retry (realistic-scale probe)",
+ "recipe_version": "0.1.0",
+ "source": {
+  "origin": "synthetic",
+  "license": "CC-BY-4.0",
+  "url": null,
+  "notes": "Freshly authored for the realistic-scale probe (uncontaminated); defects seeded then human R/F/U-audited & confirmed 2026-07-12. Not derived from any repo."
+ },
+ "construction": {
+  "proposer": "freshly authored (LLM) + LLM-seeded defects; human R/F/U-audited & confirmed 2026-07-12",
+  "transformations": [
+   "inverted-condition",
+   "missing-input-validation",
+   "off-by-one-exponent",
+   "wrong-arithmetic-operator",
+   "wrong-default-return"
+  ]
+ },
+ "clean_regions": [
+  {
+   "unit": "src/retry.py",
+   "start": 1,
+   "end": 1,
+   "note": "module header"
+  }
+ ],
+ "known_gray_zone": [],
+ "defect_count": 5
+}

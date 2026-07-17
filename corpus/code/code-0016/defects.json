@@ -1,0 +1,50 @@
+{
+  "artifact_id": "code-0016",
+  "defects": [
+    {
+      "id": "code-0016-d1",
+      "category": "inverted-condition",
+      "severity": "major",
+      "description": "The inner comparison `collection[k] > collection[min_index]` selects the maximum of the remaining elements instead of the minimum, producing a descending sort; it should be `<`.",
+      "location": {"unit": "src/selsort.py", "start": 16, "end": 16},
+      "anchor": "collection[k] > collection[min_index]",
+      "paraphrases": [
+        "`>` should be `<`; selection sort must find the minimum, not the maximum.",
+        "Tracking the largest element reverses the sort order.",
+        "selection_sort([0,5,3,2,2]) would not be ascending with `>`."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `collection[k] < collection[min_index]`. Real (wrong order), findable via the ascending docstring, distinct."
+    },
+    {
+      "id": "code-0016-d2",
+      "category": "off-by-one",
+      "severity": "minor",
+      "description": "The inner scan `range(i + 1, length - 1)` stops one element early, so the last element is never considered when searching for the minimum.",
+      "location": {"unit": "src/selsort.py", "start": 15, "end": 15},
+      "anchor": "range(i + 1, length - 1)",
+      "paraphrases": [
+        "`range(i + 1, length - 1)` should be `range(i + 1, length)`; the last index is skipped.",
+        "The inner loop omits the final element from the minimum search.",
+        "Off-by-one in the inner range can miss the true minimum."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `range(i + 1, length)`. Real (may miss the minimum), findable via the docstring, distinct."
+    },
+    {
+      "id": "code-0016-d3",
+      "category": "wrong-operator",
+      "severity": "critical",
+      "description": "The minimum index is initialised to `0` instead of the current position `i`, so for later passes it can select an already-sorted element and swap it into place, corrupting the result.",
+      "location": {"unit": "src/selsort.py", "start": 14, "end": 14},
+      "anchor": "min_index = 0",
+      "paraphrases": [
+        "`min_index = 0` should be `min_index = i`; the search must start at the current position.",
+        "Starting the minimum index at 0 lets already-sorted elements be reselected.",
+        "The candidate minimum should be i, not the first element, on every pass."
+      ],
+      "confirmed": true,
+      "rationale": "Upstream is `min_index = i`. Real (corrupts the sorted prefix), findable by reading the pass logic, distinct."
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "code-0004",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "median(): middle value of numeric data (real-derived from CPython)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "PSF-2.0",
+    "url": "https://github.com/python/cpython/blob/55a09ed4227eecbc4a3880637c2250bfc05858ef/Lib/statistics.py#L328",
+    "source_ref": "55a09ed4227eecbc4a3880637c2250bfc05858ef",
+    "retrieved": "2026-07-05",
+    "attribution": "Python Software Foundation",
+    "notes": "Base = the upstream (correct) `statistics.median`, into src/stats.py; the module-specific `StatisticsError` is replaced with `ValueError` so the excerpt is self-contained. Three independently-findable defects injected; upstream form of each mutated line is recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "missing-guard",
+      "off-by-one",
+      "wrong-operator"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/stats.py",
+      "start": 16,
+      "end": 17,
+      "note": "sorting the data and taking its length are correct"
+    },
+    {
+      "unit": "src/stats.py",
+      "start": 20,
+      "end": 20,
+      "note": "the odd/even parity test is correct"
+    },
+    {
+      "unit": "src/stats.py",
+      "start": 23,
+      "end": 23,
+      "note": "the middle index i = n // 2 is correct"
+    }
+  ],
+  "defect_count": 3
+}

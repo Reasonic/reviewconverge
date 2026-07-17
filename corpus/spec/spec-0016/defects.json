@@ -1,0 +1,50 @@
+{
+  "artifact_id": "spec-0016",
+  "defects": [
+    {
+      "id": "spec-0016-d1",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "logstash.depends_on names service `search`, but no such service is defined (the search engine service is named `elasticsearch`).",
+      "location": {"unit": "services.logstash.depends_on", "start": 33, "end": 33},
+      "anchor": "- search",
+      "paraphrases": [
+        "logstash depends on `search`, which is not a defined service (elasticsearch, logstash, kibana).",
+        "depends_on should reference `elasticsearch`, not `search`.",
+        "Dangling service dependency: `search` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking logstash.depends_on against the service list; the service is `elasticsearch`."
+    },
+    {
+      "id": "spec-0016-d2",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "kibana.depends_on names service `store`, but no such service is defined (it should be `elasticsearch`).",
+      "location": {"unit": "services.kibana.depends_on", "start": 43, "end": 43},
+      "anchor": "- store",
+      "paraphrases": [
+        "kibana depends on `store`, which is not a defined service.",
+        "depends_on should reference `elasticsearch`, not `store`.",
+        "Dangling service dependency: `store` is undefined."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking kibana.depends_on against the service list; the service is `elasticsearch`."
+    },
+    {
+      "id": "spec-0016-d3",
+      "category": "dangling-reference",
+      "severity": "major",
+      "description": "kibana.networks references `elk`, which is not declared under the top-level `networks` key (only `elastic` exists).",
+      "location": {"unit": "services.kibana.networks", "start": 45, "end": 45},
+      "anchor": "- elk",
+      "paraphrases": [
+        "kibana joins network `elk`, but only `elastic` is defined.",
+        "The network should be `elastic`, not `elk`.",
+        "Dangling network reference in the kibana service."
+      ],
+      "confirmed": true,
+      "rationale": "Findable by cross-checking kibana.networks against the top-level networks (elastic); elk is undefined."
+    }
+  ]
+}

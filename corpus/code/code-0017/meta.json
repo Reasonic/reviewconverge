@@ -1,0 +1,39 @@
+{
+  "id": "code-0017",
+  "type": "code",
+  "artifact_file": "artifact.diff",
+  "title": "count_set_bits(): population count (real-derived from TheAlgorithms/Python)",
+  "recipe_version": "0.1.0",
+  "source": {
+    "origin": "derived",
+    "license": "MIT",
+    "url": "https://github.com/TheAlgorithms/Python/blob/e3b01ecd1267d39d49b99db9676a653ff197db62/bit_manipulation/count_number_of_one_bits.py#L33",
+    "source_ref": "e3b01ecd1267d39d49b99db9676a653ff197db62",
+    "retrieved": "2026-07-05",
+    "attribution": "TheAlgorithms/Python contributors",
+    "notes": "Base = the upstream (correct) modulo-based set-bit count, into src/popcount.py (renamed count_set_bits, docstring trimmed). Three independently-findable defects injected (bit test, increment, shift); upstream form of each mutated line recorded per defect."
+  },
+  "construction": {
+    "proposer": "opus-4.8 (proposed); audited & confirmed 2026-07-05 via oracle audit (validator + anchor-resolution + real/findable/unique pass, docs/oracle-audit-2026-07-05.md) with a targeted human audit of ambiguous/interacting defects and all gray zones (docs/human-audit-checklist)",
+    "transformations": [
+      "inverted-condition",
+      "wrong-operator",
+      "off-by-one"
+    ]
+  },
+  "clean_regions": [
+    {
+      "unit": "src/popcount.py",
+      "start": 14,
+      "end": 16,
+      "note": "the negative guard and result initialization are correct"
+    },
+    {
+      "unit": "src/popcount.py",
+      "start": 21,
+      "end": 21,
+      "note": "the return statement is correct"
+    }
+  ],
+  "defect_count": 3
+}

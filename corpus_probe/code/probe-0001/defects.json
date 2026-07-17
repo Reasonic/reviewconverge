@@ -1,0 +1,80 @@
+{
+ "defects": [
+  {
+   "id": "probe-0001-d1",
+   "category": "wrong operator",
+   "severity": "critical",
+   "description": "`_weekday_cron` subtracts 1 rather than adding 1 when converting `datetime.weekday()` (Mon=0) to cron's Sun=0 numbering, shifting every weekday by two so day-of-week matching is systematically wrong.",
+   "location": {
+    "unit": "src/cron.py",
+    "start": 220,
+    "end": 220
+   },
+   "anchor": "return (moment.weekday() - 1) % 7",
+   "paraphrases": [
+    "The Mon=0 to Sun=0 remap is off: it uses `weekday() - 1`, so Monday maps to 6 and Friday to 3, corrupting which cron dow value each real weekday satisfies.",
+    "Cron numbers Sunday as 0, but this conversion decrements instead of incrementing the Python weekday, so a `mon-fri` schedule no longer lines up with actual Monday-through-Friday.",
+    "The sign of the weekday offset is inverted, giving every timestamp the wrong cron day-of-week index."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'return (moment.weekday() + 1) % 7'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0001-d2",
+   "category": "wrong boolean operator",
+   "severity": "critical",
+   "description": "`_day_matches` selects the OR (either-matches) branch with `or` instead of `and`, so whenever only one of day-of-month / day-of-week is restricted it wrongly uses either-matches semantics and the wildcard side (always true) makes the real restriction meaningless.",
+   "location": {
+    "unit": "src/cron.py",
+    "start": 161,
+    "end": 161
+   },
+   "anchor": "if self.dom_restricted or self.dow_restricted:",
+   "paraphrases": [
+    "The Vixie both-days rule should switch to 'either matches' only when both day fields are constrained, but the connector was changed so a single restricted day field also triggers it, letting the unrestricted field's blanket match swallow the constraint.",
+    "Because the branch predicate ORs the two 'restricted' flags, an expression like `0 0 1-5 * *` matches every day of the month instead of just days 1-5.",
+    "Day-of-month and day-of-week are combined with 'or-match' logic even when just one of them is set, effectively disabling that lone restriction."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'if self.dom_restricted and self.dow_restricted:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0001-d3",
+   "category": "wrong comparison",
+   "severity": "major",
+   "description": "`_advance_month` tests for month 11 instead of 12 as the year boundary, so November wrongly rolls straight to January (skipping December) and a December input falls through to a month-13 replace, so December schedules are never produced.",
+   "location": {
+    "unit": "src/cron.py",
+    "start": 228,
+    "end": 228
+   },
+   "anchor": "if dt.month == 11:",
+   "paraphrases": [
+    "The end-of-year check fires one month early: at November it jumps to the next January, so December is silently stepped over and never scheduled.",
+    "December (month 12) fails the year-rollover test because the constant is 11, leaving the fallback `replace(month=dt.month + 1)` to attempt an invalid month 13.",
+    "The wrap-to-next-year guard uses the wrong month number, causing the month advance to bypass December entirely."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'if dt.month == 12:'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  },
+  {
+   "id": "probe-0001-d4",
+   "category": "off-by-one",
+   "severity": "minor",
+   "description": "In the wrap-around branch of `_materialize_range` the lower segment uses `range(low, stop)` instead of `range(low, stop + 1)`, so a range that wraps past the field maximum (e.g. hours `22-2`) omits its final endpoint value.",
+   "location": {
+    "unit": "src/cron.py",
+    "start": 107,
+    "end": 107
+   },
+   "anchor": "wrapped = list(range(start, high + 1)) + list(range(low, stop))",
+   "paraphrases": [
+    "The second half of a wrapped range is built with an exclusive upper bound, dropping the `stop` value itself, so `22-2` yields hours 22,23,0,1 and loses hour 2.",
+    "When a range crosses the field's high/low seam, the tail segment is short by one because `stop + 1` was reduced to `stop`, excluding the wrap endpoint.",
+    "Overnight-style ranges silently lose their closing value since the low-side `range(...)` no longer includes `stop`."
+   ],
+   "confirmed": true,
+   "rationale": "Correct form: 'wrapped = list(range(start, high + 1)) + list(range(low, stop + 1))'. LLM-seeded; human R/F/U-audited & confirmed 2026-07-12."
+  }
+ ]
+}
