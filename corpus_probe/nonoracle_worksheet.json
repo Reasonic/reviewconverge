@@ -1,0 +1,625 @@
+{
+ "schema": "nonoracle-worksheet-v1",
+ "items": [
+  {
+   "id": "single-mem:probe-0001:1",
+   "arm": "memory",
+   "module": "probe-0001",
+   "weight": 1,
+   "claim": "In `_materialize_range`, the premature mapping of 7 to 0 for the `dow` field corrupts ranges that include the value 7 (e.g., `\"0-7\"` becomes `[0]` instead of `[0,1,2,3,4,5,6,7]`).",
+   "location": "src/cron.py:98-99"
+  },
+  {
+   "id": "single-mem:probe-0001:2",
+   "arm": "memory",
+   "module": "probe-0001",
+   "weight": 1,
+   "claim": "`_is_restricted` does not treat a comma list containing a bare `*` as unrestricted",
+   "location": "src/cron.py:211-212"
+  },
+  {
+   "id": "single-mem:probe-0001:3",
+   "arm": "memory",
+   "module": "probe-0001",
+   "weight": 1,
+   "claim": "In _materialize_range for the 'dow' field, mapping both 7 and 0 to 0 causes ranges like '0-7' (or any range that includes both 0 and 7) to collapse to only Sunday, losing all other days.",
+   "location": "src/cron.py:97-99"
+  },
+  {
+   "id": "single-mem:probe-0001:4",
+   "arm": "memory",
+   "module": "probe-0001",
+   "weight": 1,
+   "claim": "The search limit of about 8 years may be too short for very sparse schedules like '0 0 29 feb *', causing a spurious ValueError.",
+   "location": "src/cron.py:177-177"
+  },
+  {
+   "id": "single-mem:probe-0001:5",
+   "arm": "memory",
+   "module": "probe-0001",
+   "weight": 1,
+   "claim": "The `_advance_month` function always resets day, hour, and minute to 1, 0, 0 when advancing to the next month, which is not a correctness bug but may cause redundant checks.",
+   "location": "src/cron.py:228-230"
+  },
+  {
+   "id": "single-mem:probe-0002:6",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 1,
+   "claim": "In `_Cursor.advance`, the method increments `self.line` only on `'\\n'`, not on `'\\r'`; standalone `\\r` line endings cause incorrect line numbers in `CSVFormatError`.",
+   "location": "src/csv_reader.py:128-128"
+  },
+  {
+   "id": "single-mem:probe-0002:7",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 1,
+   "claim": "A quote character that appears after unquoted content (e.g., `a\"b\"`) is silently treated as a literal character, violating standard CSV quoting rules.",
+   "location": "src/csv_reader.py:155-155"
+  },
+  {
+   "id": "single-mem:probe-0002:8",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 2,
+   "claim": "Line 65 unconditionally strips unquoted fields before coercion, ignoring the `trim_unquoted` setting, contradicting intended behavior.",
+   "location": "src/csv_reader.py:65-65"
+  },
+  {
+   "id": "single-mem:probe-0002:9",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 1,
+   "claim": "When dialect.coerce is False, _coerce_scalar returns raw immediately without stripping, so unquoted fields are never stripped even if trim_unquoted is True; trim_unquoted flag is dead in this code path.",
+   "location": "src/csv_reader.py:62-63"
+  },
+  {
+   "id": "single-mem:probe-0002:10",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 1,
+   "claim": "Blank‑line detection fails for whitespace‑only lines",
+   "location": "src/csv_reader.py:173-178"
+  },
+  {
+   "id": "single-mem:probe-0002:11",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 2,
+   "claim": "Parser does not reject garbage after a closed quoted field before a delimiter or end-of-record, silently appending it to the field content.",
+   "location": "src/csv_reader.py:155-183"
+  },
+  {
+   "id": "single-mem:probe-0002:12",
+   "arm": "memory",
+   "module": "probe-0002",
+   "weight": 1,
+   "claim": "Mutable list sharing in _resolve_dialect: merged dictionary stores references to base dialect's token lists, causing the new Dialect to share the same list objects.",
+   "location": "src/csv_reader.py:223-234"
+  },
+  {
+   "id": "single-mem:probe-0003:13",
+   "arm": "memory",
+   "module": "probe-0003",
+   "weight": 1,
+   "claim": "paginate and walk assume items is re‑iterable without materializing it, causing silent data loss if a single‑use iterator is passed.",
+   "location": "src/cursor_pager.py:169-176"
+  },
+  {
+   "id": "single-mem:probe-0003:14",
+   "arm": "memory",
+   "module": "probe-0003",
+   "weight": 2,
+   "claim": "`decode_cursor` does not validate that the envelope's `'b'` field is a string, causing an unhandled `TypeError` if a crafted token supplies a non-string value.",
+   "location": "src/cursor_pager.py:96-96"
+  },
+  {
+   "id": "single-mem:probe-0003:15",
+   "arm": "memory",
+   "module": "probe-0003",
+   "weight": 1,
+   "claim": "The checksum used for tamper detection offers no real security; _checksum uses a fixed, public string (_SECRET_TAG) without secret key, so anyone can recompute a valid checksum.",
+   "location": "src/cursor_pager.py:48-50"
+  },
+  {
+   "id": "single-mem:probe-0004:16",
+   "arm": "memory",
+   "module": "probe-0004",
+   "weight": 2,
+   "claim": "The __main__ test block contains assertions that are inconsistent with the current implementation and will fail.",
+   "location": "src/interval_scheduler.py:166-174"
+  },
+  {
+   "id": "single-mem:probe-0005:17",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 3,
+   "claim": "ttl_remaining() can return 0.0 for a live key, contradicting its documentation.",
+   "location": "src/lru_ttl_cache.py:226-240"
+  },
+  {
+   "id": "single-mem:probe-0005:18",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 2,
+   "claim": "stats() returns size as len(self._store) which includes expired entries, but docstring says 'current live size'.",
+   "location": "src/lru_ttl_cache.py:255-255"
+  },
+  {
+   "id": "single-mem:probe-0005:19",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 1,
+   "claim": "Non-integer capacity is silently truncated, violating the documented requirement that capacity must be a positive integer.",
+   "location": "src/lru_ttl_cache.py:109-109"
+  },
+  {
+   "id": "single-mem:probe-0005:20",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 2,
+   "claim": "__len__ counts expired entries, inconsistent with __contains__ and items().",
+   "location": "src/lru_ttl_cache.py:260-260"
+  },
+  {
+   "id": "single-mem:probe-0005:21",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 2,
+   "claim": "keys_by_recency() yields expired keys despite claiming 'live keys' in its docstring",
+   "location": "keys_by_recency:265-272"
+  },
+  {
+   "id": "single-mem:probe-0005:22",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 1,
+   "claim": "_resolve_deadline (and consequently `set`/`get_or_set`) does not validate the type of the `ttl` argument, causing a `TypeError` when a non‑numeric value is passed.",
+   "location": "src/lru_ttl_cache.py:119-126"
+  },
+  {
+   "id": "single-mem:probe-0005:23",
+   "arm": "memory",
+   "module": "probe-0005",
+   "weight": 1,
+   "claim": "Passing a zero ttl to `set` or `get_or_set` raises a ValueError that is not documented at the call site.",
+   "location": "src/lru_ttl_cache.py:124-124"
+  },
+  {
+   "id": "single-mem:probe-0006:24",
+   "arm": "memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "No validation of deadline in RetryPolicy.__post_init__; a negative deadline can cause ValueError when passed to sleep.",
+   "location": "src/retry.py:116-125"
+  },
+  {
+   "id": "single-mem:probe-0006:25",
+   "arm": "memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "Lines 200‑205 are unreachable because retryable is always True when execution reaches that point.",
+   "location": "run_with_policy:200-205"
+  },
+  {
+   "id": "single-mem:probe-0006:26",
+   "arm": "memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "RetryError may report a stale last_exception when the last failure was a retryable result, because last_exc is updated only on exception and not for retryable results.",
+   "location": "src/retry.py:187-241"
+  },
+  {
+   "id": "single-mem:probe-0006:27",
+   "arm": "memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "Deadline logic can produce a negative delay when elapsed > deadline.",
+   "location": "src/retry.py:221-223"
+  },
+  {
+   "id": "single-mem:probe-0006:28",
+   "arm": "memory",
+   "module": "probe-0006",
+   "weight": 2,
+   "claim": "Documentation inconsistency: the docstring for `_raw_backoff` claims it is “uncapped”, but the method applies `min(delay, self.max_delay)` to cap the delay.",
+   "location": "src/retry.py:128-130"
+  },
+  {
+   "id": "single-mem:probe-0006:29",
+   "arm": "memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "Dead code in `run_with_policy` lines 200–205 is unreachable, creating a logical inconsistency.",
+   "location": "src/retry.py:200-205"
+  },
+  {
+   "id": "single-mem:probe-0007:30",
+   "arm": "memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "The `__main__` smoke test does not pass when run against the actual code.",
+   "location": "src/rolling_stats.py:209-238"
+  },
+  {
+   "id": "single-mem:probe-0007:31",
+   "arm": "memory",
+   "module": "probe-0007",
+   "weight": 3,
+   "claim": "The `add` method incorrectly handles out-of-order samples: the else branch (lines 70-73) unconditionally appends them without checking if they are older than the window and resets `_latest_ts` to an older timestamp, violating the sorted order and the documented drop behavior.",
+   "location": "src/rolling_stats.py:70-73"
+  },
+  {
+   "id": "single-mem:probe-0007:32",
+   "arm": "memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "`variance()` raises `EmptyWindowError` for `n==0`, but the docstring says it returns `0` when fewer than 2.",
+   "location": "src/rolling_stats.py:179-180"
+  },
+  {
+   "id": "single-mem:probe-0007:33",
+   "arm": "memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "_insert_ordered assumes the deque is sorted, but the invariant is broken by Issue 3",
+   "location": "src/rolling_stats.py:78-82"
+  },
+  {
+   "id": "single-mem:probe-0007:34",
+   "arm": "memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "Early-rejection of old samples only applies to samples newer than _latest_ts; out-of-order arrivals bypass the horizon check",
+   "location": "src/rolling_stats.py:66-68"
+  },
+  {
+   "id": "single-mem:probe-0007:35",
+   "arm": "memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "The __main__ block (lines 208-238) asserts correct sliding-window behavior but due to issue #1 (_latest_ts never updated) no evictions occur, causing the assertions (count==10, min==1.0) to fail.",
+   "location": "src/rolling_stats.py:208-238"
+  },
+  {
+   "id": "single-mem:probe-0008:36",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "Prerelease identifiers with leading zeros (e.g., `01`) are accepted as alphanumeric strings rather than being rejected or parsed as integers.",
+   "location": "src/semver.py:114-119"
+  },
+  {
+   "id": "single-mem:probe-0008:37",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "SemVer 2.0.0 requires numeric identifiers to be composed of ASCII digits only. Accepting non‑ASCII digits violates the spec and could cause unexpected parsing of version strings like `1.२.3`.",
+   "location": "src/semver.py:21-24"
+  },
+  {
+   "id": "single-mem:probe-0008:38",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "The class docstring says “Build metadata is retained for round‑tripping,” but the method removes it. If a version like `1.2.3+build.1` loses its build, the round‑trip guarantee is broken.",
+   "location": "src/semver.py:81-81"
+  },
+  {
+   "id": "single-mem:probe-0008:39",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 2,
+   "claim": "Build metadata is not validated; identifiers may contain characters outside the allowed `[0-9A-Za-z-]` set, and empty parts from a double dot in the build string are stored as empty strings.",
+   "location": "src/semver.py:57-57"
+  },
+  {
+   "id": "single-mem:probe-0008:40",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 2,
+   "claim": "The regex `_CORE_RE` does not validate leading zeros in the major, minor, and patch components, allowing invalid versions like '01.2.3'.",
+   "location": "src/semver.py:20-24"
+  },
+  {
+   "id": "single-mem:probe-0008:41",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 2,
+   "claim": "Empty string in a version fragment may be incorrectly parsed as a wildcard component.",
+   "location": "src/semver.py:181-181"
+  },
+  {
+   "id": "single-mem:probe-0008:42",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "There is an inconsistency in how leading zeros are handled between the operator path and the plain‑term path in `_parse_comparator_term`.",
+   "location": "src/semver.py:243-248"
+  },
+  {
+   "id": "single-mem:probe-0008:43",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "The parser for partial ranges (`_parse_partial`) normalises leading zeros instead of rejecting them, creating an inconsistency with the strict `Version.parse`.",
+   "location": "src/semver.py:183-184"
+  },
+  {
+   "id": "single-mem:probe-0008:44",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "The function accepts identifiers like `\"01\"` as a string instead of raising an error, violating the SemVer 2.0.0 rule that numeric identifiers MUST NOT have leading zeros.",
+   "location": "src/semver.py:114-118"
+  },
+  {
+   "id": "single-mem:probe-0008:45",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "In `_split_prerelease`, a numeric identifier like `01` does not match `_NUMERIC_RE` and is treated as a string, but SemVer forbids leading zeros; should raise `InvalidVersion`.",
+   "location": "src/semver.py:107-120"
+  },
+  {
+   "id": "single-mem:probe-0008:46",
+   "arm": "memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "Leading zeros in numeric version components are accepted; the regex and parsing code should reject them per SemVer 2.0.0.",
+   "location": "src/semver.py:21-24"
+  },
+  {
+   "id": "single-mem:probe-0009:47",
+   "arm": "memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "prune_full removes buckets when level >= capacity, which can discard excess burst tokens that are not yet at steady capacity.",
+   "location": "src/token_bucket.py:216-216"
+  },
+  {
+   "id": "single-mem:probe-0009:48",
+   "arm": "memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "`_advance` resets `bucket.last_refill` to `now` when the clock goes backwards (lines 118–120). On a negative `elapsed`, the code sets `last_refill = now` without updating the level. This can cause subsequent refill calculations to count extra elapsed time and over‑credit tokens.",
+   "location": "src/token_bucket.py:118-120"
+  },
+  {
+   "id": "single-mem:probe-0009:49",
+   "arm": "memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "No check that cost does not exceed the bucket's burst in the normal path of allow: if cost is larger than bucket.burst but smaller than self._burst, retry_after is computed incorrectly (finite instead of infinite).",
+   "location": "src/token_bucket.py:152-173"
+  },
+  {
+   "id": "single-mem:probe-0009:50",
+   "arm": "memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "_level_snapshot returns bucket.level without advancing, yielding a stale value.",
+   "location": "src/token_bucket.py:175-180"
+  },
+  {
+   "id": "single-mem:probe-0009:51",
+   "arm": "memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "Snapshot in the impossible-cost branch may return a stale token count.",
+   "location": "src/token_bucket.py:138-142"
+  },
+  {
+   "id": "single-mem:probe-0009:52",
+   "arm": "memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "prune_full permanently loses per-key overrides.",
+   "location": "src/token_bucket.py:204-219"
+  },
+  {
+   "id": "single-mem:probe-0010:53",
+   "arm": "memory",
+   "module": "probe-0010",
+   "weight": 1,
+   "claim": "Lines 64-66 silently discard self-loops, preventing detection of cycles that include a self-loop, contradicting the documented promise to always report cycles.",
+   "location": "src/topo.py:64-66"
+  },
+  {
+   "id": "single-mem:probe-0010:54",
+   "arm": "memory",
+   "module": "probe-0010",
+   "weight": 2,
+   "claim": "Self‑dependencies are silently removed, masking a cycle.",
+   "location": "_normalize:65-67"
+  },
+  {
+   "id": "single-nomem:probe-0001:55",
+   "arm": "no-memory",
+   "module": "probe-0001",
+   "weight": 1,
+   "claim": "_materialize_range mishandles the day-of-week alias `7` (Sunday) when it appears inside a range specification.",
+   "location": "src/cron.py:97-99"
+  },
+  {
+   "id": "single-nomem:probe-0002:56",
+   "arm": "no-memory",
+   "module": "probe-0002",
+   "weight": 1,
+   "claim": "Even if the trimming bug in _finish_field is fixed, _coerce_scalar returns the original unstripped raw for unrecognized unquoted tokens, inconsistent with trim_unquoted.",
+   "location": "src/csv_reader.py:56-77"
+  },
+  {
+   "id": "single-nomem:probe-0003:57",
+   "arm": "no-memory",
+   "module": "probe-0003",
+   "weight": 1,
+   "claim": "_constant_time_equals uses bitwise AND (`&=`) instead of OR (`|=`), so the function always returns `True` when the strings are the same length, completely defeating checksum validation.",
+   "location": "_constant_time_equals:115-118"
+  },
+  {
+   "id": "single-nomem:probe-0003:58",
+   "arm": "no-memory",
+   "module": "probe-0003",
+   "weight": 1,
+   "claim": "paginate uses the extra look‑ahead item (the first item of the next page) to build the `next_cursor`, so the next page will skip that item entirely.",
+   "location": "paginate:211-213"
+  },
+  {
+   "id": "single-nomem:probe-0005:59",
+   "arm": "no-memory",
+   "module": "probe-0005",
+   "weight": 1,
+   "claim": "capacity parameter is not validated to be an integer",
+   "location": "src/lru_ttl_cache.py:104-109"
+  },
+  {
+   "id": "single-nomem:probe-0005:60",
+   "arm": "no-memory",
+   "module": "probe-0005",
+   "weight": 1,
+   "claim": "ttl_remaining can return 0.0 for a live key, contradicting the docstring",
+   "location": "ttl_remaining method:229-240"
+  },
+  {
+   "id": "single-nomem:probe-0006:61",
+   "arm": "no-memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "_raw_backoff docstring says it returns uncapped backoff, but implementation caps at max_delay.",
+   "location": "src/retry.py:127-130"
+  },
+  {
+   "id": "single-nomem:probe-0006:62",
+   "arm": "no-memory",
+   "module": "probe-0006",
+   "weight": 2,
+   "claim": "Dead (unreachable) code in `run_with_policy` at the `if not retryable:` block.",
+   "location": "src/retry.py:200-205"
+  },
+  {
+   "id": "single-nomem:probe-0006:63",
+   "arm": "no-memory",
+   "module": "probe-0006",
+   "weight": 1,
+   "claim": "The implementation of \"equal\" jitter in `_apply_jitter` does not match the documented formula.",
+   "location": "_apply_jitter:139-139"
+  },
+  {
+   "id": "single-nomem:probe-0007:64",
+   "arm": "no-memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "In `add()`, the else branch (line 73) sets `self._latest_ts = ts` even when `ts <= self._latest_ts`, overriding the true newest timestamp with an older value and corrupting the window definition.",
+   "location": "src/rolling_stats.py:73-73"
+  },
+  {
+   "id": "single-nomem:probe-0007:65",
+   "arm": "no-memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "_insert_ordered extracts all timestamps into a list and uses bisect, making insertion O(n) and inefficient for a deque.",
+   "location": "src/rolling_stats.py:79-81"
+  },
+  {
+   "id": "single-nomem:probe-0007:66",
+   "arm": "no-memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "add() appends out‑of‑order samples at the end without sorting",
+   "location": "src/rolling_stats.py:71-71"
+  },
+  {
+   "id": "single-nomem:probe-0007:67",
+   "arm": "no-memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "`_insert_ordered` assumes the deque is sorted, but due to issue #2 the deque may not be sorted, resulting in incorrect insertion positions.",
+   "location": "src/rolling_stats.py:79-81"
+  },
+  {
+   "id": "single-nomem:probe-0007:68",
+   "arm": "no-memory",
+   "module": "probe-0007",
+   "weight": 1,
+   "claim": "The `else` branch of `add` does not check whether the incoming sample is older than the window, violating the documented drop‑and‑return‑`False` behavior.",
+   "location": "src/rolling_stats.py:70-73"
+  },
+  {
+   "id": "single-nomem:probe-0008:69",
+   "arm": "no-memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "_caret_bounds computes an incorrect upper bound for `^0.0.x` (wildcard patch).",
+   "location": "src/semver.py:214-215"
+  },
+  {
+   "id": "single-nomem:probe-0008:70",
+   "arm": "no-memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "Prerelease identifiers with leading zeros (e.g., '01') are accepted as alphanumeric strings instead of being rejected as invalid.",
+   "location": "src/semver.py:114-118"
+  },
+  {
+   "id": "single-nomem:probe-0008:71",
+   "arm": "no-memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "No check for empty components (e.g., 1.2.3+build..1) leads to tuples with empty strings, invalid under SemVer.",
+   "location": "src/semver.py:56-57"
+  },
+  {
+   "id": "single-nomem:probe-0008:72",
+   "arm": "no-memory",
+   "module": "probe-0008",
+   "weight": 1,
+   "claim": "Leading zeros are allowed in numeric version components, violating SemVer 2.0.0.",
+   "location": "src/semver.py:20-24"
+  },
+  {
+   "id": "single-nomem:probe-0009:73",
+   "arm": "no-memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "`_level_snapshot` in early-return path does not advance the bucket, leading to stale remaining value.",
+   "location": "src/token_bucket.py:140-140"
+  },
+  {
+   "id": "single-nomem:probe-0009:74",
+   "arm": "no-memory",
+   "module": "probe-0009",
+   "weight": 1,
+   "claim": "`prune_full` deletes buckets that have accumulated burst headroom, not just those at steady capacity.",
+   "location": "src/token_bucket.py:216-216"
+  },
+  {
+   "id": "single-nomem:probe-0010:75",
+   "arm": "no-memory",
+   "module": "probe-0010",
+   "weight": 2,
+   "claim": "Self-dependencies are silently removed in _normalize, so a 1-node cycle is not reported as a cycle, violating the documented promise.",
+   "location": "_normalize:65-66"
+  },
+  {
+   "id": "single-nomem:probe-0010:76",
+   "arm": "no-memory",
+   "module": "probe-0010",
+   "weight": 1,
+   "claim": "Because topo_sort does not raise CycleError (see issue 1), a cyclic graph produces an incomplete order. When levels tries to compute depth[dep] for a dependency that was never placed in order, a KeyError occurs.",
+   "location": "src/topo.py:179-187"
+  },
+  {
+   "id": "single-nomem:probe-0010:77",
+   "arm": "no-memory",
+   "module": "probe-0010",
+   "weight": 1,
+   "claim": "The smoke test fails because of the above bugs: the test expects find_cycle to return a non‑None cycle and topo_sort to raise CycleError; both expectations are violated.",
+   "location": "src/topo.py:229-236"
+  }
+ ],
+ "occurrences": {
+  "single-mem": 70,
+  "single-nomem": 25
+ }
+}
