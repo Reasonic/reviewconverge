@@ -8,8 +8,9 @@ abstract: >-
   against seeded ground truth, and compares workflow interventions that make the
   loop converge to a correct fixed point.
 type: software
-version: 0.0.1
-date-released: 2026-01-01
+version: 1.0.0
+date-released: 2026-07-16
+doi: 10.5281/zenodo.21420577
 license: MIT
 keywords:
   - large language models
